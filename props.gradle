@@ -1,0 +1,30 @@
+ext {
+    deps = [
+            'androidx.appcompat:appcompat'                    : 'androidx.appcompat:appcompat:1.5.1',
+            'androidx.core:core-ktx'                          : 'androidx.core:core-ktx:1.9.0',
+            'androidx.constraintlayout:constraintlayout'      : 'androidx.constraintlayout:constraintlayout:2.1.3',
+            "androidx.lifecycle:lifecycle-viewmodel-ktx"      : "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1",
+            'com.google.android.material:material'            : 'com.google.android.material:material:1.7.0',
+            'com.google.code.gson:gson'                       : 'com.google.code.gson:gson:2.10',
+            'de.robv.android.xposed:api'                      : 'de.robv.android.xposed:api:82',
+            'com.kyleduo.switchbutton:library'                : 'com.kyleduo.switchbutton:library:2.1.0',
+            // Flex布局依赖，可配合RecyclerView也可以单独使用
+            // https://mvnrepository.com/artifact/com.google.android.flexbox/flexbox
+            'com.google.android.flexbox:flexbox'              : 'com.google.android.flexbox:flexbox:3.0.0',
+            'com.tencent:mmkv-static'                         : 'com.tencent:mmkv-static:1.2.12',
+            'junit:junit'                                     : 'junit:junit:4.13.2',
+            'androidx.test.ext:junit'                         : 'androidx.test.ext:junit:1.1.3',
+            'androidx.test.espresso:espresso-core'            : 'androidx.test.espresso:espresso-core:3.5.0',
+            "com.blankj:utilcodex"                            : "com.blankj:utilcodex:1.31.1",
+            'org.jetbrains.kotlinx:kotlinx-coroutines-android': 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4',
+
+            'com.amap.api:map2d'                              : 'com.amap.api:map2d:6.0.0',
+            'com.amap.api:location'                           : 'com.amap.api:location:6.2.0',
+            'com.amap.api:search'                             : 'com.amap.api:search:9.5.0',
+
+            'com.github.Mingyueyixi:frame-base-utils'         : 'com.github.Mingyueyixi:frame-base-utils:main-SNAPSHOT',
+            'com.github.Mingyueyixi:frame-ui'                 : 'com.github.Mingyueyixi:frame-ui:main-SNAPSHOT',
+            'com.github.Mingyueyixi:frame-multi-preference'   : 'com.github.Mingyueyixi:frame-multi-preference:main-SNAPSHOT',
+
+    ]
+}

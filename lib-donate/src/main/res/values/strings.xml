@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="donate_save_fail">保存失败</string>
+    <string name="donate_save_success">保存成功</string>
+</resources>
