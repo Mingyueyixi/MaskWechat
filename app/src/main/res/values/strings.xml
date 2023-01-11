@@ -6,6 +6,8 @@
     <string name="module_version">模块版本</string>
     <string name="donate">捐赠</string>
     <string name="config_manager">配置管理</string>
-    <string name="click_here_to_manager">点击此处进行配置</string>
+    <string name="config_add">添加配置</string>
+    <string name="click_here_to_manager">点击此处管理配置</string>
+    <string name="click_here_to_add">点击添加配置</string>
     <string name="donate_description">万水千山总是情，打赏一点也是情</string>
 </resources>

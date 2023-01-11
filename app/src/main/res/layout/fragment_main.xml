@@ -51,7 +51,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/clModuleConfig"
+        android:id="@+id/clAddConfig"
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:layout_marginHorizontal="24dp"
@@ -60,41 +60,85 @@
         app:layout_constraintTop_toBottomOf="@+id/clModuleState">
 
         <ImageView
-            android:id="@+id/ivModuleConfig"
+            android:id="@+id/ivAddConfig"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginHorizontal="16dp"
-            android:src="@drawable/ic_icon_download"
+            android:src="@drawable/ic_icon_add"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
 
         <TextView
-            android:id="@+id/tvModuleConfigTitle"
+            android:id="@+id/tvAddConfigTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:gravity="left"
+            android:text="@string/config_add"
+            app:layout_constraintBottom_toTopOf="@+id/tvAddConfigSub"
+            app:layout_constraintStart_toEndOf="@+id/ivAddConfig"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <TextView
+            android:id="@+id/tvAddConfigSub"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:text="@string/click_here_to_add"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/tvAddConfigTitle"
+            app:layout_constraintTop_toBottomOf="@+id/tvAddConfigTitle"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clManagerConfig"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/clAddConfig">
+
+        <ImageView
+            android:id="@+id/ivManagerConfig"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginHorizontal="16dp"
+            android:src="@drawable/ic_icon_manager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <TextView
+            android:id="@+id/tvManagerConfigTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:gravity="left"
             android:text="@string/config_manager"
-            app:layout_constraintBottom_toTopOf="@+id/tvModuleConfigSub"
-            app:layout_constraintStart_toEndOf="@+id/ivModuleConfig"
+            app:layout_constraintBottom_toTopOf="@+id/tvManagerConfigSub"
+            app:layout_constraintStart_toEndOf="@+id/ivManagerConfig"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed" />
 
         <TextView
-            android:id="@+id/tvModuleConfigSub"
+            android:id="@+id/tvManagerConfigSub"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="left"
             android:text="@string/click_here_to_manager"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/tvModuleConfigTitle"
-            app:layout_constraintTop_toBottomOf="@+id/tvModuleConfigTitle"
+            app:layout_constraintStart_toStartOf="@+id/tvManagerConfigTitle"
+            app:layout_constraintTop_toBottomOf="@+id/tvManagerConfigTitle"
             app:layout_constraintVertical_chainStyle="packed" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/clModuleDonate"
@@ -103,7 +147,7 @@
         android:layout_marginHorizontal="24dp"
         android:layout_marginTop="24dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/clModuleConfig">
+        app:layout_constraintTop_toBottomOf="@+id/clManagerConfig">
 
         <ImageView
             android:id="@+id/ivModuleDonate"

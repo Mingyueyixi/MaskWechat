@@ -1,38 +1,31 @@
 package com.lu.wxmask.plugin
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
-import android.content.DialogInterface
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.TextView
-import com.google.gson.JsonObject
-import com.lu.magic.frame.baseutils.kxt.optBoolean
-import com.lu.magic.util.GsonUtil
-import com.lu.magic.util.ToastUtil
+import com.lu.magic.util.ReflectUtil
 import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.bean.MaskItemBean
-import com.lu.wxmask.bean.MaskItemBean.AlertTipData
-import com.lu.wxmask.util.ConfigUtil.Companion.getMaskList
+import com.lu.wxmask.util.ConfigUtil
 import com.lu.wxmask.util.ConfigUtil.Companion.registerConfigSetObserver
 import com.lu.wxmask.util.ConfigUtil.ConfigSetObserver
-import com.lu.wxmask.util.TextCheckUtil
-import de.robv.android.xposed.XC_MethodHook.MethodHookParam
-import de.robv.android.xposed.XC_MethodReplacement
-import de.robv.android.xposed.XposedBridge
+import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedHelpers
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam
 
 class WXMaskPlugin : IPlugin, ConfigSetObserver {
-    private var keywordList = getKeywordList()
-    private fun getKeywordList(): Array<String?> {
-        val maskList = getMaskList()
+    private var maskIdList = getMaskIdList()
+    private fun getMaskIdList(): Array<String?> {
+        val maskList = ConfigUtil.getMaskList()
         val ret = arrayOfNulls<String>(maskList.size)
         for (i in maskList.indices) {
-            ret[i] = maskList[i].keyWord
+            ret[i] = maskList[i].maskId
         }
         return ret
     }
@@ -42,55 +35,152 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
     }
 
     override fun onConfigChange() {
-        //实时更新keywordList的值
-        keywordList = getKeywordList()
+        //实时更新id的值
+        maskIdList = getMaskIdList()
     }
 
     override fun handleHook(context: Context, lpparam: LoadPackageParam) {
+//        handleViewClick(context, lpparam)
+        handleChattingUIFragment(context, lpparam)
+    }
+
+    private fun handleChattingUIFragment(context: Context, lpparam: LoadPackageParam) {
+
         XposedHelpers.findAndHookMethod(
-            View::class.java,
-            "performClick",
-            object : XC_MethodReplacement() {
-                @Throws(Throwable::class)
-                override fun replaceHookedMethod(param: MethodHookParam): Any {
-                    val view = param.thisObject as View
-                    if ("com.tencent.mm.ui.conversation.ConversationFolderItemView" != view.javaClass.name) {
-                        return XposedBridge.invokeOriginalMethod(param.method, param.thisObject, param.args)
-                    }
-                    val index = TextCheckUtil.haveMatchText(view, *keywordList)
-                    if (index > -1) {
-                        LogUtil.w("WXMaskPlugin replace performCLick")
-                        val maskList = getMaskList()
-                        val item = maskList[index]
-                        handleMaskItem(param, view, item)
-                        LogUtil.w(GsonUtil.toJson(item))
-                        return false
-                    }
-                    return XposedBridge.invokeOriginalMethod(param.method, param.thisObject, param.args)
+            "com.tencent.mm.ui.chatting.BaseChattingUIFragment",
+            context.classLoader,
+            "onEnterBegin",
+            object : XC_MethodHook() {
+                val tagConst = "ChattingUIFragment-mask-view"
+
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    hook(param)
                 }
+
+                private fun hook(param: MethodHookParam) {
+                    val fragmentObj = param.thisObject
+                    LogUtil.w("hook onEnterBegin ", fragmentObj)
+                    //估计是class冲突，无法强转Fragment，改为反射获取
+                    val arguments = ReflectUtil.invokeMethod(fragmentObj, "getArguments") as Bundle?
+                    val activity = ReflectUtil.invokeMethod(fragmentObj, "getActivity") as Activity
+
+                    if (arguments != null) {
+                        LogUtil.w("hook onEnterBegin ", arguments)
+                        val chatUser = arguments.getString("Chat_User")
+                        //命中配置的微信号
+                        if (chatUser != null && maskIdList.contains(chatUser)) {
+                            addMaskToChatUI(param, fragmentObj, activity, chatUser)
+                        } else{
+                            resetChatUI(fragmentObj)
+                        }
+                    }
+                }
+
+                //恢复聊天页原先的ui
+                private fun resetChatUI(fragmentObj: Any) {
+                    //糊界面一脸
+                    val view = ReflectUtil.invokeMethod(fragmentObj, "getView") as? ViewGroup?
+                    if (view != null) {
+                        val maskView:View? = view.findViewWithTag(tagConst)
+                        maskView?.parent?.let {
+                            if (it is ViewGroup) {
+                                it.removeView(maskView)
+                            }
+                        }
+                    }
+
+                }
+
+                //对聊天页面添加水印，进行糊脸
+                private fun addMaskToChatUI(param: MethodHookParam, fragmentObj: Any, activity: Activity, chatUser: String) {
+                    val item = try {
+                        ConfigUtil.getMaskList().first {
+                            it.maskId == chatUser
+                        }
+                    } catch (e: Exception) {
+                        LogUtil.w(e)
+                        return
+                    }
+                    //糊界面一脸
+                    val contentView = ReflectUtil.invokeMethod(fragmentObj, "getView") as? ViewGroup?
+                    contentView?.let {
+                        val pvId = it.resources.getIdentifier("b49", "id", lpparam.packageName)
+                        val parent = contentView.findViewById<ViewGroup>(pvId)
+                        var maskView = it.findViewWithTag<View>(tagConst)
+                        if (maskView == null) {
+                            maskView = View(it.context).also { child ->
+                                child.tag = tagConst
+                                child.background = ColorDrawable(Color.WHITE)
+                                child.translationZ = 9999f
+                            }
+                            parent.addView(
+                                maskView,
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.MATCH_PARENT
+                            )
+                        }
+                    }
+
+
+                    if (Constrant.WX_MASK_TIP_MODE_SILENT == item.tipMode) {
+                        // 静默模式，不弹提示框
+                    } else if (Constrant.WX_MASK_TIP_MODE_ALERT == item.tipMode) {
+                        handleAlertMode(activity, item)
+                    }
+
+                    LogUtil.w("hook dialog show ")
+                }
+
             }
         )
     }
 
-    private fun handleMaskItem(param: MethodHookParam, view: View, item: MaskItemBean) {
-        try {
-            val tipMode = item.tipMode
-            if (Constrant.WX_MASK_TIP_MODE_SILENT == tipMode) {
-                //静默模式，啥都没干
-            } else if (Constrant.WX_MASK_TIP_MODE_ALERT == tipMode) {
-                handleAlertMode(view.getContext(), item);
-            }
-        } catch (e: Exception) {
-            LogUtil.e(e)
-        }
-    }
 
+//    private fun handleViewClick(context: Context, lpparam: LoadPackageParam) {
+//        XposedHelpers2.findAndHookMethod(
+//            View::class.java,
+//            "performClick",
+//            object : XC_MethodReplacement() {
+//                @Throws(Throwable::class)
+//                override fun replaceHookedMethod(param: MethodHookParam): Any {
+//                    val view = param.thisObject as View
+//                    LogUtil.w("click view for ", view)
+//                    if ("com.tencent.mm.ui.conversation.ConversationFolderItemView" != view.javaClass.name) {
+//                        return XposedBridge.invokeOriginalMethod(param.method, param.thisObject, param.args)
+//                    }
+//                    val index = TextCheckUtil.haveMatchText(view, *maskIdList)
+//                    if (index > -1) {
+//                        LogUtil.w("WXMaskPlugin replace performCLick")
+//                        val maskList = ConfigUtil.getMaskList()
+//                        val item = maskList[index]
+//                        handleMaskItem(param, view, item)
+//                        LogUtil.w(GsonUtil.toJson(item))
+//                        return false
+//                    }
+//                    return XposedBridge.invokeOriginalMethod(param.method, param.thisObject, param.args)
+//                }
+//            }
+//        )
+//    }
+//
+//    private fun handleMaskItem(param: MethodHookParam, view: View, item: MaskItemBean) {
+//        try {
+//            val tipMode = item.tipMode
+//            if (Constrant.WX_MASK_TIP_MODE_SILENT == tipMode) {
+//                //静默模式，啥都没干
+//            } else if (Constrant.WX_MASK_TIP_MODE_ALERT == tipMode) {
+//                handleAlertMode(view.getContext(), item);
+//            }
+//        } catch (e: Exception) {
+//            LogUtil.e(e)
+//        }
+//    }
+//
 
     private fun handleAlertMode(uiContext: Context, item: MaskItemBean) {
         //提示模式
-        val tipData = GsonUtil.fromJson(item.tipData, AlertTipData::class.java)
         AlertDialog.Builder(uiContext)
-            .setMessage(tipData.mess)
+            .setMessage(MaskItemBean.AlertTipData.from(item).mess)
             .setNegativeButton("知道了", null)
             .show()
     }

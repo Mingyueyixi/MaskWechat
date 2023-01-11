@@ -1,0 +1,38 @@
+plugins {
+    id 'com.android.library'
+}
+apply{
+    from rootProject.file('props.gradle')
+}
+
+android {
+    namespace 'com.lu.lposed.api2'
+    compileSdk 33
+
+    defaultConfig {
+        minSdk 23
+        targetSdk 33
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    compileOnly(deps['de.robv.android.xposed:api'])
+
+    testImplementation(deps['junit:junit'])
+    androidTestImplementation(deps['androidx.test.ext:junit'])
+    androidTestImplementation(deps['androidx.test.espresso:espresso-core'])
+}

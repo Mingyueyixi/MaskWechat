@@ -20,6 +20,7 @@ import com.lu.wxmask.R
 import com.lu.wxmask.SelfHook
 import com.lu.wxmask.databinding.FragmentMainBinding
 
+
 class MainFragment : BindingFragment<FragmentMainBinding>() {
     private val donatePresenter by lazy { DonatePresenter.from(this) }
 
@@ -47,15 +48,13 @@ class MainFragment : BindingFragment<FragmentMainBinding>() {
                 binding.ivModuleState.setImageResource(R.drawable.ic_icon_warning)
                 binding.tvModuleStateTitle.setText(R.string.module_not_active)
                 RippleApplyUtil.apply(it, RectangleRippleBuilder(0xFFFF6027.toInt(), Color.GRAY, rippleRadius))
-
             }
         }
-
         RectangleRippleBuilder(Color.TRANSPARENT, Color.GRAY, rippleRadius).let {
-            RippleApplyUtil.apply(binding.clModuleConfig, it)
+            RippleApplyUtil.apply(binding.clManagerConfig, it)
             RippleApplyUtil.apply(binding.clModuleDonate, it)
+            RippleApplyUtil.apply(binding.clAddConfig, it)
         }
-
         val moduleVersionText = getString(R.string.module_version)
         val versionDesText = if (BuildConfig.DEBUG) {
             "v${BuildConfig.VERSION_NAME}-debug"
@@ -64,29 +63,40 @@ class MainFragment : BindingFragment<FragmentMainBinding>() {
         }
         binding.tvModuleStateSub.text = "$moduleVersionText：$versionDesText"
 
-        binding.clModuleConfig.setOnClickListener {
-            try {
-                val intent = Intent()
-                intent.action = "com.tencent.mm.action.BIZSHORTCUT"
-//                intent.action = Intent.ACTION_MAIN
-                intent.addCategory(Intent.CATEGORY_LAUNCHER)
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                intent.putExtra(Constrant.KEY_INTENT_MASK_WECHAT, true)
-
-                intent.component = ComponentName("com.tencent.mm", "com.tencent.mm.ui.LauncherUI")
-                startActivity(intent)
-            } catch (e: Exception) {
-                ToastUtil.show("跳转WeChat配置页面失败")
-                LogUtil.e(e)
-            }
+        binding.clManagerConfig.setOnClickListener {
+            jumpWxManagerConfigUI(it, Constrant.VALUE_INTENT_PLUGIN_MODE_MANAGER)
         }
-
         binding.clModuleDonate.setOnClickListener {
             donatePresenter.lecturing(it.context)
         }
-
+        binding.clAddConfig.setOnClickListener {
+            jumpWxManagerConfigUI(it, Constrant.VALUE_INTENT_PLUGIN_MODE_ADD)
+        }
         binding.clModuleState.setOnClickListener {
-            WXConfigUI(requireActivity()).show()
+
+        }
+
+    }
+
+    /**
+     * 跳转到微信进行配置
+     */
+    private fun jumpWxManagerConfigUI(view: View, mode: Int = Constrant.VALUE_INTENT_PLUGIN_MODE_MANAGER) {
+        try {
+            val intent = Intent()
+            intent.action = "com.tencent.mm.action.BIZSHORTCUT"
+//                intent.action = Intent.ACTION_MAIN
+            intent.addCategory(Intent.CATEGORY_LAUNCHER)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            intent.putExtra(Constrant.KEY_INTENT_FROM_MASK, true)
+            intent.putExtra(Constrant.KEY_INTENT_PLUGIN_MODE, mode)
+
+            intent.component = ComponentName("com.tencent.mm", "com.tencent.mm.ui.LauncherUI")
+            startActivity(intent)
+        } catch (e: Exception) {
+            ToastUtil.show("跳转WeChat配置页面失败")
+            LogUtil.e(e)
         }
     }
+
 }

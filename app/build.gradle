@@ -53,7 +53,7 @@ dependencies {
     implementation(deps['com.google.android.material:material'])
 
     implementation(project(":lib-donate"))
-
+    implementation(project(path: ':lposed'))
 
     compileOnly(deps['de.robv.android.xposed:api'])
 
