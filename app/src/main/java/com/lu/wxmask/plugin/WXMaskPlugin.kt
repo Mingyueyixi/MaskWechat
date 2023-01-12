@@ -3,11 +3,11 @@ package com.lu.wxmask.plugin
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
-import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import com.lu.lposed.api2.XposedHelpers2
 import com.lu.magic.util.ReflectUtil
 import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.Constrant
@@ -69,11 +69,25 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
                         val chatUser = arguments.getString("Chat_User")
                         //命中配置的微信号
                         if (chatUser != null && maskIdList.contains(chatUser)) {
-                            addMaskToChatUI(param, fragmentObj, activity, chatUser)
-                        } else{
-                            resetChatUI(fragmentObj)
+                            val listView = findChatListView(fragmentObj)
+                            if (listView != null) {
+                                listView.visibility = View.INVISIBLE
+                            } else {
+                                addMaskToChatUI(param, fragmentObj, activity, chatUser)
+                            }
+                        } else {
+                            val listView = findChatListView(fragmentObj)
+                            if (listView != null) {
+                                listView.visibility = View.VISIBLE
+                            } else {
+                                resetChatUI(fragmentObj)
+                            }
                         }
                     }
+                }
+
+                private fun findChatListView(fragmentObj: Any): View? {
+                    return XposedHelpers2.callMethod(fragmentObj, "getListView")
                 }
 
                 //恢复聊天页原先的ui
@@ -81,7 +95,7 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
                     //糊界面一脸
                     val view = ReflectUtil.invokeMethod(fragmentObj, "getView") as? ViewGroup?
                     if (view != null) {
-                        val maskView:View? = view.findViewWithTag(tagConst)
+                        val maskView: View? = view.findViewWithTag(tagConst)
                         maskView?.parent?.let {
                             if (it is ViewGroup) {
                                 it.removeView(maskView)
@@ -92,7 +106,12 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
                 }
 
                 //对聊天页面添加水印，进行糊脸
-                private fun addMaskToChatUI(param: MethodHookParam, fragmentObj: Any, activity: Activity, chatUser: String) {
+                private fun addMaskToChatUI(
+                    param: MethodHookParam,
+                    fragmentObj: Any,
+                    activity: Activity,
+                    chatUser: String
+                ) {
                     val item = try {
                         ConfigUtil.getMaskList().first {
                             it.maskId == chatUser
@@ -110,7 +129,7 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
                         if (maskView == null) {
                             maskView = View(it.context).also { child ->
                                 child.tag = tagConst
-                                child.background = ColorDrawable(Color.WHITE)
+                                child.background = ColorDrawable(0xFFEDEDED.toInt())
                                 child.translationZ = 9999f
                             }
                             parent.addView(
@@ -120,7 +139,6 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
                             )
                         }
                     }
-
 
                     if (Constrant.WX_MASK_TIP_MODE_SILENT == item.tipMode) {
                         // 静默模式，不弹提示框
