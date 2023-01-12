@@ -73,7 +73,7 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
                             if (listView != null) {
                                 listView.visibility = View.INVISIBLE
                             } else {
-                                addMaskToChatUI(param, fragmentObj, activity, chatUser)
+                                addMaskToChatUI(fragmentObj, activity, chatUser)
                             }
                         } else {
                             val listView = findChatListView(fragmentObj)
@@ -110,7 +110,6 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
 
                 //对聊天页面添加水印，进行糊脸
                 private fun addMaskToChatUI(
-                    param: MethodHookParam,
                     fragmentObj: Any,
                     activity: Activity,
                     chatUser: String

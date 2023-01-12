@@ -27,5 +27,5 @@
         app:layout_constraintEnd_toEndOf="@+id/iv_qr_pay_img"
         app:layout_constraintStart_toStartOf="@+id/iv_qr_pay_img"
         app:layout_constraintTop_toBottomOf="@+id/iv_qr_pay_img"
-        app:tint="@color/white" />
+        app:tint="@android:color/white" />
 </androidx.constraintlayout.widget.ConstraintLayout>

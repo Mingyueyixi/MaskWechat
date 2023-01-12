@@ -1,13 +1,13 @@
 package com.lu.lposed.api2;
 
+import com.lu.lposed.api2.function.Consumer;
+import com.lu.lposed.api2.function.Predicate;
+
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedBridge;
