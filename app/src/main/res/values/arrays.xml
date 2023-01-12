@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="xposed_scope">
+        <!--xposed推荐的app作用域-->
+        <item>com.tencent.mm</item>
+    </string-array>
+</resources>
