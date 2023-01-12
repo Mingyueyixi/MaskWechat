@@ -66,6 +66,9 @@ class MainFragment : BindingFragment<FragmentMainBinding>() {
         binding.clManagerConfig.setOnClickListener {
             jumpWxManagerConfigUI(it, Constrant.VALUE_INTENT_PLUGIN_MODE_MANAGER)
         }
+
+        //模块需要优化，先屏蔽入口
+        binding.clModuleDonate.visibility = View.GONE
         binding.clModuleDonate.setOnClickListener {
             donatePresenter.lecturing(it.context)
         }
