@@ -261,7 +261,7 @@ private class ConfigManagerUIController(private val context: Context) {
 
     private fun showEditMaskItemDialog(position: Int) {
         EditMaskItemUI(context, listAdapter.getData(), position)
-            .setOnConfigChangeListener { dialog, mask, mode ->
+            .setOnConfigChangeListener { _, _, mode ->
                 when (mode) {
                     EditMaskItemUI.MODE_CONFIG_UPDATE -> listAdapter.notifyItemChanged(position)
                     EditMaskItemUI.MODE_CONFIG_REMOVE -> listAdapter.notifyItemRemoved(position)

@@ -64,7 +64,7 @@ class MainFragment : BindingFragment<FragmentMainBinding>() {
         binding.tvModuleStateSub.text = "$moduleVersionText：$versionDesText"
 
         binding.clManagerConfig.setOnClickListener {
-            jumpWxManagerConfigUI(it, Constrant.VALUE_INTENT_PLUGIN_MODE_MANAGER)
+            jumpWxManagerConfigUI(Constrant.VALUE_INTENT_PLUGIN_MODE_MANAGER)
         }
 
         //模块需要优化，先屏蔽入口
@@ -73,7 +73,7 @@ class MainFragment : BindingFragment<FragmentMainBinding>() {
             donatePresenter.lecturing(it.context)
         }
         binding.clAddConfig.setOnClickListener {
-            jumpWxManagerConfigUI(it, Constrant.VALUE_INTENT_PLUGIN_MODE_ADD)
+            jumpWxManagerConfigUI(Constrant.VALUE_INTENT_PLUGIN_MODE_ADD)
         }
         binding.clModuleState.setOnClickListener {
 
@@ -84,7 +84,7 @@ class MainFragment : BindingFragment<FragmentMainBinding>() {
     /**
      * 跳转到微信进行配置
      */
-    private fun jumpWxManagerConfigUI(view: View, mode: Int = Constrant.VALUE_INTENT_PLUGIN_MODE_MANAGER) {
+    private fun jumpWxManagerConfigUI(mode: Int = Constrant.VALUE_INTENT_PLUGIN_MODE_MANAGER) {
         try {
             val intent = Intent()
             intent.action = "com.tencent.mm.action.BIZSHORTCUT"
