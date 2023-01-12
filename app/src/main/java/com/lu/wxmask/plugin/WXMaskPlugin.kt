@@ -59,7 +59,7 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
 
                 private fun hook(param: MethodHookParam) {
                     val fragmentObj = param.thisObject
-                    LogUtil.w("hook onEnterBegin ", fragmentObj)
+                    LogUtil.w("enter chattingUI")
                     //估计是class冲突，无法强转Fragment，改为反射获取
                     val arguments = ReflectUtil.invokeMethod(fragmentObj, "getArguments") as Bundle?
                     val activity = ReflectUtil.invokeMethod(fragmentObj, "getActivity") as Activity
@@ -83,6 +83,9 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
                                 resetChatUI(fragmentObj)
                             }
                         }
+                    }
+                    else{
+                        LogUtil.w("chattingUI's arguments if null")
                     }
                 }
 

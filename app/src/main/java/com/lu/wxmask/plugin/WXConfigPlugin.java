@@ -3,7 +3,6 @@ package com.lu.wxmask.plugin;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -123,7 +122,7 @@ public class WXConfigPlugin implements IPlugin {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) {
                         if (!isOnDoingConfig) {
-                            LogUtil.w("ignore config ui");
+                            LogUtil.d("ignore show config ui");
                             return;
                         }
                         LogUtil.w("start config ui");
@@ -235,7 +234,7 @@ public class WXConfigPlugin implements IPlugin {
 //                bundle.putString("field_username", field_username);
 //                bundle.putString("field_nickname", field_nickname);
 //
-                LogUtil.w(field_nickname, field_username, field_conRemark);
+                LogUtil.d(field_nickname, field_username, field_conRemark);
             }
         });
     }

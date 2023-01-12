@@ -2,9 +2,13 @@ package com.lu.wxmask;
 
 import android.app.Application;
 import android.content.Context;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.lu.magic.util.AppUtil;
 import com.lu.magic.util.log.LogUtil;
+import com.lu.magic.util.log.SimpleLogger;
 import com.lu.wxmask.plugin.PluginRegistry;
 import com.lu.wxmask.plugin.WXConfigPlugin;
 import com.lu.wxmask.plugin.WXMaskPlugin;
@@ -28,8 +32,22 @@ public class MainHook implements IXposedHookLoadPackage {
         if (!"com.tencent.mm".equals(lpparam.processName)) {
             return;
         }
+        LogUtil.setLogger(new SimpleLogger() {
+            @Override
+            public void onLog(int level, @NonNull Object[] objects) {
+                if (!BuildConfig.DEBUG) {
+                    super.onLog(level, objects);
+                } else {
+                    //release 打印i以上级别的log，其他的忽略
+                    if (level > 1){
+                        String msgText = buildLogText(objects);
+                        XposedHelpers2.log(TAG + " " + msgText);
+                    }
+                }
+            }
+        });
         LogUtil.w("start mask plugin for wechat");
-        XposedHelpers2.Config.setThrowableCallBack(throwable -> LogUtil.e("MaskPlugin error",throwable));
+        XposedHelpers2.Config.setThrowableCallBack(throwable -> LogUtil.e("MaskPlugin error", throwable));
 
         XposedHelpers2.findAndHookMethod(
                 Application.class.getName(),
