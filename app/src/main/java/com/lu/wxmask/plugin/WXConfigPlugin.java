@@ -9,6 +9,7 @@ import android.view.View;
 
 import com.lu.lposed.api2.XC_MethodHook2;
 import com.lu.lposed.api2.XposedHelpers2;
+import com.lu.lposed.plugin.IPlugin;
 import com.lu.magic.util.log.LogUtil;
 import com.lu.wxmask.Constrant;
 import com.lu.wxmask.bean.MaskItemBean;

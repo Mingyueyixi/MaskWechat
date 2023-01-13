@@ -45,15 +45,18 @@ dependencies {
     implementation(deps['com.google.code.gson:gson'])
     implementation(deps['com.github.Mingyueyixi:frame-base-utils'])
     implementation(deps['com.github.Mingyueyixi:frame-ui'])
+    implementation 'com.github.Mingyueyixi.lposed:xposed-api2'
 
     implementation(deps['org.jetbrains.kotlinx:kotlinx-coroutines-android'])
     implementation(deps["androidx.lifecycle:lifecycle-viewmodel-ktx"])
     implementation(deps['androidx.core:core-ktx'])
     implementation(deps['androidx.appcompat:appcompat'])
     implementation(deps['com.google.android.material:material'])
+    implementation(deps['com.github.Mingyueyixi.lposed:xposed-api2'])
+    implementation(deps['com.github.Mingyueyixi.lposed:plugin'])
 
     implementation(project(":lib-donate"))
-    implementation(project(path: ':lposed'))
+
 
     compileOnly(deps['de.robv.android.xposed:api'])
 

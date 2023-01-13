@@ -6,10 +6,10 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 
 import com.lu.lposed.api2.XposedHelpers2;
+import com.lu.lposed.plugin.PluginRegistry;
 import com.lu.magic.util.AppUtil;
 import com.lu.magic.util.log.LogUtil;
 import com.lu.magic.util.log.SimpleLogger;
-import com.lu.wxmask.plugin.PluginRegistry;
 import com.lu.wxmask.plugin.WXConfigPlugin;
 import com.lu.wxmask.plugin.WXMaskPlugin;
 

@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import com.lu.lposed.api2.XposedHelpers2
+import com.lu.lposed.plugin.IPlugin
 import com.lu.magic.util.ReflectUtil
 import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.Constrant
