@@ -34,7 +34,7 @@ public class MainHook implements IXposedHookLoadPackage {
         LogUtil.setLogger(new SimpleLogger() {
             @Override
             public void onLog(int level, @NonNull Object[] objects) {
-                if (!BuildConfig.DEBUG) {
+                if (BuildConfig.DEBUG) {
                     super.onLog(level, objects);
                 } else {
                     //release 打印i以上级别的log，其他的忽略
