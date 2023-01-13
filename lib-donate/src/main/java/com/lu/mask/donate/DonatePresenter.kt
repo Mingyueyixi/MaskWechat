@@ -39,7 +39,7 @@ class DonatePresenter(val vm: DonateViewModel) {
 
 
     fun lecturing(context: Context, alipayQRPersonLink: String = "https://qr.alipay.com/tsx18437nsf7otyumo1gc2e") {
-        LecturingAction(context)
+        lecturingWith(context)
             .setAlipayQRPersonLink(alipayQRPersonLink)
             .addPayImgRes(R.mipmap.ic_alipay_qr, "alipay_qr.jpg")
             .addPayImgRes(R.mipmap.ic_wxpay_qr, "wxpay_qr.jpg")

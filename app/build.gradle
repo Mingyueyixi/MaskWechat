@@ -19,11 +19,24 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-
+    signingConfigs {
+        alpha {
+            storeFile file("${rootDir}/app/key-store-test.jks")
+            storePassword "123456"
+            keyAlias "maskwechat"
+            keyPassword "123456"
+        }
+    }
     buildTypes {
-        release {
+        debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.alpha
+        }
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.alpha
         }
     }
     compileOptions {
@@ -42,20 +55,20 @@ android {
 
 dependencies {
     implementation(fileTree(dir: "libs", include: ["*.jar", "*.aar"]))
-    implementation(deps['com.google.code.gson:gson'])
     implementation(deps['com.github.Mingyueyixi:frame-base-utils'])
     implementation(deps['com.github.Mingyueyixi:frame-ui'])
-    implementation 'com.github.Mingyueyixi.lposed:xposed-api2'
-
-    implementation(deps['org.jetbrains.kotlinx:kotlinx-coroutines-android'])
-    implementation(deps["androidx.lifecycle:lifecycle-viewmodel-ktx"])
-    implementation(deps['androidx.core:core-ktx'])
-    implementation(deps['androidx.appcompat:appcompat'])
-    implementation(deps['com.google.android.material:material'])
     implementation(deps['com.github.Mingyueyixi.lposed:xposed-api2'])
     implementation(deps['com.github.Mingyueyixi.lposed:plugin'])
 
-    implementation(project(":lib-donate"))
+    implementation(deps['com.google.code.gson:gson'])
+//    implementation(deps['org.jetbrains.kotlinx:kotlinx-coroutines-android'])
+//    implementation(deps["androidx.lifecycle:lifecycle-viewmodel-ktx"])
+//    implementation(deps['androidx.core:core-ktx'])
+    implementation(deps['androidx.appcompat:appcompat'])
+    implementation(deps['com.google.android.material:material'])
+
+
+//    implementation(project(":lib-donate"))
 
 
     compileOnly(deps['de.robv.android.xposed:api'])

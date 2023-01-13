@@ -3,6 +3,7 @@ package com.lu.wxmask;
 import android.app.Application;
 import android.content.Context;
 
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 
 import com.lu.lposed.api2.XposedHelpers2;
@@ -17,6 +18,7 @@ import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
+@Keep
 public class MainHook implements IXposedHookLoadPackage {
 
     private boolean hasInit = false;

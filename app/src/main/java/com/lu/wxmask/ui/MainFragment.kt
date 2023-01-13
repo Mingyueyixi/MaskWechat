@@ -13,7 +13,6 @@ import com.lu.magic.util.ToastUtil
 import com.lu.magic.util.log.LogUtil
 import com.lu.magic.util.ripple.RectangleRippleBuilder
 import com.lu.magic.util.ripple.RippleApplyUtil
-import com.lu.mask.donate.DonatePresenter
 import com.lu.wxmask.BuildConfig
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.R
@@ -22,7 +21,7 @@ import com.lu.wxmask.databinding.FragmentMainBinding
 
 
 class MainFragment : BindingFragment<FragmentMainBinding>() {
-    private val donatePresenter by lazy { DonatePresenter.from(this) }
+//    private val donatePresenter by lazy { DonatePresenter.from(this) }
 
     override fun onViewBinding(
         inflater: LayoutInflater,
@@ -69,9 +68,9 @@ class MainFragment : BindingFragment<FragmentMainBinding>() {
 
         //模块需要优化，先屏蔽入口
         binding.clModuleDonate.visibility = View.GONE
-        binding.clModuleDonate.setOnClickListener {
-            donatePresenter.lecturing(it.context)
-        }
+//        binding.clModuleDonate.setOnClickListener {
+//            donatePresenter.lecturing(it.context)
+//        }
         binding.clAddConfig.setOnClickListener {
             jumpWxManagerConfigUI(Constrant.VALUE_INTENT_PLUGIN_MODE_ADD)
         }

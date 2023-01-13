@@ -1,11 +1,14 @@
 package com.lu.wxmask;
 
+import androidx.annotation.Keep;
+
 import com.lu.magic.util.log.LogUtil;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
+@Keep
 public class SelfHook {
     private static class Holder {
         private static final SelfHook INSTANCE = new SelfHook();
