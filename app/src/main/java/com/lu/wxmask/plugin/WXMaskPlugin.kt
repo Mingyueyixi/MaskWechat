@@ -70,22 +70,11 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
                         val chatUser = arguments.getString("Chat_User")
                         //命中配置的微信号
                         if (chatUser != null && maskIdList.contains(chatUser)) {
-                            val listView = findChatListView(fragmentObj)
-                            if (listView != null) {
-                                listView.visibility = View.INVISIBLE
-                            } else {
-                                addMaskToChatUI(fragmentObj, activity, chatUser)
-                            }
+                            hideChatListUI(fragmentObj, activity, chatUser)
                         } else {
-                            val listView = findChatListView(fragmentObj)
-                            if (listView != null) {
-                                listView.visibility = View.VISIBLE
-                            } else {
-                                resetChatUI(fragmentObj)
-                            }
+                            showChatListUI(fragmentObj)
                         }
-                    }
-                    else{
+                    } else {
                         LogUtil.w("chattingUI's arguments if null")
                     }
                 }
@@ -94,27 +83,25 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
                     return XposedHelpers2.callMethod(fragmentObj, "getListView")
                 }
 
-                //恢复聊天页原先的ui
-                private fun resetChatUI(fragmentObj: Any) {
-                    //糊界面一脸
-                    val view = ReflectUtil.invokeMethod(fragmentObj, "getView") as? ViewGroup?
-                    if (view != null) {
-                        val maskView: View? = view.findViewWithTag(tagConst)
-                        maskView?.parent?.let {
-                            if (it is ViewGroup) {
-                                it.removeView(maskView)
-                            }
-                        }
+                private fun showChatListUI(fragmentObj: Any) {
+                    val chatListView: View? = XposedHelpers2.callMethod(fragmentObj, "getListView")
+                    if (chatListView != null) {
+                        chatListView.visibility = View.VISIBLE
+                    } else {
+                        showChatListUIFromMask(fragmentObj)
                     }
-
                 }
 
-                //对聊天页面添加水印，进行糊脸
-                private fun addMaskToChatUI(
-                    fragmentObj: Any,
-                    activity: Activity,
-                    chatUser: String
-                ) {
+                //恢复聊天页原先的ui
+                private fun showChatListUIFromMask(fragmentObj: Any) {
+                    val contentView = ReflectUtil.invokeMethod(fragmentObj, "getView") as? ViewGroup?
+                    val maskView = contentView?.findViewWithTag<View?>(tagConst)
+                    if (maskView != null) {
+                        (maskView.parent as? ViewGroup)?.removeView(maskView)
+                    }
+                }
+
+                private fun hideChatListUI(fragmentObj: Any, activity: Activity, chatUser: String) {
                     val item = try {
                         ConfigUtil.getMaskList().first {
                             it.maskId == chatUser
@@ -123,6 +110,24 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
                         LogUtil.w(e)
                         return
                     }
+
+                    val chatListView = findChatListView(fragmentObj)
+                    if (chatListView != null) {
+                        chatListView.visibility = View.INVISIBLE
+                    } else {
+                        hideListViewUIByMask(fragmentObj)
+                    }
+
+                    if (Constrant.WX_MASK_TIP_MODE_SILENT == item.tipMode) {
+                        // 静默模式，不弹提示框
+                    } else if (Constrant.WX_MASK_TIP_MODE_ALERT == item.tipMode) {
+                        handleAlertMode(activity, item)
+                    }
+
+                }
+
+                //对聊天页面添加水印，进行糊脸
+                private fun hideListViewUIByMask(fragmentObj: Any) {
                     //糊界面一脸
                     val contentView = ReflectUtil.invokeMethod(fragmentObj, "getView") as? ViewGroup?
                     contentView?.let {
@@ -143,13 +148,6 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
                         }
                     }
 
-                    if (Constrant.WX_MASK_TIP_MODE_SILENT == item.tipMode) {
-                        // 静默模式，不弹提示框
-                    } else if (Constrant.WX_MASK_TIP_MODE_ALERT == item.tipMode) {
-                        handleAlertMode(activity, item)
-                    }
-
-                    LogUtil.w("hook dialog show ")
                 }
 
             }
