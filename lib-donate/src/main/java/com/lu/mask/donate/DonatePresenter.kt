@@ -23,7 +23,6 @@ class DonatePresenter {
         lecturingWith(context)
             .setAlipayQRPersonLink(alipayQRPersonLink)
             .addPayImgRes(R.mipmap.ic_alipay_qr, "alipay_qr.jpg")
-            .addPayImgRes(R.mipmap.ic_wxpay_qr, "wxpay_qr.jpg")
             .runWith { ctx, imgResId, fileName ->
                 showDonateDialog(ctx, imgResId, fileName)
             }

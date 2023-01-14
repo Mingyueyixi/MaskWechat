@@ -70,12 +70,7 @@ class MainFragment : BindingFragment<FragmentMainBinding>() {
         //模块需要优化，先屏蔽入口
 //        binding.clModuleDonate.visibility = View.GONE
         binding.clModuleDonate.setOnClickListener {
-            donatePresenter.lecturingWith(it.context)
-                .addPayImgRes(com.lu.mask.donate.R.mipmap.ic_alipay_qr, "alipay_qr.jpg")
-                .addPayImgRes(com.lu.mask.donate.R.mipmap.ic_wxpay_qr, "wxpay_qr.jpg")
-                .runWith { ctx, imgResId, fileName ->
-                    donatePresenter.showDonateDialog(ctx, imgResId, fileName)
-                }
+            donatePresenter.lecturing(it.context)
         }
         binding.clAddConfig.setOnClickListener {
             jumpWxManagerConfigUI(Constrant.VALUE_INTENT_PLUGIN_MODE_ADD)

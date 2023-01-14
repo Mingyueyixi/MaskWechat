@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        tools:src="@mipmap/ic_wxpay_qr" />
+        tools:src="@mipmap/ic_alipay_qr" />
 
     <ImageView
         android:id="@+id/ivDownload"
