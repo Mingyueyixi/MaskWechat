@@ -40,14 +40,6 @@ android {
 
 dependencies {
     implementation deps['com.github.Mingyueyixi:frame-base-utils']
-    implementation deps['com.github.Mingyueyixi:frame-ui']
-
-    implementation deps['org.jetbrains.kotlinx:kotlinx-coroutines-android']
-    implementation deps["androidx.lifecycle:lifecycle-viewmodel-ktx"]
-
-    implementation deps['androidx.core:core-ktx']
-    implementation deps['androidx.appcompat:appcompat']
-    implementation deps['com.google.android.material:material']
 
     testImplementation deps['junit:junit']
     androidTestImplementation deps['androidx.test.ext:junit']

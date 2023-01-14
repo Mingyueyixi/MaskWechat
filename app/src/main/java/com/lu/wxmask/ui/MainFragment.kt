@@ -13,6 +13,7 @@ import com.lu.magic.util.ToastUtil
 import com.lu.magic.util.log.LogUtil
 import com.lu.magic.util.ripple.RectangleRippleBuilder
 import com.lu.magic.util.ripple.RippleApplyUtil
+import com.lu.mask.donate.DonatePresenter
 import com.lu.wxmask.BuildConfig
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.R
@@ -21,7 +22,7 @@ import com.lu.wxmask.databinding.FragmentMainBinding
 
 
 class MainFragment : BindingFragment<FragmentMainBinding>() {
-//    private val donatePresenter by lazy { DonatePresenter.from(this) }
+    private val donatePresenter by lazy { DonatePresenter.create() }
 
     override fun onViewBinding(
         inflater: LayoutInflater,
@@ -67,10 +68,15 @@ class MainFragment : BindingFragment<FragmentMainBinding>() {
         }
 
         //模块需要优化，先屏蔽入口
-        binding.clModuleDonate.visibility = View.GONE
-//        binding.clModuleDonate.setOnClickListener {
-//            donatePresenter.lecturing(it.context)
-//        }
+//        binding.clModuleDonate.visibility = View.GONE
+        binding.clModuleDonate.setOnClickListener {
+            donatePresenter.lecturingWith(it.context)
+                .addPayImgRes(com.lu.mask.donate.R.mipmap.ic_alipay_qr, "alipay_qr.jpg")
+                .addPayImgRes(com.lu.mask.donate.R.mipmap.ic_wxpay_qr, "wxpay_qr.jpg")
+                .runWith { ctx, imgResId, fileName ->
+                    donatePresenter.showDonateDialog(ctx, imgResId, fileName)
+                }
+        }
         binding.clAddConfig.setOnClickListener {
             jumpWxManagerConfigUI(Constrant.VALUE_INTENT_PLUGIN_MODE_ADD)
         }

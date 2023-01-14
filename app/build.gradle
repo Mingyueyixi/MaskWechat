@@ -35,6 +35,7 @@ android {
         }
         release {
             minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.alpha
         }
@@ -61,15 +62,11 @@ dependencies {
     implementation(deps['com.github.Mingyueyixi.lposed:plugin'])
 
     implementation(deps['com.google.code.gson:gson'])
-//    implementation(deps['org.jetbrains.kotlinx:kotlinx-coroutines-android'])
-//    implementation(deps["androidx.lifecycle:lifecycle-viewmodel-ktx"])
-//    implementation(deps['androidx.core:core-ktx'])
     implementation(deps['androidx.appcompat:appcompat'])
     implementation(deps['com.google.android.material:material'])
 
 
-//    implementation(project(":lib-donate"))
-
+    implementation(project(":lib-donate"))
 
     compileOnly(deps['de.robv.android.xposed:api'])
 

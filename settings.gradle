@@ -32,4 +32,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "MaskWechat"
 include ':app'
-//include ':lib-donate'
+include ':lib-donate'
