@@ -52,6 +52,23 @@ android {
         enabled = true
     }
 
+    applicationVariants.all { variant ->
+        def outputs = variant.outputs
+        def size = outputs.size()
+        outputs.eachWithIndex { Object output, int index ->
+            def fontName = "maskwechat-v${variant.versionName}-${variant.name}"
+            if (size == 1) {
+                output.outputFileName = "${fontName}.apk"
+            } else {
+                output.outputFileName = "${fontName}-${index}.apk"
+            }
+        }
+//        variant.properties.each {
+//            println("${it.key} --》 ${it.value}")
+//        }
+//        println("------------"+ variant.outputs)
+    }
+
 }
 
 dependencies {
@@ -64,7 +81,6 @@ dependencies {
     implementation(deps['com.google.code.gson:gson'])
     implementation(deps['androidx.appcompat:appcompat'])
     implementation(deps['com.google.android.material:material'])
-
 
     implementation(project(":lib-donate"))
 
