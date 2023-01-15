@@ -1,5 +1,6 @@
 package com.lu.mask.donate
 
+import android.annotation.TargetApi
 import android.content.ContentValues
 import android.content.Context
 import android.os.Build
@@ -12,8 +13,9 @@ import org.json.JSONObject
 import java.io.File
 
 
-class DonateModel() {
+class DonateModel {
 
+    @TargetApi(Build.VERSION_CODES.Q)
     private fun savePayImgForQ(context: Context, payImgResId: Int, fileName: String) {
         //mediaStore数据库返回的相对路径最后可能带有/，比较是否相等时需要注意
         val relativePath = "${Environment.DIRECTORY_DCIM}/${context.packageName}"

@@ -22,7 +22,7 @@ class DonatePresenter {
     fun lecturing(context: Context, alipayQRPersonLink: String = "https://qr.alipay.com/tsx18437nsf7otyumo1gc2e") {
         lecturingWith(context)
             .setAlipayQRPersonLink(alipayQRPersonLink)
-            .addPayImgRes(R.mipmap.ic_alipay_qr, "alipay_qr.jpg")
+            .addPayImgRes(R.mipmap.ic_alipay_qr, "alipay_qr.webp")
             .runWith { ctx, imgResId, fileName ->
                 showDonateDialog(ctx, imgResId, fileName)
             }
@@ -50,7 +50,7 @@ class DonatePresenter {
                 if (it.isSuccess) {
                     Toast.makeText(context, R.string.donate_save_success, Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(context, R.string.donate_save_success, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, R.string.donate_save_fail, Toast.LENGTH_SHORT).show()
                     LogUtil.w(it.exceptionOrNull())
                 }
             }
