@@ -177,8 +177,8 @@ private class ConfigManagerUIController(private val context: Context) {
                 MarginLayoutParams.WRAP_CONTENT
             ).also {
             }
-
             divider = null
+            selector = ColorDrawable(Color.TRANSPARENT)
         }
 
         listAdapter = object : CommonListAdapter<MaskItemBean,AbsListAdapter.ViewHolder>() {
