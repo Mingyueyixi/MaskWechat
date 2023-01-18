@@ -3,11 +3,11 @@ package com.lu.wxmask.adapter
 import java.util.concurrent.CopyOnWriteArrayList
 
 
-abstract class CommonListAdapter<E> : AbsListAdapter() {
+abstract class CommonListAdapter<E, VH : AbsListAdapter.ViewHolder> : AbsListAdapter<VH>() {
 
     open val dataList: MutableList<E> = CopyOnWriteArrayList()
 
-    open fun setData(data: List<E>): CommonListAdapter<E> {
+    open fun setData(data: List<E>): CommonListAdapter<E, VH> {
         this.dataList.clear()
         this.dataList.addAll(data)
         return this
@@ -31,27 +31,27 @@ abstract class CommonListAdapter<E> : AbsListAdapter() {
         notifyDataSetChanged()
     }
 
-    open fun addData(data: List<E>): CommonListAdapter<E> {
+    open fun addData(data: List<E>): CommonListAdapter<E, VH> {
         this.dataList.addAll(data)
         return this
     }
 
-    open fun addData(vararg ele: E): CommonListAdapter<E> {
+    open fun addData(vararg ele: E): CommonListAdapter<E, VH> {
         this.dataList.addAll(ele)
         return this
     }
 
-    open fun remove(data: List<E>): CommonListAdapter<E> {
+    open fun remove(data: List<E>): CommonListAdapter<E, VH> {
         this.dataList.removeAll(data)
         return this
     }
 
-    open fun remove(vararg elements: E): CommonListAdapter<E> {
+    open fun remove(vararg elements: E): CommonListAdapter<E, VH> {
         this.dataList.removeAll(elements.toSet())
         return this
     }
 
-    open fun removeAt(index: Int): CommonListAdapter<E> {
+    open fun removeAt(index: Int): CommonListAdapter<E, VH> {
         this.dataList.removeAt(index)
         return this
     }

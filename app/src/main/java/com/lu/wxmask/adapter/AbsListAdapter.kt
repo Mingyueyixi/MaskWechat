@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 
 
-abstract class AbsListAdapter : BaseAdapter() {
+abstract class AbsListAdapter<VH: AbsListAdapter.ViewHolder> : BaseAdapter() {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val vh = if (convertView == null) {
@@ -13,15 +13,16 @@ abstract class AbsListAdapter : BaseAdapter() {
                 it.itemView.tag = it
             }
         } else {
-            convertView.tag as ViewHolder
+            @Suppress("UNCHECKED_CAST")
+            convertView.tag as VH
         }
         vh.layoutPosition = position
         onBindViewHolder(vh, position, parent)
         return vh.itemView
     }
 
-    abstract fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
-    abstract fun onBindViewHolder(vh: ViewHolder, position: Int, parent: ViewGroup)
+    abstract fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH
+    abstract fun onBindViewHolder(vh: VH, position: Int, parent: ViewGroup)
 
     open class ViewHolder(var itemView: View){
         var layoutPosition = 0

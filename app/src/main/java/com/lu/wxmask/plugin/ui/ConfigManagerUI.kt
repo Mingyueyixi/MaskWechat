@@ -20,6 +20,7 @@ import com.lu.magic.util.ResUtil
 import com.lu.magic.util.SizeUtil
 import com.lu.magic.util.ripple.RectangleRippleBuilder
 import com.lu.magic.util.ripple.RippleApplyUtil
+import com.lu.wxmask.adapter.AbsListAdapter
 import com.lu.wxmask.adapter.CommonListAdapter
 import com.lu.wxmask.bean.MaskItemBean
 import com.lu.wxmask.util.ConfigUtil
@@ -109,7 +110,7 @@ internal class ConfigManagerUI(private val activity: Activity) : IConfigManagerU
 
 
 private class ConfigManagerUIController(private val context: Context) {
-    private lateinit var listAdapter: CommonListAdapter<MaskItemBean>
+    private lateinit var listAdapter: CommonListAdapter<MaskItemBean, AbsListAdapter.ViewHolder>
     private lateinit var contentView: LinearLayout
     val dp24 = SizeUtil.dp2px(context.resources, 24f).toInt()
 
@@ -180,7 +181,7 @@ private class ConfigManagerUIController(private val context: Context) {
             divider = null
         }
 
-        listAdapter = object : CommonListAdapter<MaskItemBean>() {
+        listAdapter = object : CommonListAdapter<MaskItemBean,AbsListAdapter.ViewHolder>() {
             init {
                 //去重
                 val dataListTemp = ConfigUtil.getMaskList().let {
