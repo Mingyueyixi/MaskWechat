@@ -80,9 +80,11 @@ dependencies {
 
     implementation(deps['com.google.code.gson:gson'])
     implementation(deps['androidx.appcompat:appcompat'])
-    implementation(deps['com.google.android.material:material'])
+//    implementation(deps['com.google.android.material:material'])
 
     implementation(project(":lib-donate"))
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
+//    implementation 'androidx.recyclerview:recyclerview:1.2.1'
 
     compileOnly(deps['de.robv.android.xposed:api'])
 

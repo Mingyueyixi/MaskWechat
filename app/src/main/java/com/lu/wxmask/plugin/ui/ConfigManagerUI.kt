@@ -9,20 +9,18 @@ import android.view.Gravity
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import android.widget.ListView
 import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.core.view.setPadding
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.lu.magic.ui.recycler.MultiAdapter
-import com.lu.magic.ui.recycler.MultiViewHolder
-import com.lu.magic.ui.recycler.SimpleItemType
 import com.lu.magic.util.ResUtil
 import com.lu.magic.util.SizeUtil
 import com.lu.magic.util.ripple.RectangleRippleBuilder
 import com.lu.magic.util.ripple.RippleApplyUtil
+import com.lu.wxmask.adapter.CommonListAdapter
 import com.lu.wxmask.bean.MaskItemBean
 import com.lu.wxmask.util.ConfigUtil
 
@@ -55,7 +53,7 @@ internal class ConfigManagerUI(private val activity: Activity) : IConfigManagerU
 
             activity.applicationContext.resources.displayMetrics.let {
                 width = it.widthPixels
-                height = ViewGroup.LayoutParams.WRAP_CONTENT
+                height = MarginLayoutParams.WRAP_CONTENT
             }
             contentView = onCreateView()
 
@@ -65,7 +63,7 @@ internal class ConfigManagerUI(private val activity: Activity) : IConfigManagerU
                     activity.window.attributes = it
                 }
             }
-            //全屏。显示到状态栏
+            //不剪切
             isClippingEnabled = false
         }
 
@@ -111,7 +109,7 @@ internal class ConfigManagerUI(private val activity: Activity) : IConfigManagerU
 
 
 private class ConfigManagerUIController(private val context: Context) {
-    private lateinit var listAdapter: MultiAdapter<MaskItemBean>
+    private lateinit var listAdapter: CommonListAdapter<MaskItemBean>
     private lateinit var contentView: LinearLayout
     val dp24 = SizeUtil.dp2px(context.resources, 24f).toInt()
 
@@ -172,78 +170,81 @@ private class ConfigManagerUIController(private val context: Context) {
     }
 
     private fun initMaskListView() {
-        val recyclerView = RecyclerView(context).apply {
+        val listView = ListView(context).apply {
             layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+                MarginLayoutParams.MATCH_PARENT,
+                MarginLayoutParams.WRAP_CONTENT
+            ).also {
+            }
+
+            divider = null
         }
 
-        listAdapter = MultiAdapter<MaskItemBean>()
-            .addData(ConfigUtil.getMaskList().let {
-                val keyMap = LinkedHashMap<String, MaskItemBean>()
+        listAdapter = object : CommonListAdapter<MaskItemBean>() {
+            init {
                 //去重
-                it.forEach {
-                    keyMap.put(it.maskId, it)
-                }
-                keyMap.values.toList()
-            })
-            .addItemType(object : SimpleItemType<MaskItemBean>() {
-                override fun createViewHolder(
-                    adapter: MultiAdapter<MaskItemBean>,
-                    parent: ViewGroup,
-                    viewType: Int
-                ): MultiViewHolder<MaskItemBean> {
-
-                    val itemView = TextView(context).also {
-                        it.layoutParams = RecyclerView.LayoutParams(
-                            RecyclerView.LayoutParams.MATCH_PARENT,
-                            RecyclerView.LayoutParams.WRAP_CONTENT
-                        )
-                        val dp6 = SizeUtil.dp2px(context.resources, 6f).toInt()
-                        it.setPadding(dp6)
-                        RippleApplyUtil.apply(it, RectangleRippleBuilder(Color.TRANSPARENT, 0x33333333))
+                val dataListTemp = ConfigUtil.getMaskList().let {
+                    val keyMap = LinkedHashMap<String, MaskItemBean>()
+                    //去重
+                    it.forEach { bean ->
+                        keyMap[bean.maskId] = bean
                     }
+                    keyMap.values.toList()
+                }
+                setData(dataListTemp)
+            }
 
-                    return object : MultiViewHolder<MaskItemBean>(itemView) {
-                        init {
-                            itemView.setOnLongClickListener {
-                                val position = layoutPosition
-                                showDeleteMaskItemDialog(position)
-                                return@setOnLongClickListener false
-                            }
-                            itemView.setOnClickListener {
-                                showEditMaskItemDialog(layoutPosition)
-                            }
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+                val itemView = TextView(context).also {
+                    it.layoutParams = MarginLayoutParams(
+                        MarginLayoutParams.MATCH_PARENT,
+                        MarginLayoutParams.WRAP_CONTENT
+                    )
+                    val dp6 = SizeUtil.dp2px(context.resources, 6f).toInt()
+                    it.setPadding(dp6)
+                    RippleApplyUtil.apply(it, RectangleRippleBuilder(Color.TRANSPARENT, 0x33333333))
+                }
+
+                return object : ViewHolder(itemView) {
+                    init {
+                        itemView.setOnLongClickListener {
+                            showDeleteMaskItemDialog(layoutPosition)
+                            return@setOnLongClickListener false
                         }
-
-                        override fun onBindView(
-                            adapter: MultiAdapter<MaskItemBean>,
-                            itemModel: MaskItemBean,
-                            position: Int
-                        ) {
-                            itemView.text = if (itemModel.tagName.isNullOrEmpty()) {
-                                itemModel.maskId
-                            } else {
-                                "${itemModel.maskId} (${itemModel.tagName})"
-                            }
+                        itemView.setOnClickListener {
+                            showEditMaskItemDialog(layoutPosition)
                         }
                     }
                 }
+            }
 
-            })
-        recyclerView.adapter = listAdapter
-        contentView.addView(recyclerView)
+            override fun onBindViewHolder(vh: ViewHolder, position: Int, parent: ViewGroup) {
+                val itemView = vh.itemView
+                val itemModel = dataList[position]
+
+                if (itemView is TextView) {
+                    itemView.text = if (itemModel.tagName.isEmpty()) {
+                        itemModel.maskId
+                    } else {
+                        "${itemModel.maskId} (${itemModel.tagName})"
+                    }
+                }
+
+            }
+
+        }
+
+        listView.adapter = listAdapter
+        contentView.addView(listView)
     }
 
     private fun showDeleteMaskItemDialog(position: Int) {
         AlertDialog.Builder(context)
             .setTitle("是否删除？")
             .setNegativeButton("确定") { _, _ ->
-                listAdapter.getData().removeAt(position)
+                listAdapter.removeAt(position)
                 ConfigUtil.setMaskList(listAdapter.getData())
-                listAdapter.notifyItemRemoved(position)
+                listAdapter.notifyDataSetChanged()
             }
             .setNeutralButton("取消") { _, _ ->
 
@@ -255,17 +256,18 @@ private class ConfigManagerUIController(private val context: Context) {
         AddMaskItemUI(context, listAdapter.getData())
             .setConfirmListener { _, maskItemBean ->
                 listAdapter.addData(maskItemBean)
-                listAdapter.notifyItemInserted(listAdapter.itemCount - 1)
+                listAdapter.notifyDataSetChanged()
             }.show()
     }
 
     private fun showEditMaskItemDialog(position: Int) {
         EditMaskItemUI(context, listAdapter.getData(), position)
             .setOnConfigChangeListener { _, _, mode ->
-                when (mode) {
-                    EditMaskItemUI.MODE_CONFIG_UPDATE -> listAdapter.notifyItemChanged(position)
-                    EditMaskItemUI.MODE_CONFIG_REMOVE -> listAdapter.notifyItemRemoved(position)
-                }
+//                when (mode) {
+//                    EditMaskItemUI.MODE_CONFIG_UPDATE -> listAdapter.notifyItemChanged(position)
+//                    EditMaskItemUI.MODE_CONFIG_REMOVE -> listAdapter.notifyItemRemoved(position)
+//                }
+                listAdapter.notifyDataSetChanged()
             }
             .show()
     }
