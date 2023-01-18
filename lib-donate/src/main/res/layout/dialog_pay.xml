@@ -7,19 +7,27 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <com.lu.mask.donate.view.AutoFillParentImage
-        android:id="@+id/iv_qr_pay_img"
+    <FrameLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_gravity="center_horizontal"
-        tools:src="@mipmap/ic_alipay_qr" />
+        android:layout_weight="1">
+
+        <com.lu.mask.donate.view.AutoFillParentImage
+            android:id="@+id/iv_qr_pay_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            tools:src="@mipmap/ic_alipay_qr" />
+
+    </FrameLayout>
 
     <ImageView
         android:id="@+id/ivDownload"
         android:layout_width="match_parent"
         android:layout_height="36dp"
-        android:scaleType="centerInside"
         android:layout_marginTop="8dp"
+        android:scaleType="centerInside"
         android:src="@drawable/ic_icon_download"
         app:tint="@android:color/white" />
 
