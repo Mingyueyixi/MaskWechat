@@ -11,6 +11,7 @@ import com.lu.lposed.api2.XC_MethodHook2;
 import com.lu.lposed.api2.XposedHelpers2;
 import com.lu.lposed.plugin.IPlugin;
 import com.lu.magic.util.log.LogUtil;
+import com.lu.wxmask.ClazzN;
 import com.lu.wxmask.Constrant;
 import com.lu.wxmask.bean.MaskItemBean;
 import com.lu.wxmask.plugin.ui.AddMaskItemUI;
@@ -22,6 +23,7 @@ import com.lu.wxmask.util.ConfigUtil;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class WXConfigPlugin implements IPlugin {
@@ -44,7 +46,7 @@ public class WXConfigPlugin implements IPlugin {
 
     private void handleHookLauncherUI(Context context, XC_LoadPackage.LoadPackageParam lpparam) {
         XposedHelpers2.findAndHookMethod(
-                "com.tencent.mm.ui.LauncherUI",
+                ClazzN.LauncherUI,
                 context.getClassLoader(),
                 "onCreate",
                 Bundle.class.getName(),
@@ -59,7 +61,7 @@ public class WXConfigPlugin implements IPlugin {
         );
 
         XposedHelpers2.findAndHookMethod(
-                "com.tencent.mm.ui.LauncherUI",
+                ClazzN.LauncherUI,
                 context.getClassLoader(),
                 "onNewIntent",
                 Intent.class.getName(),
@@ -115,61 +117,64 @@ public class WXConfigPlugin implements IPlugin {
     }
 
     private void handleHookChattingUIAddMaskDialog(Context context, XC_LoadPackage.LoadPackageParam lpparam) {
-        XposedHelpers2.findAndHookMethod(
-                "com.tencent.mm.ui.chatting.BaseChattingUIFragment",
-                context.getClassLoader(),
-                "doResume",
-                new XC_MethodHook2() {
-                    @Override
-                    protected void afterHookedMethod(MethodHookParam param) {
-                        if (!isOnDoingConfig) {
-                            LogUtil.d("ignore show config ui");
-                            return;
-                        }
-                        LogUtil.w("start config ui");
-                        View view = XposedHelpers2.callMethod(param.thisObject, "getView");
-                        view.post(() -> {
+//        XposedHelpers2.findAndHookMethod(
+//                ClazzN.BaseChattingUIFragment,
+//                context.getClassLoader(),
+//                "doResume",
+//                new XC_MethodHook2() {
+//                    @Override
+//                    protected void afterHookedMethod(MethodHookParam param) {
+//                        doResumeHookAction(param);
+//                    }
+//
+//                });
+//
+    }
 
-                            //确保数据和画面准备好了
-                            if (XposedHelpers2.callMethod(param.thisObject, "isHidden")) {
-                                LogUtil.w("isHidden");
-                                return;
-                            }
-                            Activity activity = XposedHelpers2.callMethod(param.thisObject, "getActivity");
-                            if (!"com.tencent.mm.ui.LauncherUI".equals(activity.getClass().getName())) {
-                                LogUtil.w("isNot Activity");
-                                return;
-                            }
-                            Bundle arguments = XposedHelpers2.callMethod(param.thisObject, "getArguments");
-                            String chatUser = arguments.getString("Chat_User");
-                            List<MaskItemBean> lst = ConfigUtil.Companion.getMaskList();
-                            int idIndex = MaskUtil.findIndex(lst, chatUser);
-                            if (idIndex < 0) {
-                                new AddMaskItemUI(activity, lst)
-                                        .setChatUserId(chatUser)
-                                        .setTagName(field_conRemark.isEmpty() ? field_nickname : field_conRemark)
-                                        .setFreeButton("退出配置", (dialog, which) -> isOnDoingConfig = false)
-                                        .show();
-                            } else {
-                                new EditMaskItemUI(activity, lst, idIndex)
-                                        .setFreeButton("退出配置", (dialog, which) -> isOnDoingConfig = false)
-                                        .show();
-                            }
-                        });
+    public void doResumeHookAction(XC_MethodHook.MethodHookParam param) {
+        if (!isOnDoingConfig) {
+            LogUtil.d("ignore show config ui");
+            return;
+        }
+        LogUtil.w("start config ui");
+        View view = XposedHelpers2.callMethod(param.thisObject, "getView");
+        view.post(() -> {
 
-                    }
-
-                });
+            //确保数据和画面准备好了
+            if (XposedHelpers2.callMethod(param.thisObject, "isHidden")) {
+                LogUtil.w("isHidden");
+                return;
+            }
+            Activity activity = XposedHelpers2.callMethod(param.thisObject, "getActivity");
+            if (!ClazzN.LauncherUI.equals(activity.getClass().getName())) {
+                LogUtil.w("isNot Activity");
+                return;
+            }
+            Bundle arguments = XposedHelpers2.callMethod(param.thisObject, "getArguments");
+            String chatUser = arguments.getString("Chat_User");
+            List<MaskItemBean> lst = ConfigUtil.Companion.getMaskList();
+            int idIndex = MaskUtil.findIndex(lst, chatUser);
+            if (idIndex < 0) {
+                new AddMaskItemUI(activity, lst)
+                        .setChatUserId(chatUser)
+                        .setTagName(field_conRemark.isEmpty() ? field_nickname : field_conRemark)
+                        .setFreeButton("退出配置", (dialog, which) -> isOnDoingConfig = false)
+                        .show();
+            } else {
+                new EditMaskItemUI(activity, lst, idIndex)
+                        .setFreeButton("退出配置", (dialog, which) -> isOnDoingConfig = false)
+                        .show();
+            }
+        });
 
     }
 
 
     private void handleHookGetChatInfo(Context context, XC_LoadPackage.LoadPackageParam lpparam) {
 
-        String fragmentClassName = "com.tencent.mm.ui.chatting.BaseChattingUIFragment";
         Method setChattingInfoMethod = null;
         try {
-            setChattingInfoMethod = XposedHelpers2.findMethodExact(fragmentClassName, context.getClassLoader(), "aB", "com.tencent.mm.storage.aw");
+            setChattingInfoMethod = XposedHelpers2.findMethodExact(ClazzN.BaseChattingUIFragment, context.getClassLoader(), "aB", "com.tencent.mm.storage.aw");
         } catch (Throwable e) {
             LogUtil.w("can' fin aB(com.tencent.mm.storage.aw) function, try to exact BaseChattingUIFragment's methods");
         }
@@ -178,9 +183,10 @@ public class WXConfigPlugin implements IPlugin {
         if (setChattingInfoMethod == null) {
             //直接遍历搜查
             Method[] methods = XposedHelpers2.findMethodsByExactPredicate(
-                    "com.tencent.mm.ui.chatting.BaseChattingUIFragment",
+                    ClazzN.BaseChattingUIFragment,
                     context.getClassLoader(),
                     method -> {
+//                        LogUtil.w(method);
                         for (Class<?> parameterType : method.getParameterTypes()) {
                             if (baseContactClazz.isAssignableFrom(parameterType)) {
                                 return true;
@@ -209,6 +215,7 @@ public class WXConfigPlugin implements IPlugin {
         }
         if (setChattingInfoMethod == null) {
             //理论也可以从hED变量搜索
+            return;
         }
 
         XposedHelpers2.hookMethod(setChattingInfoMethod, new XC_MethodHook2() {

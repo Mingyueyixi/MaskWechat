@@ -62,7 +62,7 @@ public class MainHook implements IXposedHookLoadPackage {
                     }
                 }
         );
-//        XposedHelpers.findAndHookMethod("com.tencent.mm.ui.LauncherUI",
+//        XposedHelpers.findAndHookMethod(ClazzName.LauncherUI,
 //                lpparam.classLoader,
 //                "onCreate",
 //                Bundle.class,

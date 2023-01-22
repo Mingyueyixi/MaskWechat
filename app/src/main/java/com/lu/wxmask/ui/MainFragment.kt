@@ -7,8 +7,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.MarginLayoutParams
-import android.widget.LinearLayout
 import com.lu.magic.ui.BaseFragment
 import com.lu.magic.ui.LifecycleAutoViewBinding
 import com.lu.magic.util.SizeUtil
@@ -18,6 +16,7 @@ import com.lu.magic.util.ripple.RectangleRippleBuilder
 import com.lu.magic.util.ripple.RippleApplyUtil
 import com.lu.mask.donate.DonatePresenter
 import com.lu.wxmask.BuildConfig
+import com.lu.wxmask.ClazzN
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.R
 import com.lu.wxmask.SelfHook
@@ -156,7 +155,7 @@ class MainFragment : BaseFragment() {
             intent.putExtra(Constrant.KEY_INTENT_FROM_MASK, true)
             intent.putExtra(Constrant.KEY_INTENT_PLUGIN_MODE, mode)
 
-            intent.component = ComponentName("com.tencent.mm", "com.tencent.mm.ui.LauncherUI")
+            intent.component = ComponentName("com.tencent.mm", ClazzN.LauncherUI)
             startActivity(intent)
         } catch (e: Exception) {
             ToastUtil.show("跳转WeChat配置页面失败")
