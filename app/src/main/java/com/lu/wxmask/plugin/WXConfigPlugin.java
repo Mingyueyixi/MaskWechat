@@ -178,7 +178,7 @@ public class WXConfigPlugin implements IPlugin {
         } catch (Throwable e) {
             LogUtil.w("can' fin aB(com.tencent.mm.storage.aw) function, try to exact BaseChattingUIFragment's methods");
         }
-        final Class<?> baseContactClazz = XposedHelpers2.findClassIfExists("com.tencent.mm.autogen.table.BaseContact", context.getClassLoader());
+        final Class<?> baseContactClazz = XposedHelpers2.findClassIfExists(ClazzN.BaseContact, context.getClassLoader());
 
         if (setChattingInfoMethod == null) {
             //直接遍历搜查

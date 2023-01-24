@@ -7,9 +7,14 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ListAdapter
+import android.widget.ListView
+import com.lu.lposed.api2.XC_MethodHook2
 import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
 import com.lu.lposed.plugin.PluginProviders
+import com.lu.magic.util.AppUtil
+import com.lu.magic.util.GsonUtil
 import com.lu.magic.util.ReflectUtil
 import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.ClazzN
@@ -18,8 +23,10 @@ import com.lu.wxmask.bean.MaskItemBean
 import com.lu.wxmask.util.ConfigUtil
 import com.lu.wxmask.util.ConfigUtil.Companion.registerConfigSetObserver
 import com.lu.wxmask.util.ConfigUtil.ConfigSetObserver
+import com.lu.wxmask.util.AppVersionUtil
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam
+import java.lang.reflect.Method
 
 class WXMaskPlugin : IPlugin, ConfigSetObserver {
     var maskIdList = loadMaskIdList()
@@ -51,8 +58,10 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
 
     override fun handleHook(context: Context, lpparam: LoadPackageParam) {
 //        handleViewClick(context, lpparam)
+        handleMainUIChattingListView(context, lpparam)
         handleChattingUIFragment(context, lpparam)
     }
+
 
     private fun handleChattingUIFragment(context: Context, lpparam: LoadPackageParam) {
         val onEnterBeginMethod = XposedHelpers2.findMethodExactIfExists(
@@ -141,6 +150,92 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
         }
 
     }
+
+    private fun handleMainUIChattingListView(context: Context, lpparam: LoadPackageParam) {
+        val setAdapterMethod = XposedHelpers2.findMethodExactIfExists(
+            ListView::class.java.name,
+            context.classLoader,
+            "setAdapter",
+            ListAdapter::class.java
+        )
+        XposedHelpers2.hookMethod(
+            setAdapterMethod,
+            object : XC_MethodHook2() {
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    val adapter = param.args[0]
+                    hookListViewAdapter(adapter)
+                }
+            }
+        )
+    }
+
+    private var hasHookListViewAdapter = false
+    private fun hookListViewAdapter(adapterObj: Any) {
+        if (hasHookListViewAdapter) {
+            return
+        }
+        val baseConversationClazz = XposedHelpers2.findClassIfExists(ClazzN.BaseConversation, AppUtil.getContext().classLoader)
+        val getViewMethod: Method = XposedHelpers2.findMethodExactIfExists(
+            adapterObj.javaClass,
+            "getView",
+            java.lang.Integer.TYPE,
+            View::class.java,
+            ViewGroup::class.java
+        ) ?: return
+
+        XposedHelpers2.hookMethod(
+            getViewMethod,
+            object : XC_MethodHook2() {
+
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    val adapter: ListAdapter = param.thisObject as ListAdapter
+                    val position: Int = (param.args[0] as? Int?) ?: return
+                    val itemData: Any = adapter.getItem(position) ?: return
+
+                    LogUtil.d("after getView", adapter.javaClass, GsonUtil.toJson(itemData))
+                    if (baseConversationClazz.isAssignableFrom(itemData.javaClass)) {
+                        val chatUser: String = XposedHelpers2.getObjectField(itemData, "field_username") ?: return
+                        val itemView: View = param.args[1] as? View ?: return
+                        LogUtil.d(chatUser, GsonUtil.toJson(itemData))
+                        if (containChatUser(chatUser)) {
+                            hideUnReadTipView(itemView, param)
+                            hideLastMsgView(itemView, param)
+                        }
+                    } else {
+                        //不是所需类型
+                    }
+                }
+
+                private fun hideUnReadTipView(itemView: View, param: MethodHookParam) {
+                    val tipTvIdText = when (AppVersionUtil.getVersionCode()) {
+                        2300 -> "kmv"
+                        else -> "tipcnt_tv"
+                    }
+                    val tipTvId = AppUtil.getContext().resources.getIdentifier(tipTvIdText, "id", AppUtil.getContext().packageName)
+                    val tipTv = itemView.findViewById<View>(tipTvId)
+                    tipTv.visibility = View.INVISIBLE
+                }
+                //隐藏最后一条消息
+                private fun hideLastMsgView(itemView: View, param: MethodHookParam) {
+                    val resource = AppUtil.getContext().resources
+                    val msgTvIdName = when (AppVersionUtil.getVersionCode()) {
+                        2300 -> "fhs"
+                        else -> "last_msg_tv"
+                    }
+                    val lastMsgViewId = resource.getIdentifier(msgTvIdName, "id", AppUtil.getContext().packageName)
+                    LogUtil.d("mask last msg textView", lastMsgViewId)
+                    val msgTv: View? = itemView.findViewById(lastMsgViewId)
+
+                    try {
+                        val ret: Any? = XposedHelpers2.callMethod(msgTv, "setText",  "")
+                    } catch (e: Throwable) {
+                        LogUtil.w("error", msgTv)
+                    }
+                }
+
+            })
+    }
+
 
 }
 
@@ -258,7 +353,7 @@ class EnterChattingHookAction(val context: Context, val lpparam: LoadPackagePara
             listView = runCatching {
                 val mmListViewId = context.resources.getIdentifier("b5n", "id", context.packageName)
 //                val mmListView =
-                    XposedHelpers2.callMethod(fragmentObj, "findViewById", mmListViewId) as View
+                XposedHelpers2.callMethod(fragmentObj, "findViewById", mmListViewId) as View
 //                XposedHelpers2.callMethod(mmListView, "getListView") as View
             }.getOrNull()
 

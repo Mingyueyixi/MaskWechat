@@ -1,7 +1,6 @@
 package com.lu.wxmask.util
 
 import android.content.Context
-import com.google.gson.JsonObject
 import com.lu.magic.util.AppUtil
 import com.lu.magic.util.GsonUtil
 import com.lu.magic.util.log.LogUtil
