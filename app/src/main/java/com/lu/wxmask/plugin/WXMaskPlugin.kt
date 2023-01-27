@@ -152,34 +152,40 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
 
     //隐藏指定用户的主页的消息
     private fun handleMainUIChattingListView(context: Context, lpparam: LoadPackageParam) {
-        when (AppVersionUtil.getVersionCode()) {
-            Constrant.WX_CODE_8_0_32 -> {
-                val adapterClazz = XposedHelpers2.findClassIfExists(
-                    "com.tencent.mm.ui.conversation.p",
-                    AppUtil.getContext().classLoader
-                ) ?: return
-                hookListViewAdapter(adapterClazz)
-            }
-
-            else -> {
-                val setAdapterMethod = XposedHelpers2.findMethodExactIfExists(
-                    ListView::class.java.name,
-                    context.classLoader,
-                    "setAdapter",
-                    ListAdapter::class.java
-                )
-                XposedHelpers2.hookMethod(
-                    setAdapterMethod,
-                    object : XC_MethodHook2() {
-                        override fun afterHookedMethod(param: MethodHookParam) {
-                            val adapter = param.args[0] ?: return
-                            hookListViewAdapter(adapter.javaClass)
-                        }
+        val adapterName = when (AppVersionUtil.getVersionCode()) {
+            Constrant.WX_CODE_8_0_32 -> "com.tencent.mm.ui.conversation.p"
+            Constrant.WX_CODE_8_0_22 -> "com.tencent.mm.ui.conversation.k"
+            else -> null
+        }
+        var adapterClazz: Class<*>? = null
+        if (adapterName != null) {
+            adapterClazz = XposedHelpers2.findClassIfExists(
+                adapterName,
+                AppUtil.getContext().classLoader
+            )
+        }
+        if (adapterClazz != null) {
+            hookListViewAdapter(adapterClazz)
+        } else {
+            LogUtil.w("WeChat MainUI not found Adapter for ListView, guess start.")
+            val setAdapterMethod = XposedHelpers2.findMethodExactIfExists(
+                ListView::class.java.name,
+                context.classLoader,
+                "setAdapter",
+                ListAdapter::class.java
+            )
+            XposedHelpers2.hookMethod(
+                setAdapterMethod,
+                object : XC_MethodHook2() {
+                    override fun afterHookedMethod(param: MethodHookParam) {
+                        val adapter = param.args[0] ?: return
+                        hookListViewAdapter(adapter.javaClass)
                     }
-                )
-            }
+                }
+            )
 
         }
+
     }
 
     private fun hookListViewAdapter(adapterClazz: Class<*>) {
