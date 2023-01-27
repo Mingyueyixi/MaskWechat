@@ -14,20 +14,20 @@ import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
 import com.lu.lposed.plugin.PluginProviders
 import com.lu.magic.util.AppUtil
-import com.lu.magic.util.GsonUtil
 import com.lu.magic.util.ReflectUtil
 import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.ClazzN
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.bean.MaskItemBean
+import com.lu.wxmask.util.AppVersionUtil
 import com.lu.wxmask.util.ConfigUtil
 import com.lu.wxmask.util.ConfigUtil.ConfigSetObserver
-import com.lu.wxmask.util.AppVersionUtil
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam
 import java.lang.reflect.Method
 
 class WXMaskPlugin : IPlugin, ConfigSetObserver {
+    private val hookMethodNameRecord = linkedSetOf<String>()
     var maskIdList = loadMaskIdList()
 
     companion object {
@@ -150,38 +150,51 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
 
     }
 
+    //隐藏指定用户的主页的消息
     private fun handleMainUIChattingListView(context: Context, lpparam: LoadPackageParam) {
-        val setAdapterMethod = XposedHelpers2.findMethodExactIfExists(
-            ListView::class.java.name,
-            context.classLoader,
-            "setAdapter",
-            ListAdapter::class.java
-        )
-        XposedHelpers2.hookMethod(
-            setAdapterMethod,
-            object : XC_MethodHook2() {
-                override fun afterHookedMethod(param: MethodHookParam) {
-                    val adapter = param.args[0] ?: return
-                    hookListViewAdapter(adapter)
-                }
+        when (AppVersionUtil.getVersionCode()) {
+            Constrant.WX_CODE_8_0_32 -> {
+                val adapterClazz = XposedHelpers2.findClassIfExists(
+                    "com.tencent.mm.ui.conversation.p",
+                    AppUtil.getContext().classLoader
+                ) ?: return
+                hookListViewAdapter(adapterClazz)
             }
-        )
+
+            else -> {
+                val setAdapterMethod = XposedHelpers2.findMethodExactIfExists(
+                    ListView::class.java.name,
+                    context.classLoader,
+                    "setAdapter",
+                    ListAdapter::class.java
+                )
+                XposedHelpers2.hookMethod(
+                    setAdapterMethod,
+                    object : XC_MethodHook2() {
+                        override fun afterHookedMethod(param: MethodHookParam) {
+                            val adapter = param.args[0] ?: return
+                            hookListViewAdapter(adapter.javaClass)
+                        }
+                    }
+                )
+            }
+
+        }
     }
 
-    private var hasHookListViewAdapter = false
-    private fun hookListViewAdapter(adapterObj: Any) {
-        if (hasHookListViewAdapter) {
-            return
-        }
-        val baseConversationClazz = XposedHelpers2.findClassIfExists(ClazzN.BaseConversation, AppUtil.getContext().classLoader)
+    private fun hookListViewAdapter(adapterClazz: Class<*>) {
         val getViewMethod: Method = XposedHelpers2.findMethodExactIfExists(
-            adapterObj.javaClass,
+            adapterClazz,
             "getView",
             java.lang.Integer.TYPE,
             View::class.java,
             ViewGroup::class.java
         ) ?: return
-
+        if (hookMethodNameRecord.contains(getViewMethod.toString())) {
+            return
+        }
+        val baseConversationClazz =
+            XposedHelpers2.findClassIfExists(ClazzN.BaseConversation, AppUtil.getContext().classLoader)
         XposedHelpers2.hookMethod(
             getViewMethod,
             object : XC_MethodHook2() {
@@ -205,15 +218,21 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
                     }
                 }
 
+                //隐藏未读消息红点
                 private fun hideUnReadTipView(itemView: View, param: MethodHookParam) {
                     val tipTvIdText = when (AppVersionUtil.getVersionCode()) {
                         Constrant.WX_CODE_8_0_32 -> "kmv"
                         else -> "tipcnt_tv"
                     }
-                    val tipTvId = AppUtil.getContext().resources.getIdentifier(tipTvIdText, "id", AppUtil.getContext().packageName)
+                    val tipTvId = AppUtil.getContext().resources.getIdentifier(
+                        tipTvIdText,
+                        "id",
+                        AppUtil.getContext().packageName
+                    )
                     val tipTv = itemView.findViewById<View>(tipTvId)
                     tipTv.visibility = View.INVISIBLE
                 }
+
                 //隐藏最后一条消息
                 private fun hideLastMsgView(itemView: View, param: MethodHookParam) {
                     val resource = AppUtil.getContext().resources
@@ -226,13 +245,15 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
                     val msgTv: View? = itemView.findViewById(lastMsgViewId)
 
                     try {
-                        val ret: Any? = XposedHelpers2.callMethod(msgTv, "setText",  "")
+                        val ret: Any? = XposedHelpers2.callMethod(msgTv, "setText", "")
                     } catch (e: Throwable) {
                         LogUtil.w("error", msgTv)
                     }
                 }
 
             })
+        LogUtil.i(getViewMethod.toString())
+        hookMethodNameRecord.add(getViewMethod.toString())
     }
 
 
