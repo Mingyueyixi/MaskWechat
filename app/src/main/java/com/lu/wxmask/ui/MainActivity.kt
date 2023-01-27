@@ -1,9 +1,11 @@
 package com.lu.wxmask.ui
 
 import android.os.Bundle
+import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import com.lu.magic.ui.FragmentNavigation
 import com.lu.wxmask.databinding.LayoutMainBinding
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var fragmentNavigation: FragmentNavigation
@@ -15,6 +17,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         fragmentNavigation = FragmentNavigation(this, binding.mainContainer)
         fragmentNavigation.navigate(MainFragment::class.java)
+        JsonMenuManager.updateMenuListFromRemote(this.applicationContext)
     }
 
 
@@ -23,7 +26,14 @@ class MainActivity : AppCompatActivity() {
         if (!fragmentNavigation.navigateBack()) {
             super.onBackPressed()
         }
-        applicationContext
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+
+        // Inflate the menu; this adds items to the action bar if it is present.
+        super.onCreateOptionsMenu(menu)
+        JsonMenuManager.inflate(this, menu)
+        return true
     }
 
 
