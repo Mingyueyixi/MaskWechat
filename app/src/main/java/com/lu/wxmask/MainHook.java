@@ -47,7 +47,7 @@ public class MainHook implements IXposedHookLoadPackage {
                 }
             }
         });
-        LogUtil.w("start mask plugin for wechat");
+        LogUtil.w("start main plugin for wechat");
         XposedHelpers2.Config.setThrowableCallBack(throwable -> LogUtil.e("MaskPlugin error", throwable));
 
         XposedHelpers2.findAndHookMethod(

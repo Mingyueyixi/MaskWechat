@@ -7,6 +7,7 @@ class AppVersionUtil {
     companion object {
         private var versionCode = -1
         private var versionName = ""
+        @JvmStatic
         fun getVersionName(): String? {
             if (versionName.isBlank()) {
                 versionName = try {
@@ -21,6 +22,7 @@ class AppVersionUtil {
             return versionName
         }
 
+        @JvmStatic
         fun getVersionCode(): Int {
             if (versionCode == -1) {
                 versionCode = try {

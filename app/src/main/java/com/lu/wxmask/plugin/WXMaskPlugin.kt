@@ -21,7 +21,6 @@ import com.lu.wxmask.ClazzN
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.bean.MaskItemBean
 import com.lu.wxmask.util.ConfigUtil
-import com.lu.wxmask.util.ConfigUtil.Companion.registerConfigSetObserver
 import com.lu.wxmask.util.ConfigUtil.ConfigSetObserver
 import com.lu.wxmask.util.AppVersionUtil
 import de.robv.android.xposed.XC_MethodHook
@@ -48,7 +47,7 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
     }
 
     override fun onCreate() {
-        registerConfigSetObserver(this)
+        ConfigUtil.registerConfigSetObserver(this)
     }
 
     override fun onConfigChange() {
@@ -162,7 +161,7 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
             setAdapterMethod,
             object : XC_MethodHook2() {
                 override fun afterHookedMethod(param: MethodHookParam) {
-                    val adapter = param.args[0]
+                    val adapter = param.args[0] ?: return
                     hookListViewAdapter(adapter)
                 }
             }
@@ -192,11 +191,11 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
                     val position: Int = (param.args[0] as? Int?) ?: return
                     val itemData: Any = adapter.getItem(position) ?: return
 
-                    LogUtil.d("after getView", adapter.javaClass, GsonUtil.toJson(itemData))
+//                    LogUtil.d("after getView", adapter.javaClass, GsonUtil.toJson(itemData))
                     if (baseConversationClazz.isAssignableFrom(itemData.javaClass)) {
                         val chatUser: String = XposedHelpers2.getObjectField(itemData, "field_username") ?: return
                         val itemView: View = param.args[1] as? View ?: return
-                        LogUtil.d(chatUser, GsonUtil.toJson(itemData))
+//                        LogUtil.d(chatUser, GsonUtil.toJson(itemData))
                         if (containChatUser(chatUser)) {
                             hideUnReadTipView(itemView, param)
                             hideLastMsgView(itemView, param)
@@ -208,7 +207,7 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
 
                 private fun hideUnReadTipView(itemView: View, param: MethodHookParam) {
                     val tipTvIdText = when (AppVersionUtil.getVersionCode()) {
-                        2300 -> "kmv"
+                        Constrant.WX_CODE_8_0_32 -> "kmv"
                         else -> "tipcnt_tv"
                     }
                     val tipTvId = AppUtil.getContext().resources.getIdentifier(tipTvIdText, "id", AppUtil.getContext().packageName)
@@ -219,7 +218,7 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
                 private fun hideLastMsgView(itemView: View, param: MethodHookParam) {
                     val resource = AppUtil.getContext().resources
                     val msgTvIdName = when (AppVersionUtil.getVersionCode()) {
-                        2300 -> "fhs"
+                        Constrant.WX_CODE_8_0_32 -> "fhs"
                         else -> "last_msg_tv"
                     }
                     val lastMsgViewId = resource.getIdentifier(msgTvIdName, "id", AppUtil.getContext().packageName)
