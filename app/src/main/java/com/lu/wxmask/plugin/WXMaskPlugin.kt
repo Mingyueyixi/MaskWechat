@@ -22,6 +22,7 @@ import com.lu.wxmask.bean.MaskItemBean
 import com.lu.wxmask.util.AppVersionUtil
 import com.lu.wxmask.util.ConfigUtil
 import com.lu.wxmask.util.ConfigUtil.ConfigSetObserver
+import com.lu.wxmask.util.QuickCountClickListenerUtil
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam
 import java.lang.reflect.Method
@@ -409,6 +410,7 @@ class EnterChattingHookAction(val context: Context, val lpparam: LoadPackagePara
         val chatListView: View? = findChatListView(fragmentObj)
         if (chatListView != null) {
             chatListView.visibility = View.VISIBLE
+            QuickCountClickListenerUtil.unRegister(chatListView.parent as? View?)
         } else {
             showChatListUIFromMask(fragmentObj)
         }
@@ -436,7 +438,10 @@ class EnterChattingHookAction(val context: Context, val lpparam: LoadPackagePara
         val chatListView = findChatListView(fragmentObj)
         if (chatListView != null) {
             chatListView.visibility = View.INVISIBLE
-            LogUtil.w("hide chatListView")
+            QuickCountClickListenerUtil.register(chatListView.parent as? View?) {
+                chatListView.visibility = View.VISIBLE
+            }
+            LogUtil.i("hide chatListView")
         } else {
             hideListViewUIByMask(fragmentObj)
         }
@@ -448,6 +453,7 @@ class EnterChattingHookAction(val context: Context, val lpparam: LoadPackagePara
         }
 
     }
+
 
     //对聊天页面添加水印，进行糊脸
     private fun hideListViewUIByMask(fragmentObj: Any) {
@@ -482,3 +488,4 @@ class DoResumeAction(context: Context, lpparam: LoadPackageParam, tagConst: Stri
     }
 
 }
+
