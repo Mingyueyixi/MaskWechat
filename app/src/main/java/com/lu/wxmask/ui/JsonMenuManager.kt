@@ -9,6 +9,7 @@ import androidx.annotation.Keep
 import com.lu.magic.util.GsonUtil
 import com.lu.magic.util.thread.AppExecutor
 import com.lu.wxmask.R
+import com.lu.wxmask.util.http.HttpConnectUtil
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.HttpURLConnection
@@ -72,37 +73,18 @@ class JsonMenuManager {
         }
 
         fun updateMenuListFromRemote(context: Context) {
-            AppExecutor.io().execute {
-                var connect: URLConnection? = null
-                var iStream: InputStream? = null
-                var fileOutputStream: OutputStream? = null
-                try {
-                    val releatePath = "Mingyueyixi/MaskWechat/tree/main/app/src/main/res/raw/menu_ui.json"
-                    //val githubRawPath = "https://github.com/$releatePath"
-                    val cdnRawPath = "https://cdn.jsdelivr.net/gh/$releatePath"
-                    connect = URL(cdnRawPath).openConnection()
-                    connect.connect()
-                    iStream = connect.getInputStream()
-                    val bin = iStream.readBytes()
-                    if (bin.isNotEmpty()) {
-                        fileOutputStream = context.openFileOutput(menuFileName, Context.MODE_PRIVATE)
-                        fileOutputStream.write(bin)
+            val releatePath = "Mingyueyixi/MaskWechat/tree/main/app/src/main/res/raw/menu_ui.json"
+            //val githubRawPath = "https://github.com/$releatePath"
+            val cdnRawPath = "https://cdn.jsdelivr.net/gh/$releatePath"
 
-                    }
-                } catch (e: Exception) {
-
-                } finally {
-                    try {
-                        fileOutputStream?.close()
-                        if (connect is HttpURLConnection) {
-                            connect.disconnect()
-                        }
-                        iStream?.close()
-                        connect?.getOutputStream()?.close()
-                    } catch (e: Exception) {
+            HttpConnectUtil.get(cdnRawPath) {
+                if (it.error != null && it.code == 200 && it.body.isNotEmpty()) {
+                    context.openFileOutput(menuFileName, Context.MODE_PRIVATE).use { out ->
+                        out.write(it.body)
                     }
                 }
             }
+
         }
 
     }

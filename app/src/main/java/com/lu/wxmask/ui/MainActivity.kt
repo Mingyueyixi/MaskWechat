@@ -3,8 +3,10 @@ package com.lu.wxmask.ui
 import android.os.Bundle
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.lu.magic.ui.FragmentNavigation
 import com.lu.wxmask.databinding.LayoutMainBinding
+import com.lu.wxmask.ui.vm.AppUpdateViewModel
 
 
 class MainActivity : AppCompatActivity() {
@@ -18,6 +20,7 @@ class MainActivity : AppCompatActivity() {
         fragmentNavigation = FragmentNavigation(this, binding.mainContainer)
         fragmentNavigation.navigate(MainFragment::class.java)
         JsonMenuManager.updateMenuListFromRemote(this.applicationContext)
+        ViewModelProvider(this)[AppUpdateViewModel::class.java].checkOnEnter(this)
     }
 
 
