@@ -7,6 +7,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.annotation.Keep
 import com.lu.magic.util.GsonUtil
+import com.lu.magic.util.log.LogUtil
 import com.lu.magic.util.thread.AppExecutor
 import com.lu.wxmask.R
 import com.lu.wxmask.util.http.HttpConnectUtil
@@ -72,19 +73,36 @@ class JsonMenuManager {
             }
         }
 
-        fun updateMenuListFromRemote(context: Context) {
-            val releatePath = "Mingyueyixi/MaskWechat/tree/main/app/src/main/res/raw/menu_ui.json"
+        fun updateMenuListFromRemote(ctx: Context) {
+            val releatePath = "app/src/main/res/raw/menu_ui.json"
             //val githubRawPath = "https://github.com/$releatePath"
-            val cdnRawPath = "https://cdn.jsdelivr.net/gh/$releatePath"
+            //@main 或者@v1.6， commit id之类的，直接在写/main有时候不行
+            val context = ctx.applicationContext
 
-            HttpConnectUtil.get(cdnRawPath) {
-                if (it.error != null && it.code == 200 && it.body.isNotEmpty()) {
-                    context.openFileOutput(menuFileName, Context.MODE_PRIVATE).use { out ->
-                        out.write(it.body)
+            val rawJsonMenuUrl = "https://raw.githubusercontent.com/Mingyueyixi/MaskWechat/main/$releatePath"
+            HttpConnectUtil.get(rawJsonMenuUrl) {
+                if (it.error == null && it.code == 200 && it.body.isNotEmpty()) {
+                    writeRemoteToLocal(context, it.body)
+                } else {
+                    LogUtil.w("request raw remote menu fail, $rawJsonMenuUrl", it)
+                    val cdnRawPath = "https://cdn.jsdelivr.net/gh/Mingyueyixi/MaskWechat@main/$releatePath"
+                    HttpConnectUtil.get(cdnRawPath) {cdnRes->
+                        if (cdnRes.error == null && cdnRes.code == 200 && cdnRes.body.isNotEmpty()) {
+                            writeRemoteToLocal(context, cdnRes.body)
+                        } else {
+                            LogUtil.w("request jscdn remote menu fail, $cdnRawPath", cdnRes)
+                        }
                     }
-                }
-            }
 
+                }
+
+            }
+        }
+
+        private fun writeRemoteToLocal(context: Context, body: ByteArray) {
+            context.openFileOutput(menuFileName, Context.MODE_PRIVATE).use { out ->
+                out.write(body)
+            }
         }
 
     }

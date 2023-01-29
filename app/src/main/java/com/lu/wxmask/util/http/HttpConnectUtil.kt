@@ -16,7 +16,11 @@ class HttpConnectUtil {
         var header: Map<String, List<String>>,
         var body: ByteArray,
         var error: Throwable? = null
-    )
+    ) {
+        override fun toString(): String {
+            return "Response(code=$code, header=$header, body=${body.contentToString()}, error=$error)"
+        }
+    }
 
     class Request(
         var url: String,
@@ -26,6 +30,12 @@ class HttpConnectUtil {
         var connectTimeOut: Int = 5000,
         var readTimeOut: Int = 5000
     ) {
+        override fun toString(): String {
+            return "Request(url='$url', method='$method', header=$header, body=${body?.contentToString()}, connectTimeOut=$connectTimeOut, readTimeOut=$readTimeOut)"
+        }
+    }
+
+    class Fetcher(var request: Request) {
         fun fetch(): Response {
             var connection: HttpURLConnection? = null
             var iStream: InputStream? = null
@@ -33,14 +43,14 @@ class HttpConnectUtil {
 
             val resp = Response(-1, mutableMapOf(), byteArrayOf())
             try {
-                connection = URL(url).openConnection() as HttpURLConnection
-                connection.requestMethod = method
-                connection.connectTimeout = connectTimeOut
-                connection.readTimeout = readTimeOut
-                header.forEach {
+                connection = URL(request.url).openConnection() as HttpURLConnection
+                connection.requestMethod = request.method
+                connection.connectTimeout = request.connectTimeOut
+                connection.readTimeout = request.readTimeOut
+                request.header.forEach {
                     connection.setRequestProperty(it.key, it.value)
                 }
-                body?.let {
+                request.body?.let {
                     connection.doOutput = true
                     val out = connection.outputStream
                     outStream = out
@@ -73,18 +83,20 @@ class HttpConnectUtil {
         @JvmStatic
         fun get(url: String, callback: (resp: Response) -> Unit) {
             httpExecutor.submit {
-                Request(url, "GET").fetch().let(callback)
+                Fetcher(Request(url, "GET")).fetch().let(callback)
             }
         }
 
         @JvmStatic
         fun postJson(url: String, json: String, callback: (resp: Response) -> Unit) {
             httpExecutor.submit {
-                Request(
-                    url,
-                    "POST",
-                    mutableMapOf("Content-Type" to "application/json; charset=utf-8"),
-                    json.toByteArray(Charsets.UTF_8)
+                Fetcher(
+                    Request(
+                        url,
+                        "POST",
+                        mutableMapOf("Content-Type" to "application/json; charset=utf-8"),
+                        json.toByteArray(Charsets.UTF_8)
+                    )
                 ).fetch().let(callback)
             }
         }

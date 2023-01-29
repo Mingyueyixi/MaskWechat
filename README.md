@@ -2,6 +2,8 @@
 
 [Source link / 源码地址](https://github.com/Mingyueyixi/MaskWechat)
 
+反馈问题可点击源码地址，发起issues
+
 
 ## 介绍
 这是一个微信 Xposed 模块，她可以隐藏掉特定用户的聊天记录，防止私密的聊天被第三人偷看
@@ -44,6 +46,11 @@ PS.
 - 其他版本号以及32位版本未经测试，不保证功能可用
 - 模块一般只测试通过了最后一个适配的微信版本，因为作者精力有限+穷没有多余手机测试
 - 微信版本集合： https://weixin.qq.com/cgi-bin/readtemplate?lang=zh_CN&t=weixin_faq_list&head=true
+
+
+## 交流
+
+QQ群：点击添加 [549614926](https://qm.qq.com/cgi-bin/qm/qr?k=J884tv29im41_SuTo1Hm_gapAL6gBySJ&authKey=6jUdcjVCpYgDGmLsZmtkCtxJQY+oas0RACQ6vS9E+4xpMRB6858C/OMLhlSKxZRC&noverify=0)
 
 
 ## 声明
