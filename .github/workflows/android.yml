@@ -2,9 +2,9 @@ name: Android CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "v*/**"]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main" , "v*/**"]
 
 jobs:
   build:
@@ -24,3 +24,15 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
+
+    - name: Upload Archive Release-Apk
+      uses: actions/upload-artifact@v3
+      with:
+        name: release-apk
+        path: app/build/outputs/apk/release/*.apk
+
+    - name: Upload Archive Debug-Apk
+      uses: actions/upload-artifact@v3
+      with:
+        name: debug-apk
+        path: ./app/build/outputs/apk/debug/*.apk
