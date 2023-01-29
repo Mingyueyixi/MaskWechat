@@ -19,7 +19,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         fragmentNavigation = FragmentNavigation(this, binding.mainContainer)
         fragmentNavigation.navigate(MainFragment::class.java)
-        JsonMenuManager.updateMenuListFromRemote(this)
         ViewModelProvider(this)[AppUpdateViewModel::class.java].checkOnEnter(this)
     }
 

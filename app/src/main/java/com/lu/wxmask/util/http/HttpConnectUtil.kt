@@ -5,6 +5,7 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import java.nio.charset.Charset
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
@@ -18,20 +19,21 @@ class HttpConnectUtil {
         var error: Throwable? = null
     ) {
         override fun toString(): String {
-            return "Response(code=$code, header=$header, body=${body.contentToString()}, error=$error)"
+            return "Response(code=$code, header=$header, body=${body.toString(Charsets.UTF_8)}, error=$error)"
         }
     }
 
     class Request(
         var url: String,
         var method: String,
+        //虽然http协议允许重复的 header，但实际没什么用，所以这里不许
         var header: Map<String, String> = mutableMapOf(),
         var body: ByteArray? = null,
         var connectTimeOut: Int = 5000,
         var readTimeOut: Int = 5000
     ) {
         override fun toString(): String {
-            return "Request(url='$url', method='$method', header=$header, body=${body?.contentToString()}, connectTimeOut=$connectTimeOut, readTimeOut=$readTimeOut)"
+            return "Request(url='$url', method='$method', header=$header, body=${body?.toString(Charsets.UTF_8)}, connectTimeOut=$connectTimeOut, readTimeOut=$readTimeOut)"
         }
     }
 
@@ -81,9 +83,20 @@ class HttpConnectUtil {
         val httpExecutor = ThreadPoolExecutor(8, 16, 0L, TimeUnit.MILLISECONDS, LinkedBlockingQueue());
 
         @JvmStatic
+        val noCacheHttpHeader = mapOf("Cache-Control" to "no-cache")
+
+        @JvmStatic
         fun get(url: String, callback: (resp: Response) -> Unit) {
             httpExecutor.submit {
                 Fetcher(Request(url, "GET")).fetch().let(callback)
+            }
+        }
+
+
+        @JvmStatic
+        fun get(url: String, header: Map<String, String>, callback: (resp: Response) -> Unit) {
+            httpExecutor.submit {
+                Fetcher(Request(url, "GET", header)).fetch().let(callback)
             }
         }
 

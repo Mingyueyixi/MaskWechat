@@ -42,6 +42,7 @@ class JsonMenuManager {
                     if (clickLink.startsWith("https://") || clickLink.startsWith("http://")) {
                         val intent = Intent()
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        intent.action = Intent.ACTION_VIEW
                         intent.data = Uri.parse(menuBean.link)
                         context.startActivity(intent)
                     }
@@ -75,18 +76,19 @@ class JsonMenuManager {
 
         fun updateMenuListFromRemote(ctx: Context) {
             val releatePath = "app/src/main/res/raw/menu_ui.json"
-            //val githubRawPath = "https://github.com/$releatePath"
-            //@main 或者@v1.6， commit id之类的，直接在写/main有时候不行
             val context = ctx.applicationContext
 
             val rawJsonMenuUrl = "https://raw.githubusercontent.com/Mingyueyixi/MaskWechat/main/$releatePath"
-            HttpConnectUtil.get(rawJsonMenuUrl) {
+            HttpConnectUtil.get(rawJsonMenuUrl, HttpConnectUtil.noCacheHttpHeader) {
                 if (it.error == null && it.code == 200 && it.body.isNotEmpty()) {
                     writeRemoteToLocal(context, it.body)
                 } else {
                     LogUtil.w("request raw remote menu fail, $rawJsonMenuUrl", it)
-                    val cdnRawPath = "https://cdn.jsdelivr.net/gh/Mingyueyixi/MaskWechat@main/$releatePath"
-                    HttpConnectUtil.get(cdnRawPath) {cdnRes->
+                    //val githubRawPath = "https://github.com/$releatePath"
+                    //@main分支 或者@v1.6， commit id之类的，直接在写/main有时候不行
+                    //不指定版本，则取最后一个https://www.jsdelivr.com/?docs=gh
+                    val cdnRawPath = "https://cdn.jsdelivr.net/gh/Mingyueyixi/MaskWechat/$releatePath"
+                    HttpConnectUtil.get(cdnRawPath, HttpConnectUtil.noCacheHttpHeader) { cdnRes ->
                         if (cdnRes.error == null && cdnRes.code == 200 && cdnRes.body.isNotEmpty()) {
                             writeRemoteToLocal(context, cdnRes.body)
                         } else {
