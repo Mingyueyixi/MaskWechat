@@ -66,6 +66,7 @@ class AppUpdateViewModel : ViewModel() {
 
     private fun openUri(context: Context, url: String) {
         val intent = Intent()
+        intent.action = Intent.ACTION_VIEW
         intent.data = Uri.parse(url)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(intent)

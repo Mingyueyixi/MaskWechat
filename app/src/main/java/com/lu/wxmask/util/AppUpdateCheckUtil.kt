@@ -58,9 +58,9 @@ class AppUpdateCheckUtil {
                     if (it.code != 200) {
                         throw Exception("response code is not 200")
                     }
-                    var json = JSONObject(it.body.toString(Charsets.UTF_8))
-                    var tagName = json.optString("tag_name")
-                    var assets = json.optJSONArray("assets")
+                    val json = JSONObject(it.body.toString(Charsets.UTF_8))
+                    val tagName = json.optString("tag_name")
+                    val assets = json.optJSONArray("assets")
 
                     if (tagName.isBlank() || assets == null || assets.length() == 0) {
                         throw Exception("tagName is Blank or assets is empty")
