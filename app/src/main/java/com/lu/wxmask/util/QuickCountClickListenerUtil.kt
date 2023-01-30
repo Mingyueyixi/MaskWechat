@@ -57,7 +57,7 @@ class QuickCountClickListenerUtil {
         /**点击满多少次后， 触发fullQuickCallBack */
         @JvmField var fullCount: Int = 5,
         /**最大间隔时间。当前默认150毫秒**/
-        @JvmField var maxDuration: Int = 150
+        @JvmField var maxDuration: Int = 200
     ) : View.OnClickListener {
         var quickClickCount = 0
         var lastMills = 0L
