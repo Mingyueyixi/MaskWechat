@@ -25,14 +25,21 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
 
+    - name: Prepare Artifact
+      if: success()
+      id: prepareArtifact
+      run: |
+        releaseArtifactName=`ls app/build/outputs/apk/release/*.apk | grep -Po "(?<=release/).*(?=\.apk)"` && echo "releaseArtifactName=$releaseArtifactName" >> $GITHUB_OUTPUT
+        debugArtifactName=`ls app/build/outputs/apk/debug/*.apk | grep -Po "(?<=debug/).*(?=\.apk)"` && echo "debugArtifactName=$debugArtifactName" >> $GITHUB_OUTPUT
+
     - name: Upload Archive Release-Apk
       uses: actions/upload-artifact@v3
       with:
-        name: release-apk
+        name: ${{ steps.prepareArtifact.outputs.releaseArtifactName }}
         path: app/build/outputs/apk/release/*.apk
 
     - name: Upload Archive Debug-Apk
       uses: actions/upload-artifact@v3
       with:
-        name: debug-apk
+        name: ${{ steps.prepareArtifact.outputs.debugArtifactName }}
         path: ./app/build/outputs/apk/debug/*.apk
