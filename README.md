@@ -1,8 +1,8 @@
 # MaskWechat
 
-[Source link / 源码地址](https://github.com/Mingyueyixi/MaskWechat)
+[Source link / 项目地址](https://github.com/Mingyueyixi/MaskWechat)
 
-反馈问题可点击源码地址，发起issues
+反馈问题可点击以上地址，发起issues
 
 
 ## 介绍
@@ -21,9 +21,14 @@
 
 ### 临时解除隐藏（Since v1.6）
 
-1.6版本： 
+v1.6版本：
 
 在聊天记录空白处，连续点击5次以上，每次点击间隔不超过150毫秒（超过则重新计数），则解除隐藏
+
+
+### 搜索列表隐藏特定用户所在行（Since V1.7）
+
+v1.7版本新增功能（预计**Only For 8.0.32**）当Wechat主页发起的搜索结果命中糊脸ID时，将隐藏所在行视图
 
 
 ### 清除配置
@@ -40,7 +45,7 @@ PS.
 ## 适配版本
 
 8.0.22 (2140) 2022-04-29    
-8.0.32 (2300) 2023-01-06    
+8.0.32 (2300) 2023-01-06
 
 PS.
 - 其他版本号以及32位版本未经测试，不保证功能可用
@@ -52,11 +57,13 @@ PS.
 
 QQ群：点击添加 [549614926](https://qm.qq.com/cgi-bin/qm/qr?k=J884tv29im41_SuTo1Hm_gapAL6gBySJ&authKey=6jUdcjVCpYgDGmLsZmtkCtxJQY+oas0RACQ6vS9E+4xpMRB6858C/OMLhlSKxZRC&noverify=0)
 
-CI编译telegram频道:点击添加 [MaskWechatCI](https://t.me/MaskWechatCI)
+CI编译telegram频道： 点击添加 [https://t.me/MaskWechatCI](https://t.me/MaskWechatCI)
 
 
 ## 声明
 
-1. App旨在学习开发，请勿用于非法用途
-2. App不会主动收集任何个人信息  
-
+1. 项目旨在测试与学习开发，请勿用于商业用途，请勿用于非法用途  
+2. 项目所发布的所有App版本，虽名为release，实际均为开发包，均使用同一个测试签名，因此它将不会在应用市场发布  
+3. 项目只保证自身不会包含任何恶意代码，不会主动收集任何个人信息，但不能保证第三方库安全  
+4. 您应当知道并理解使用`模块`的风险，使用此模块如造成问题与作者无关  
+5. 您只有清楚并同意本声明的情况下，才可使用本项目的App  
