@@ -2,6 +2,7 @@ package com.lu.wxmask.plugin
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.Application
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -19,6 +20,7 @@ import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.ClazzN
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.bean.MaskItemBean
+import com.lu.wxmask.plugin.part.HideSearchListUIPluginPart
 import com.lu.wxmask.util.AppVersionUtil
 import com.lu.wxmask.util.ConfigUtil
 import com.lu.wxmask.util.ConfigUtil.ConfigSetObserver
@@ -29,7 +31,8 @@ import java.lang.reflect.Method
 
 class WXMaskPlugin : IPlugin, ConfigSetObserver {
     private val hookMethodNameRecord = linkedSetOf<String>()
-    var maskIdList = loadMaskIdList()
+    lateinit var maskIdList : Array<String?>
+    private val hideSearchListPluginPart = HideSearchListUIPluginPart(this)
 
     companion object {
         fun containChatUser(chatUser: String): Boolean {
@@ -58,8 +61,11 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
 
     override fun handleHook(context: Context, lpparam: LoadPackageParam) {
 //        handleViewClick(context, lpparam)
+//        LogUtil.w(" context state:::::::::::", context is Application, context.applicationContext)
+        maskIdList = loadMaskIdList()
         handleMainUIChattingListView(context, lpparam)
         handleChattingUIFragment(context, lpparam)
+        hideSearchListPluginPart.handleHook(context, lpparam)
     }
 
 
@@ -488,4 +494,5 @@ class DoResumeAction(context: Context, lpparam: LoadPackageParam, tagConst: Stri
     }
 
 }
+
 

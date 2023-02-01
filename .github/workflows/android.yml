@@ -25,14 +25,30 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
 
+    - name: Prepare Artifact
+      if: success()
+      id: prepareArtifact
+      run: |
+        releaseArtifactName=`ls app/build/outputs/apk/release/*.apk | grep -Po "(?<=release/).*(?=\.apk)"` && echo "releaseArtifactName=$releaseArtifactName" >> $GITHUB_OUTPUT
+        debugArtifactName=`ls app/build/outputs/apk/debug/*.apk | grep -Po "(?<=debug/).*(?=\.apk)"` && echo "debugArtifactName=$debugArtifactName" >> $GITHUB_OUTPUT
+
     - name: Upload Archive Release-Apk
       uses: actions/upload-artifact@v3
       with:
-        name: release-apk
+        name: ${{ steps.prepareArtifact.outputs.releaseArtifactName }}
         path: app/build/outputs/apk/release/*.apk
 
     - name: Upload Archive Debug-Apk
       uses: actions/upload-artifact@v3
       with:
-        name: debug-apk
+        name: ${{ steps.prepareArtifact.outputs.debugArtifactName }}
         path: ./app/build/outputs/apk/debug/*.apk
+
+    - name: Post Message
+      env:
+        CHAT_ID: ${{ secrets.TG_CI_CHAT_ID }}
+        BOT_TOKEN: ${{ secrets.TG_CI_BOT_TOKEN }}
+      run: |
+        github_run_url=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID        
+        echo "github_run_url=$github_run_url"
+        curl -X POST "https://api.telegram.org/bot$BOT_TOKEN/sendMessage" -d "chat_id=$CHAT_ID&text=CI编译完成${github_run_url}"
