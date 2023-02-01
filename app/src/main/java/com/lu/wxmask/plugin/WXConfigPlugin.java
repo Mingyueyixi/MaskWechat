@@ -186,8 +186,7 @@ public class WXConfigPlugin implements IPlugin {
                 if (f != null) {
                     //com.tencent.mm.storage.y1
                     Object v = XposedHelpers2.getObjectField(f, "e");
-                    Class<?> BaseContactClazz = XposedHelpers2.findClassIfExists(ClazzN.BaseContact, AppUtil.getContext().getClassLoader());
-                    if (BaseContactClazz.isAssignableFrom(v.getClass())) {
+                    if (ClazzN.from(ClazzN.BaseContact).isAssignableFrom(v.getClass())) {
                         return v;
                     }
                 }
