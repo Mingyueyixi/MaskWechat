@@ -11,7 +11,10 @@ import com.lu.wxmask.util.dev.DebugUtil
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 
-class HideSearchListUIPluginPart(val plugin: WXMaskPlugin) : IPlugin {
+/**
+ * 隐藏搜索列表
+ */
+class HideSearchListUIPluginPart : IPlugin {
     override fun handleHook(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
         //        val wxVersionCode = AppVersionUtil.getVersionCode()
         // 理论上 hook com.tencent.mm.plugin.fts.ui.z#getItem 也是一样的，但是无效，不清楚原因
