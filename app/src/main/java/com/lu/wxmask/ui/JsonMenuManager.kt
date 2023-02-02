@@ -75,7 +75,7 @@ class JsonMenuManager {
         }
 
         fun updateMenuListFromRemote(ctx: Context) {
-            val releatePath = "app/src/main/res/raw/menu_ui.json"
+            val releatePath = "res/raw/menu_ui.json"
             val context = ctx.applicationContext
 
             val rawJsonMenuUrl = "https://raw.githubusercontent.com/Mingyueyixi/MaskWechat/main/$releatePath"
