@@ -22,7 +22,7 @@ ext {
             'com.amap.api:location'                           : 'com.amap.api:location:6.2.0',
             'com.amap.api:search'                             : 'com.amap.api:search:9.5.0',
 
-            'com.github.Mingyueyixi:frame-base-utils'         : 'com.github.Mingyueyixi:frame-base-utils:main-SNAPSHOT',
+            'com.github.Mingyueyixi:frame-base-utils'         : 'com.github.Mingyueyixi:frame-base-utils:v1.0.0-alpha.2',
             'com.github.Mingyueyixi:frame-ui'                 : 'com.github.Mingyueyixi:frame-ui:main-SNAPSHOT',
             'com.github.Mingyueyixi:frame-multi-preference'   : 'com.github.Mingyueyixi:frame-multi-preference:main-SNAPSHOT',
             'com.github.Mingyueyixi.lposed:xposed-api2'       : 'com.github.Mingyueyixi.lposed:xposed-api2:main-SNAPSHOT',
