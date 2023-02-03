@@ -122,9 +122,10 @@ class JsonMenuManager {
             val context = ctx.applicationContext
 
             val rawJsonMenuUrl = "https://raw.githubusercontent.com/Mingyueyixi/MaskWechat/main/$releatePath"
-            LogUtil.i("request $rawJsonMenuUrl")
             isRemoteUpdating = true
-            HttpConnectUtil.get(rawJsonMenuUrl, HttpConnectUtil.noCacheHttpHeader) {
+            HttpConnectUtil.getWithRetry(rawJsonMenuUrl, HttpConnectUtil.noCacheHttpHeader, 3, { retryCount, res ->
+                LogUtil.i("onFetch retry:$retryCount", rawJsonMenuUrl)
+            }, {
                 if (it.error == null && it.code == 200 && it.body.isNotEmpty()) {
                     writeRemoteToLocal(context, it.body)
                     isRemoteUpdating = false
@@ -146,7 +147,7 @@ class JsonMenuManager {
 
                 }
 
-            }
+            })
         }
 
         private fun writeRemoteToLocal(context: Context, body: ByteArray) {
