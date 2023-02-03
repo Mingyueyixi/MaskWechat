@@ -1,6 +1,5 @@
 package com.lu.wxmask.util
 
-import android.content.Context
 import com.lu.magic.util.log.LogUtil
 import com.lu.magic.util.thread.AppExecutor
 import com.lu.wxmask.util.http.HttpConnectUtil
@@ -13,16 +12,13 @@ class AppUpdateCheckUtil {
         //val sourceLastReleaseUrl = "https://api.github.com/repos/Mingyueyixi/MaskWechat/releases/latest"
         val repoLastReleaseUrl = "https://api.github.com/repos/Xposed-Modules-Repo/com.lu.wxmask/releases/latest"
         private val key_check_app_update_on_enter = "check_app_update_on_enter"
-        private val tableName = "app"
-        fun setCheckFlagOnEnter(context: Context, check: Boolean) {
-            context.applicationContext.getSharedPreferences(tableName, Context.MODE_PRIVATE).edit()
-                .putBoolean(key_check_app_update_on_enter, check)
-                .apply()
+
+        fun setCheckFlagOnEnter(check: Boolean) {
+            LocalKVUtil.getDefaultTable().edit().putBoolean(key_check_app_update_on_enter, check).apply()
         }
 
-        fun getCheckFlagOnEnter(context: Context): Boolean {
-            return context.applicationContext.getSharedPreferences(tableName, Context.MODE_PRIVATE)
-                .getBoolean(key_check_app_update_on_enter, true)
+        fun hasCheckFlagOnEnter(): Boolean {
+            return LocalKVUtil.getDefaultTable().getBoolean(key_check_app_update_on_enter, true)
         }
 
         fun checkUpdate(callBack: (downloadUrl: String, name: String) -> Unit) {

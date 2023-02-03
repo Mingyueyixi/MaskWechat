@@ -1,5 +1,28 @@
 [
-  {"title": "QQ群", "link": "https://qm.qq.com/cgi-bin/qm/qr?k=J884tv29im41_SuTo1Hm_gapAL6gBySJ&authKey=6jUdcjVCpYgDGmLsZmtkCtxJQY+oas0RACQ6vS9E+4xpMRB6858C/OMLhlSKxZRC&noverify=0"},
-  {"title": "反馈问题", "link":"https://github.com/Mingyueyixi/MaskWechat/issues"},
-  {"title": "关于", "link":"https://github.com/Mingyueyixi/MaskWechat"}
+  {
+    "title": "CI频道",
+    "link": "https://t.me/MaskWechatCI"
+  },
+  {
+    "title": "TG群",
+    "link": "https://t.me/MaskWechatX"
+  },
+  {
+    "title": "QQ群",
+    "link": "https://qm.qq.com/cgi-bin/qm/qr?k=J884tv29im41_SuTo1Hm_gapAL6gBySJ&authKey=6jUdcjVCpYgDGmLsZmtkCtxJQY+oas0RACQ6vS9E+4xpMRB6858C/OMLhlSKxZRC&noverify=0",
+    "appLink": {
+      "priority": 0,
+      "links": [
+        "mqqopensdkapi://bizAgent/qm/qr?url=https%3A%2F%2Fqm.qq.com%2Fcgi-bin%2Fqm%2Fqr%3Fk%3DJ884tv29im41_SuTo1Hm_gapAL6gBySJ%26jump_from%3D%26auth%3D%26app_name%3D%26authSig%3D6jUdcjVCpYgDGmLsZmtkCtxJQY%2Boas0RACQ6vS9E%2B4xpMRB6858C%2FOMLhlSKxZRC%26source_id%3D3_40001"
+      ]
+    }
+  },
+  {
+    "title": "反馈问题",
+    "link": "https://github.com/Mingyueyixi/MaskWechat/issues"
+  },
+  {
+    "title": "关于",
+    "link": "https://github.com/Mingyueyixi/MaskWechat"
+  }
 ]
