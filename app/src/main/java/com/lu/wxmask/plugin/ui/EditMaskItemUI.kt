@@ -3,12 +3,15 @@ package com.lu.wxmask.plugin.ui
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
+import com.google.gson.JsonObject
 import com.lu.magic.frame.baseutils.kxt.toElseEmptyString
+import com.lu.magic.frame.baseutils.kxt.toElseString
 import com.lu.magic.util.GsonUtil
 import com.lu.magic.util.ToastUtil
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.bean.MaskItemBean
 import com.lu.wxmask.util.ConfigUtil
+import com.lu.wxmask.util.ext.toJsonObject
 
 class EditMaskItemUI(
     private val context: Context,
@@ -48,10 +51,10 @@ class EditMaskItemUI(
         val ui = MaskItemUIController(context, maskItemBean)
 
         //spinner的模式index
-        val selectModeIndex = ui.spinnerDataList.map { it.first }.indexOf(maskItemBean.tipMode).let {
+        val selectModeIndex = ui.spinnerTipDataList.map { it.first }.indexOf(maskItemBean.tipMode).let {
             if (it == -1) 0 else it
         }
-        ui.spinner.setSelection(selectModeIndex)
+        ui.tipSpinner.setSelection(selectModeIndex)
         AlertDialog.Builder(context)
             .setTitle("编辑配置")
             .setView(ui.root)
@@ -84,14 +87,27 @@ class EditMaskItemUI(
                         onConfigChangeListener?.invoke(dialog, maskItemBean, MODE_CONFIG_REMOVE)
                     } else {
                         maskItemBean.maskId = maskId
-                        maskItemBean.tipMode = ui.spinnerSelectedItem.first
+                        maskItemBean.tipMode = ui.tipSpinnerSelectedItem.first
                         maskItemBean.tagName = tagName
 
                         when (maskItemBean.tipMode) {
-                            Constrant.WX_MASK_TIP_MODE_ALERT -> GsonUtil.toJsonTree(MaskItemBean.AlertTipData(tipMess)).asJsonObject.let {
-                                maskItemBean.tipData = it
-                            }
+                            Constrant.CONFIG_TIP_MODE_ALERT -> GsonUtil.toJsonTree(MaskItemBean.TipData(tipMess)).asJsonObject
+                            else -> null
+                        }?.let {
+                            maskItemBean.tipData = it
                         }
+
+                        when (maskItemBean.temporaryMode) {
+                            Constrant.CONFIG_TEMPORARY_MODE_QUICK_CLICK -> {
+                                val clickCount = ui.etClickCount.text.toElseString("5").toInt()
+                                val duration = ui.etDuration.text.toElseString("150").toInt()
+                                MaskItemBean.QuickTemporary(duration, clickCount).toJsonObject()
+                            }
+                            else -> null
+                        }?.let {
+                            maskItemBean.temporary = it
+                        }
+
                         ConfigUtil.setMaskList(lst)
                         ToastUtil.show("已更新！")
                         onConfigChangeListener?.invoke(dialog, maskItemBean, MODE_CONFIG_UPDATE)

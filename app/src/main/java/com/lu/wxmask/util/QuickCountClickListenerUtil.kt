@@ -6,7 +6,7 @@ import com.lu.magic.util.log.LogUtil
 
 class QuickCountClickListenerUtil {
     companion object {
-        fun register(view: View?, callBack: View.OnClickListener) {
+        fun register(view: View?, fullCount: Int, maxDuration: Int, callBack: View.OnClickListener) {
             if (view == null) {
                 return
             }
@@ -21,11 +21,12 @@ class QuickCountClickListenerUtil {
                 null
             }
             if (viewListener is QuickCountClickListener) {
-                view.setOnClickListener(QuickCountClickListener(viewListener.sourceListener, callBack))
+                viewListener.sourceListener
             } else {
-                view.setOnClickListener(QuickCountClickListener(viewListener, callBack))
+                viewListener
+            }.let {
+                view.setOnClickListener(QuickCountClickListener(it, callBack, fullCount, maxDuration))
             }
-
         }
 
         fun unRegister(view: View?) {

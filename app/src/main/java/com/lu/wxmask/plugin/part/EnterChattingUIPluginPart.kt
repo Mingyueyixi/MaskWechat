@@ -26,9 +26,8 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
 /**
  * 聊天页页面处理：
  * 1、隐藏单聊/群聊聊天记录
- * 2、
  */
-class EnterChattingUIPluginPart : IPlugin {
+class EnterChattingUIPluginPart() : IPlugin {
     override fun handleHook(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
         handleChattingUIFragment(context, lpparam)
     }
@@ -200,7 +199,7 @@ class EnterChattingHookAction(
     }
 
     private fun hideChatListUI(fragmentObj: Any, activity: Activity, chatUser: String) {
-        val item = try {
+        val maskItem = try {
             ConfigUtil.getMaskList().first {
                 it.maskId == chatUser
             }
@@ -212,7 +211,9 @@ class EnterChattingHookAction(
         val chatListView = findChatListView(fragmentObj)
         if (chatListView != null) {
             chatListView.visibility = View.INVISIBLE
-            QuickCountClickListenerUtil.register(chatListView.parent as? View?) {
+
+            val quick = MaskItemBean.QuickTemporary.from(maskItem)
+            QuickCountClickListenerUtil.register(chatListView.parent as? View?, quick.clickCount, quick.duration) {
                 chatListView.visibility = View.VISIBLE
             }
             LogUtil.i("hide chatListView")
@@ -220,10 +221,10 @@ class EnterChattingHookAction(
             hideListViewUIByMask(fragmentObj)
         }
 
-        if (Constrant.WX_MASK_TIP_MODE_SILENT == item.tipMode) {
+        if (Constrant.WX_MASK_TIP_MODE_SILENT == maskItem.tipMode) {
             // 静默模式，不弹提示框
-        } else if (Constrant.WX_MASK_TIP_MODE_ALERT == item.tipMode) {
-            handleAlertMode(activity, item)
+        } else if (Constrant.CONFIG_TIP_MODE_ALERT == maskItem.tipMode) {
+            handleAlertMode(activity, maskItem)
         }
 
     }
@@ -231,7 +232,7 @@ class EnterChattingHookAction(
     private fun handleAlertMode(uiContext: Context, item: MaskItemBean) {
         //提示模式
         AlertDialog.Builder(uiContext)
-            .setMessage(MaskItemBean.AlertTipData.from(item).mess)
+            .setMessage(MaskItemBean.TipData.from(item).mess)
             .setNegativeButton("知道了", null)
             .show()
     }

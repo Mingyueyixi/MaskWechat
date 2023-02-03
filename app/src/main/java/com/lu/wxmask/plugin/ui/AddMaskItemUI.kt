@@ -4,10 +4,13 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import com.lu.magic.frame.baseutils.kxt.toElseEmptyString
+import com.lu.magic.frame.baseutils.kxt.toElseString
 import com.lu.magic.util.GsonUtil
 import com.lu.magic.util.ToastUtil
+import com.lu.wxmask.Constrant
 import com.lu.wxmask.bean.MaskItemBean
 import com.lu.wxmask.util.ConfigUtil
+import com.lu.wxmask.util.ext.toJsonObject
 
 class AddMaskItemUI(
     private val context: Context,
@@ -18,6 +21,7 @@ class AddMaskItemUI(
     private var onFreeButtonListener: DialogInterface.OnClickListener? = null
     private var chatUserId = ""
     private var tagName = ""
+
     //空闲的按钮的文字
     private var freeButtonText: CharSequence? = null
 
@@ -75,10 +79,17 @@ class AddMaskItemUI(
                         ToastUtil.show("配置已存在！")
                         return@setOnClickListener
                     }
-                    val tipMode = ui.spinnerSelectedItem.first
-                    val tipData = GsonUtil.toJsonTree(MaskItemBean.AlertTipData(tipMess)).asJsonObject
                     val maskName = ui.etTagName.text.toElseEmptyString()
-                    MaskItemBean(maskId, maskName, tipMode, tipData).let {
+
+                    val tipMode = ui.tipSpinnerSelectedItem.first
+                    val tipData = GsonUtil.toJsonTree(MaskItemBean.TipData(tipMess)).asJsonObject
+
+                    val temporaryMode = Constrant.CONFIG_TEMPORARY_MODE_QUICK_CLICK
+                    val clickCount = ui.etClickCount.text.toElseString("5").toInt()
+                    val duration = ui.etDuration.text.toElseString("150").toInt()
+                    val temporary = MaskItemBean.QuickTemporary(duration, clickCount).toJsonObject()
+
+                    MaskItemBean(maskId, maskName, tipMode, tipData, temporaryMode, temporary).let {
                         ConfigUtil.addMaskList(it)
                         configListener?.invoke(dialog, it)
                     }
