@@ -13,7 +13,7 @@ class AppUpdateViewModel : ViewModel() {
         if (hasOnCheckAction) {
             return
         }
-        if (!AppUpdateCheckUtil.getCheckFlagOnEnter(context)) {
+        if (!AppUpdateCheckUtil.hasCheckFlagOnEnter()) {
             return
         }
         hasOnCheckAction = true
@@ -31,7 +31,7 @@ class AppUpdateViewModel : ViewModel() {
                     openUri(context, url)
                 }
                 .setPositiveButton("不再提示") { _, _ ->
-                    AppUpdateCheckUtil.setCheckFlagOnEnter(context, false)
+                    AppUpdateCheckUtil.setCheckFlagOnEnter(false)
                 }
                 .setOnDismissListener {
                     hasOnCheckAction = false

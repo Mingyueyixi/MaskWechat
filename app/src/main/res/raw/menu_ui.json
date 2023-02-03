@@ -1,4 +1,10 @@
 [
-  {"title": "反馈问题", "link":"https://github.com/Mingyueyixi/MaskWechat/issues"},
-  {"title": "关于", "link":"https://github.com/Mingyueyixi/MaskWechat"}
+  {
+    "title": "反馈问题",
+    "link": "https://github.com/Mingyueyixi/MaskWechat/issues"
+  },
+  {
+    "title": "关于",
+    "link": "https://github.com/Mingyueyixi/MaskWechat"
+  }
 ]
