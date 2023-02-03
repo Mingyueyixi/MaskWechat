@@ -112,7 +112,7 @@ class JsonMenuManager {
 
         fun updateMenuListFromRemoteIfNeed(ctx: Context) {
             // 2 hour
-            if (System.currentTimeMillis() - lastUpdateSuccessMills > 1000 * 60 * 60 * 2) {
+            if (!isRemoteUpdating && System.currentTimeMillis() - lastUpdateSuccessMills > 1000 * 60 * 60 * 2) {
                 updateMenuListFromRemote(ctx)
             }
         }
@@ -122,9 +122,10 @@ class JsonMenuManager {
             val context = ctx.applicationContext
 
             val rawJsonMenuUrl = "https://raw.githubusercontent.com/Mingyueyixi/MaskWechat/main/$releatePath"
-            LogUtil.i("request $rawJsonMenuUrl")
             isRemoteUpdating = true
-            HttpConnectUtil.get(rawJsonMenuUrl, HttpConnectUtil.noCacheHttpHeader) {
+            HttpConnectUtil.getWithRetry(rawJsonMenuUrl, HttpConnectUtil.noCacheHttpHeader, 3, { retryCount, res ->
+                LogUtil.i("onFetch retry:$retryCount", rawJsonMenuUrl)
+            }, {
                 if (it.error == null && it.code == 200 && it.body.isNotEmpty()) {
                     writeRemoteToLocal(context, it.body)
                     isRemoteUpdating = false
@@ -133,7 +134,7 @@ class JsonMenuManager {
                     //val githubRawPath = "https://github.com/$releatePath"
                     //@main分支 或者@v1.6， commit id之类的，直接在写/main有时候不行
                     //不指定版本，则取最后一个https://www.jsdelivr.com/?docs=gh
-                    val cdnRawPath = "https://cdn.jsdelivr.net/gh/Mingyueyixi/MaskWechat/$releatePath"
+                    val cdnRawPath = "https://cdn.jsdelivr.net/gh/Mingyueyixi/MaskWechat@main/$releatePath"
                     LogUtil.i("request $cdnRawPath")
                     HttpConnectUtil.get(cdnRawPath, HttpConnectUtil.noCacheHttpHeader) { cdnRes ->
                         if (cdnRes.error == null && cdnRes.code == 200 && cdnRes.body.isNotEmpty()) {
@@ -146,7 +147,7 @@ class JsonMenuManager {
 
                 }
 
-            }
+            })
         }
 
         private fun writeRemoteToLocal(context: Context, body: ByteArray) {

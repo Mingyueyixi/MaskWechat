@@ -1,11 +1,9 @@
 package com.lu.wxmask.util.http
 
-import com.lu.magic.util.thread.AppExecutor
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
-import java.nio.charset.Charset
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
@@ -29,8 +27,8 @@ class HttpConnectUtil {
         //虽然http协议允许重复的 header，但实际没什么用，所以这里不许
         var header: Map<String, String> = mutableMapOf(),
         var body: ByteArray? = null,
-        var connectTimeOut: Int = 5000,
-        var readTimeOut: Int = 5000
+        var connectTimeOut: Int = 10000,
+        var readTimeOut: Int = 10000
     ) {
         override fun toString(): String {
             return "Request(url='$url', method='$method', header=$header, body=${body?.toString(Charsets.UTF_8)}, connectTimeOut=$connectTimeOut, readTimeOut=$readTimeOut)"
@@ -97,6 +95,31 @@ class HttpConnectUtil {
         fun get(url: String, header: Map<String, String>, callback: (resp: Response) -> Unit) {
             httpExecutor.submit {
                 Fetcher(Request(url, "GET", header)).fetch().let(callback)
+            }
+        }
+
+        @JvmStatic
+        fun getWithRetry(
+            url: String,
+            header: Map<String, String>,
+            retryCount: Int,
+            onEachFetch: (retryCount: Int, res: Response) -> Unit,
+            onFinalCallback: (resp: Response) -> Unit
+        ) {
+            httpExecutor.submit {
+                val fetcher = Fetcher(Request(url, "GET", header))
+                var res = fetcher.fetch()
+                onEachFetch(0, res)
+                if (res.error != null) {
+                    for (i in 0 until retryCount) {
+                        res = fetcher.fetch()
+                        onEachFetch(i + 1, res)
+                        if (res.error == null) {
+                            break
+                        }
+                    }
+                }
+                onFinalCallback.invoke(res)
             }
         }
 
