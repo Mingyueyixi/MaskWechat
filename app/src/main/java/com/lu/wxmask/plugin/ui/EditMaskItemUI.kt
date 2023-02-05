@@ -3,15 +3,14 @@ package com.lu.wxmask.plugin.ui
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
-import com.google.gson.JsonObject
 import com.lu.magic.frame.baseutils.kxt.toElseEmptyString
 import com.lu.magic.frame.baseutils.kxt.toElseString
 import com.lu.magic.util.GsonUtil
 import com.lu.magic.util.ToastUtil
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.bean.MaskItemBean
+import com.lu.wxmask.bean.QuickTemporaryBean
 import com.lu.wxmask.util.ConfigUtil
-import com.lu.wxmask.util.ext.toJsonObject
 
 class EditMaskItemUI(
     private val context: Context,
@@ -97,16 +96,9 @@ class EditMaskItemUI(
                             maskItemBean.tipData = it
                         }
 
-                        when (maskItemBean.temporaryMode) {
-                            Constrant.CONFIG_TEMPORARY_MODE_QUICK_CLICK -> {
-                                val clickCount = ui.etClickCount.text.toElseString("5").toInt()
-                                val duration = ui.etDuration.text.toElseString("150").toInt()
-                                MaskItemBean.QuickTemporary(duration, clickCount).toJsonObject()
-                            }
-                            else -> null
-                        }?.let {
-                            maskItemBean.temporary = it
-                        }
+                        val clickCount = ui.etClickCount.text.toElseString("5").toInt()
+                        val duration = ui.etDuration.text.toElseString("150").toInt()
+                        ConfigUtil.setTemporary(QuickTemporaryBean(duration, clickCount))
 
                         ConfigUtil.setMaskList(lst)
                         ToastUtil.show("已更新！")

@@ -7,10 +7,9 @@ import com.lu.magic.frame.baseutils.kxt.toElseEmptyString
 import com.lu.magic.frame.baseutils.kxt.toElseString
 import com.lu.magic.util.GsonUtil
 import com.lu.magic.util.ToastUtil
-import com.lu.wxmask.Constrant
 import com.lu.wxmask.bean.MaskItemBean
+import com.lu.wxmask.bean.QuickTemporaryBean
 import com.lu.wxmask.util.ConfigUtil
-import com.lu.wxmask.util.ext.toJsonObject
 
 class AddMaskItemUI(
     private val context: Context,
@@ -84,13 +83,12 @@ class AddMaskItemUI(
                     val tipMode = ui.tipSpinnerSelectedItem.first
                     val tipData = GsonUtil.toJsonTree(MaskItemBean.TipData(tipMess)).asJsonObject
 
-                    val temporaryMode = Constrant.CONFIG_TEMPORARY_MODE_QUICK_CLICK
                     val clickCount = ui.etClickCount.text.toElseString("5").toInt()
                     val duration = ui.etDuration.text.toElseString("150").toInt()
-                    val temporary = MaskItemBean.QuickTemporary(duration, clickCount).toJsonObject()
 
-                    MaskItemBean(maskId, maskName, tipMode, tipData, temporaryMode, temporary).let {
+                    MaskItemBean(maskId, maskName, tipMode, tipData).let {
                         ConfigUtil.addMaskList(it)
+                        ConfigUtil.setTemporary(QuickTemporaryBean(duration, clickCount))
                         configListener?.invoke(dialog, it)
                     }
                     dialog.dismiss()
