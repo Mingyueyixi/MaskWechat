@@ -11,9 +11,7 @@ class MaskItemBean(
     var maskId: String,
     var tagName: String = "",
     var tipMode: Int = Constrant.CONFIG_TIP_MODE_ALERT,
-    var tipData: JsonElement? = JsonObject(),
-    var temporaryMode: Int = Constrant.CONFIG_TEMPORARY_MODE_QUICK_CLICK,
-    var temporary: JsonElement? = JsonObject(),
+    var tipData: JsonElement? = JsonObject()
 ) {
 
     @Keep
@@ -38,20 +36,5 @@ class MaskItemBean(
         }
     }
 
-    @Keep
-    class QuickTemporary(var duration: Int = 150, var clickCount: Int = 5) {
-        companion object {
-            @JvmStatic
-            fun from(wrapper: MaskItemBean): QuickTemporary {
-                return try {
-                    GsonUtil.fromJson(wrapper.temporary, QuickTemporary::class.java)
-                } catch (e: Exception) {
-                    QuickTemporary()
-                }
-            }
-
-        }
-
-    }
 }
 

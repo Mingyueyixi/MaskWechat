@@ -11,12 +11,15 @@ import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.core.view.setPadding
+import com.google.gson.JsonObject
 import com.lu.magic.frame.baseutils.kxt.toElseString
 import com.lu.magic.util.SizeUtil
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.adapter.AbsListAdapter
 import com.lu.wxmask.adapter.CommonListAdapter
 import com.lu.wxmask.bean.MaskItemBean
+import com.lu.wxmask.bean.QuickTemporaryBean
+import com.lu.wxmask.util.ConfigUtil
 
 internal class MaskItemUIController(private val context: Context, private val mask: MaskItemBean) {
     private val viewId: MutableMap<String, View> = mutableMapOf()
@@ -86,13 +89,14 @@ internal class MaskItemUIController(private val context: Context, private val ma
 
     val blockTemporary = LinearLayout(context).also { block ->
         block.orientation = LinearLayout.VERTICAL
-        val quick = MaskItemBean.QuickTemporary.from(mask)
+
+        val quick = QuickTemporaryBean(ConfigUtil.getTemporaryJson()?: JsonObject())
         block.addView(LinearLayout(context).also { row ->
             row.orientation = LinearLayout.HORIZONTAL
             row.gravity = Gravity.CENTER_VERTICAL
 
             row.addView(TextView(context).also {
-                it.text = "聊天页临时解除"
+                it.text = "聊天页临时解除（全局配置）"
             })
             row.addView(
                 Spinner(context).also {

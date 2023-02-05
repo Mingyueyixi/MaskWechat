@@ -1,18 +1,17 @@
 package com.lu.wxmask.util
 
-import android.content.Context
-import com.lu.magic.util.AppUtil
+import com.google.gson.JsonObject
 import com.lu.magic.util.GsonUtil
 import com.lu.magic.util.log.LogUtil
+import com.lu.wxmask.bean.BaseTemporary
 import com.lu.wxmask.bean.MaskItemBean
 import com.lu.wxmask.util.ext.toJson
-import com.lu.wxmask.util.ext.toJsonObject
 
 class ConfigUtil {
     companion object {
-        const val TABLE = "mask_wechat_config"
-        val sp by lazy { AppUtil.getContext().getSharedPreferences(TABLE, Context.MODE_PRIVATE) }
+        val sp by lazy { LocalKVUtil.getTable("mask_wechat_config") }
         val KEY_MASK_LIST = "maskList"
+        val KEY_TEMPORARY = "temporary"
 
         @JvmStatic
         private val dataSetObserverList = arrayListOf<ConfigSetObserver>()
@@ -58,6 +57,23 @@ class ConfigUtil {
             notifyConfigSetObserverChanged()
         }
 
+        fun getTemporaryJson(): JsonObject? {
+            val text = sp.getString(KEY_TEMPORARY, null) ?: return null
+            return try {
+                GsonUtil.fromJson(text, JsonObject::class.java)
+            } catch (e: Exception) {
+                null
+            }
+        }
+
+        fun <T : BaseTemporary> setTemporary(data: T) {
+            try {
+                sp.edit().putString(KEY_TEMPORARY, data.toJson()).apply()
+            } catch (e: Exception) {
+                LogUtil.w("save temporary fail", e)
+            }
+        }
+
         fun registerConfigSetObserver(observer: ConfigSetObserver) {
             dataSetObserverList.add(observer)
         }
@@ -75,7 +91,6 @@ class ConfigUtil {
                 it.onConfigChange()
             }
         }
-
     }
 
     fun interface ConfigSetObserver {

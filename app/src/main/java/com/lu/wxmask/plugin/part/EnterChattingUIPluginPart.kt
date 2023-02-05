@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import com.google.gson.JsonObject
 import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
 import com.lu.lposed.plugin.PluginProviders
@@ -15,6 +16,7 @@ import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.ClazzN
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.bean.MaskItemBean
+import com.lu.wxmask.bean.QuickTemporaryBean
 import com.lu.wxmask.plugin.WXConfigPlugin
 import com.lu.wxmask.plugin.WXMaskPlugin
 import com.lu.wxmask.util.AppVersionUtil
@@ -212,13 +214,14 @@ class EnterChattingHookAction(
         if (chatListView != null) {
             chatListView.visibility = View.INVISIBLE
 
-            val quick = MaskItemBean.QuickTemporary.from(maskItem)
+            val quick = QuickTemporaryBean(ConfigUtil.getTemporaryJson()?: JsonObject())
             QuickCountClickListenerUtil.register(chatListView.parent as? View?, quick.clickCount, quick.duration) {
                 chatListView.visibility = View.VISIBLE
             }
-            LogUtil.i("hide chatListView")
+            LogUtil.i("hide chatListView by setVisible")
         } else {
             hideListViewUIByMask(fragmentObj)
+            LogUtil.i("hide chatListView by add Mask")
         }
 
         if (Constrant.WX_MASK_TIP_MODE_SILENT == maskItem.tipMode) {
