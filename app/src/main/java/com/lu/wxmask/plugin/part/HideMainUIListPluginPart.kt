@@ -107,13 +107,18 @@ class HideMainUIListPluginPart : IPlugin {
                         Constrant.WX_CODE_8_0_32 -> "kmv"
                         else -> "tipcnt_tv"
                     }
-                    val tipTvId = AppUtil.getContext().resources.getIdentifier(
-                        tipTvIdText,
-                        "id",
-                        AppUtil.getContext().packageName
-                    )
-                    val tipTv = itemView.findViewById<View>(tipTvId)
-                    tipTv.visibility = View.INVISIBLE
+                    val packageName = AppUtil.getContext().packageName
+                    val tipTvId = AppUtil.getContext().resources.getIdentifier(tipTvIdText, "id", packageName)
+                    itemView.findViewById<View>(tipTvId)?.visibility = View.INVISIBLE
+
+                    //头像上的红点
+                    when (AppVersionUtil.getVersionCode()) {
+                        Constrant.WX_CODE_8_0_32 -> {
+                            val viewId = AppUtil.getContext().resources.getIdentifier("a2f", "id", packageName)
+                            itemView.findViewById<View>(viewId)?.visibility = View.INVISIBLE
+                        }
+                    }
+
                 }
 
                 //隐藏最后一条消息
@@ -128,7 +133,7 @@ class HideMainUIListPluginPart : IPlugin {
                     val msgTv: View? = itemView.findViewById(lastMsgViewId)
 
                     try {
-                         XposedHelpers2.callMethod<Any?>(msgTv, "setText", "")
+                        XposedHelpers2.callMethod<Any?>(msgTv, "setText", "")
                     } catch (e: Throwable) {
                         LogUtil.w("error", msgTv)
                     }
