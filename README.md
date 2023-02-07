@@ -57,8 +57,6 @@ PS.
 
 ## 交流
 
-QQ群：点击添加 [549614926](https://qm.qq.com/cgi-bin/qm/qr?k=J884tv29im41_SuTo1Hm_gapAL6gBySJ&authKey=6jUdcjVCpYgDGmLsZmtkCtxJQY+oas0RACQ6vS9E+4xpMRB6858C/OMLhlSKxZRC&noverify=0)
-
 CI编译telegram频道（频道不能聊天）： 点击添加 [https://t.me/MaskWechatCI](https://t.me/MaskWechatCI)
 
 telegram普通群：点击添加 [https://t.me/MaskWechatX](https://t.me/MaskWechatX)
