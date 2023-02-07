@@ -1,45 +1,31 @@
 package com.lu.wxmask.plugin
 
-import android.app.Activity
-import android.app.AlertDialog
-import android.app.Application
 import android.content.Context
-import android.graphics.drawable.ColorDrawable
-import android.os.Bundle
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ListAdapter
-import android.widget.ListView
-import com.lu.lposed.api2.XC_MethodHook2
-import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
 import com.lu.lposed.plugin.PluginProviders
-import com.lu.magic.util.AppUtil
-import com.lu.magic.util.ReflectUtil
 import com.lu.magic.util.log.LogUtil
-import com.lu.wxmask.ClazzN
-import com.lu.wxmask.Constrant
-import com.lu.wxmask.bean.MaskItemBean
+import com.lu.wxmask.plugin.part.EmptySingChatHistoryGalleryPluginPart
 import com.lu.wxmask.plugin.part.EnterChattingUIPluginPart
 import com.lu.wxmask.plugin.part.HideMainUIListPluginPart
 import com.lu.wxmask.plugin.part.HideSearchListUIPluginPart
-import com.lu.wxmask.util.AppVersionUtil
 import com.lu.wxmask.util.ConfigUtil
 import com.lu.wxmask.util.ConfigUtil.ConfigSetObserver
-import com.lu.wxmask.util.QuickCountClickListenerUtil
-import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam
-import java.lang.reflect.Method
 
 class WXMaskPlugin : IPlugin, ConfigSetObserver {
     lateinit var maskIdList: Array<String?>
     private val hideSearchListPluginPart = HideSearchListUIPluginPart()
     private val enterChattingUIPluginPart = EnterChattingUIPluginPart()
     private val hideMainUIListPluginPart = HideMainUIListPluginPart()
+    private val emptySingChatHistoryGalleryPluginPart = EmptySingChatHistoryGalleryPluginPart()
 
     companion object {
-        fun containChatUser(chatUser: String): Boolean {
+        fun containChatUser(chatUser: String?): Boolean {
             val self = PluginProviders.from(WXMaskPlugin::class.java)
+            if (chatUser.isNullOrBlank()) {
+                LogUtil.w("chatUser is null or blan")
+                return false
+            }
             return self.maskIdList.contains(chatUser)
         }
     }
@@ -69,6 +55,7 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
         hideMainUIListPluginPart.handleHook(context, lpparam)
         enterChattingUIPluginPart.handleHook(context, lpparam)
         hideSearchListPluginPart.handleHook(context, lpparam)
+        emptySingChatHistoryGalleryPluginPart.handleHook(context, lpparam)
     }
 
 
