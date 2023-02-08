@@ -18,8 +18,31 @@ class HideSearchListUIPluginPart : IPlugin {
     override fun handleHook(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
         //        val wxVersionCode = AppVersionUtil.getVersionCode()
         // 理论上 hook com.tencent.mm.plugin.fts.ui.z#getItem 也是一样的，但是无效，不清楚原因
+        //全局搜索首页
         XposedHelpers2.findAndHookMethod(
             "com.tencent.mm.plugin.fts.ui.z",
+            context.classLoader,
+            "d",
+            Integer.TYPE,
+            object : XC_MethodHook2() {
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    if (needHideUserName(param, param.result)) {
+                        LogUtil.w(param.result)
+                        param.result = try {
+                            //将命中的用户数据抹除掉
+                            param.result::class.java.newInstance()
+                        } catch (e: Throwable) {
+                            LogUtil.w("error new Instance")
+                            null
+                        }
+                    }
+
+                }
+            }
+        )
+        //全局搜索详情置空
+        XposedHelpers2.findAndHookMethod(
+            "com.tencent.mm.plugin.fts.ui.y",
             context.classLoader,
             "d",
             Integer.TYPE,
