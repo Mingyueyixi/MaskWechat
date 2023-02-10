@@ -73,8 +73,9 @@ android {
 
 dependencies {
     implementation(fileTree(dir: "libs", include: ["*.jar", "*.aar"]))
-    implementation(deps['com.github.Mingyueyixi:frame-base-utils'])
-    implementation(deps['com.github.Mingyueyixi:frame-ui'])
+    implementation(deps['com.github.Mingyueyixi.frame-base-utils:core'])
+    implementation(deps['com.github.Mingyueyixi.frame-ui:ui-appcompat'])
+
     implementation(deps['com.github.Mingyueyixi.lposed:xposed-api2'])
     implementation(deps['com.github.Mingyueyixi.lposed:plugin'])
 
