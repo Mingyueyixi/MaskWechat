@@ -94,8 +94,10 @@ public class WXConfigPlugin implements IPlugin {
     private void showAddTipDialog(Activity activity) {
         activity.runOnUiThread(() -> {
             new AlertDialog.Builder(activity)
-                    .setMessage("去点击用户进行配置吧~")
-                    .setNegativeButton("知道了", ((dialog, which) -> {
+                    .setTitle("配置提示")
+                    .setMessage("点击用户发起聊天，就可以对用户进行配置噢~")
+                    .setCancelable(false)
+                    .setPositiveButton("继续", ((dialog, which) -> {
                         isOnDoingConfig = true;
                     }))
                     .setNeutralButton("忽略", (dialog, which) -> {

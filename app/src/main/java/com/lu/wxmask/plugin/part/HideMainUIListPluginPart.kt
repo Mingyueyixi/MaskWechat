@@ -36,10 +36,7 @@ class HideMainUIListPluginPart : IPlugin {
         }
         var adapterClazz: Class<*>? = null
         if (adapterName != null) {
-            adapterClazz = XposedHelpers2.findClassIfExists(
-                adapterName,
-                AppUtil.getContext().classLoader
-            )
+            adapterClazz = XposedHelpers2.findClassIfExists(adapterName, AppUtil.getContext().classLoader)
         }
         if (adapterClazz != null) {
             hookListViewAdapter(adapterClazz)
@@ -76,8 +73,7 @@ class HideMainUIListPluginPart : IPlugin {
         if (hookMethodNameRecord.contains(getViewMethod.toString())) {
             return
         }
-        val baseConversationClazz =
-            XposedHelpers2.findClassIfExists(ClazzN.BaseConversation, AppUtil.getContext().classLoader)
+        val baseConversationClazz = ClazzN.from(ClazzN.BaseConversation)
         XposedHelpers2.hookMethod(
             getViewMethod,
             object : XC_MethodHook2() {
@@ -88,7 +84,7 @@ class HideMainUIListPluginPart : IPlugin {
                     val itemData: Any = adapter.getItem(position) ?: return
 
 //                    LogUtil.d("after getView", adapter.javaClass, GsonUtil.toJson(itemData))
-                    if (baseConversationClazz.isAssignableFrom(itemData.javaClass)) {
+                    if (baseConversationClazz?.isAssignableFrom(itemData.javaClass) == true) {
                         val chatUser: String = XposedHelpers2.getObjectField(itemData, "field_username") ?: return
                         val itemView: View = param.args[1] as? View ?: return
 //                        LogUtil.d(chatUser, GsonUtil.toJson(itemData))

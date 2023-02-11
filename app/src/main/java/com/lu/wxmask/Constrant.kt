@@ -26,7 +26,7 @@ class Constrant {
 
         /** 静默模式，点击符合条件的用户，进行静默处理，即无反应，不能发起聊天 */
         const val WX_MASK_TIP_MODE_SILENT = 10086
-        const val WX_MASK_TIP_ALERT_MESS_DEFAULT = "该用户对您私密哦"
+        const val WX_MASK_TIP_ALERT_MESS_DEFAULT = "该用户已将您拉黑（私密），请联系对方解除~"
 
         //微信版本号
         const val WX_CODE_8_0_22 = 2140
