@@ -17,6 +17,14 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
+        maven {
+            url = uri("https://maven.pkg.github.com/mingyueyixi/frame-ui")
+            credentials {
+                username = "Mingyueyixi"
+                //只读token
+                password = "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"
+            }
+        }
         maven { url 'https://repo.huaweicloud.com/repository/maven' }
         //central有的，public聚合仓不一定有，奇葩
         maven { url 'https://maven.aliyun.com/repository/central' }
