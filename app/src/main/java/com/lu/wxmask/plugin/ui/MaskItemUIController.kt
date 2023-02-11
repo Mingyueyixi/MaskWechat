@@ -12,8 +12,8 @@ import android.widget.Spinner
 import android.widget.TextView
 import androidx.core.view.setPadding
 import com.google.gson.JsonObject
-import com.lu.magic.frame.baseutils.kxt.toElseString
 import com.lu.magic.util.SizeUtil
+import com.lu.magic.util.kxt.toElseString
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.adapter.AbsListAdapter
 import com.lu.wxmask.adapter.CommonListAdapter

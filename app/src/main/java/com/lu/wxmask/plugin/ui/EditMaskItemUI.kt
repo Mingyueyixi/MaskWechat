@@ -3,10 +3,10 @@ package com.lu.wxmask.plugin.ui
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
-import com.lu.magic.frame.baseutils.kxt.toElseEmptyString
-import com.lu.magic.frame.baseutils.kxt.toElseString
 import com.lu.magic.util.GsonUtil
 import com.lu.magic.util.ToastUtil
+import com.lu.magic.util.kxt.toElseEmptyString
+import com.lu.magic.util.kxt.toElseString
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.bean.MaskItemBean
 import com.lu.wxmask.bean.QuickTemporaryBean
