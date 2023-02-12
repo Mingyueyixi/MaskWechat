@@ -17,7 +17,8 @@ class AppConfigUtil {
         fun load(callBack: ((config: AppConfig, fromRemote: Boolean) -> Unit)? = null) {
             val releatePath = "res/raw/app_config.json"
             val rawUrl = "https://raw.githubusercontent.com/Mingyueyixi/MaskWechat/main/$releatePath"
-            val cdnUrl = "https://cdn.jsdelivr.net/gh/Mingyueyixi/MaskWechat@vv1.12%2Fdev/$releatePath"
+            //例如分支v1.12, 写法url编码，且前缀加@v：@vv1.12%2Fdev
+            val cdnUrl = "https://cdn.jsdelivr.net/gh/Mingyueyixi/MaskWechat@main/$releatePath"
 
             HttpConnectUtil.get(rawUrl, HttpConnectUtil.noCacheHttpHeader) { raw ->
                 if (raw.error != null || raw.code != 200) {
