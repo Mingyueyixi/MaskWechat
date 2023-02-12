@@ -123,7 +123,7 @@ class JsonMenuManager {
 
             val rawJsonMenuUrl = "https://raw.githubusercontent.com/Mingyueyixi/MaskWechat/main/$releatePath"
             isRemoteUpdating = true
-            HttpConnectUtil.getWithRetry(rawJsonMenuUrl, HttpConnectUtil.noCacheHttpHeader, 2, { retryCount, res ->
+            HttpConnectUtil.getWithRetry(rawJsonMenuUrl, HttpConnectUtil.noCacheHttpHeader, 1, { retryCount, res ->
                 LogUtil.i("onFetch retry:$retryCount", rawJsonMenuUrl)
             }, {
                 if (it.error == null && it.code == 200 && it.body.isNotEmpty()) {
