@@ -39,7 +39,7 @@ android {
 }
 
 dependencies {
-    implementation deps['com.github.Mingyueyixi:frame-base-utils']
+    implementation deps['com.github.Mingyueyixi.frame-base-utils:core']
 
     testImplementation deps['junit:junit']
     androidTestImplementation deps['androidx.test.ext:junit']

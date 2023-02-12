@@ -15,6 +15,7 @@ import com.lu.magic.util.ToastUtil
 import com.lu.magic.util.log.LogUtil
 import com.lu.magic.util.ripple.RectangleRippleBuilder
 import com.lu.magic.util.ripple.RippleApplyUtil
+import com.lu.magic.util.thread.AppExecutor
 import com.lu.mask.donate.DonatePresenter
 import com.lu.wxmask.BuildConfig
 import com.lu.wxmask.ClazzN
@@ -23,6 +24,7 @@ import com.lu.wxmask.R
 import com.lu.wxmask.SelfHook
 import com.lu.wxmask.adapter.AbsListAdapter
 import com.lu.wxmask.adapter.CommonListAdapter
+import com.lu.wxmask.config.AppConfigUtil
 import com.lu.wxmask.databinding.FragmentMainBinding
 import com.lu.wxmask.databinding.ItemIconTextBinding
 import com.lu.wxmask.ui.vm.AppUpdateViewModel
@@ -33,6 +35,9 @@ class MainFragment : BaseFragment() {
     private var mainBinding: FragmentMainBinding by LifecycleAutoViewBinding<MainFragment, FragmentMainBinding>()
     private val donatePresenter by lazy { DonatePresenter.create() }
     private val mAppUpdateUI by lazy { ViewModelProvider(requireActivity())[AppUpdateViewModel::class.java] }
+    private val donateCardId = 10086
+
+    private var mListAdapter: CommonListAdapter<Int, ItemBindingViewHolder>? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return FragmentMainBinding.inflate(inflater, container, false).let {
@@ -45,9 +50,10 @@ class MainFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val rippleRadius = SizeUtil.dp2px(resources, 8f).toInt()
-        mainBinding.listView.adapter = object : CommonListAdapter<Any, ItemBindingViewHolder>() {
+
+        mListAdapter = object : CommonListAdapter<Int, ItemBindingViewHolder>() {
             init {
-                setData(arrayListOf(1, 2, 3, 4))
+                setData(arrayListOf(1, 2, 3))
             }
 
 
@@ -57,11 +63,13 @@ class MainFragment : BaseFragment() {
                 return object : ItemBindingViewHolder(itemBinding) {
                     init {
                         itemBinding.layoutItem.setOnClickListener {
-                            when (layoutPosition) {
-                                0 -> mAppUpdateUI.checkOnce(it.context)
-                                1 -> jumpWxManagerConfigUI(Constrant.VALUE_INTENT_PLUGIN_MODE_ADD)
-                                2 -> jumpWxManagerConfigUI(Constrant.VALUE_INTENT_PLUGIN_MODE_MANAGER)
-                                3 -> donatePresenter.lecturing(view.context)
+                            val itemValue = getItem(layoutPosition)
+
+                            when (itemValue) {
+                                1 -> mAppUpdateUI.checkOnce(it.context)
+                                2 -> jumpWxManagerConfigUI(Constrant.VALUE_INTENT_PLUGIN_MODE_ADD)
+                                3 -> jumpWxManagerConfigUI(Constrant.VALUE_INTENT_PLUGIN_MODE_MANAGER)
+                                donateCardId -> donatePresenter.lecturing(view.context)
                             }
                         }
 
@@ -73,8 +81,8 @@ class MainFragment : BaseFragment() {
                 if (position != 0) {
                     applyCommonItemRipple(vh.binding.layoutItem)
                 }
-                when (position) {
-                    0 -> {
+                when (getItem(position)) {
+                    1 -> {
                         if (SelfHook.getInstance().isModuleEnable) {
                             vh.binding.ivItemIcon.setImageResource(R.drawable.ic_icon_check)
                             vh.binding.tvItemTitle.setText(R.string.module_have_active)
@@ -87,19 +95,19 @@ class MainFragment : BaseFragment() {
                         vh.binding.tvItemTitleSub.text = (getString(R.string.module_version) + "：" + getVersionText())
                     }
 
-                    1 -> {
+                    2 -> {
                         vh.binding.ivItemIcon.setImageResource(R.drawable.ic_icon_add)
                         vh.binding.tvItemTitle.setText(R.string.config_add)
                         vh.binding.tvItemTitleSub.setText(R.string.click_here_to_add)
                     }
 
-                    2 -> {
+                    3 -> {
                         vh.binding.ivItemIcon.setImageResource(R.drawable.ic_icon_manager)
                         vh.binding.tvItemTitle.setText(R.string.config_manager)
                         vh.binding.tvItemTitleSub.setText(R.string.click_here_to_manager)
                     }
 
-                    3 -> {
+                    donateCardId -> {
                         vh.binding.ivItemIcon.setImageResource(R.drawable.ic_icon_dollar)
                         vh.binding.tvItemTitle.setText(R.string.donate)
                         vh.binding.tvItemTitleSub.setText(R.string.donate_description)
@@ -133,6 +141,28 @@ class MainFragment : BaseFragment() {
 //        mainBinding.listView.setOnItemClickListener { _, view, position, _ ->
 //
 //        }
+        mainBinding.listView.adapter = mListAdapter
+        AppConfigUtil.load { config, isRemote ->
+            if (isDetached || isRemoving) {
+                return@load
+            }
+            val donateCard = config.mainUi?.donateCard ?: return@load
+            if (donateCard.show) {
+                showDonateCard()
+            }
+        }
+    }
+
+    private fun showDonateCard() {
+        AppExecutor.executeMain {
+            mListAdapter?.let { adapter ->
+                if (adapter.dataList.contains(donateCardId)) {
+                    return@executeMain
+                }
+                adapter.addData(donateCardId)
+                adapter.notifyDataSetChanged()
+            }
+        }
     }
 
     private fun getVersionText(): String {

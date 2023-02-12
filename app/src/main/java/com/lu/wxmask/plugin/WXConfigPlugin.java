@@ -10,7 +10,6 @@ import android.view.View;
 import com.lu.lposed.api2.XC_MethodHook2;
 import com.lu.lposed.api2.XposedHelpers2;
 import com.lu.lposed.plugin.IPlugin;
-import com.lu.magic.util.AppUtil;
 import com.lu.magic.util.GsonUtil;
 import com.lu.magic.util.log.LogUtil;
 import com.lu.wxmask.ClazzN;
@@ -78,6 +77,16 @@ public class WXConfigPlugin implements IPlugin {
             LogUtil.w("ignore not from mask");
             return;
         }
+        if (!AppVersionUtil.isSupportWechat()) {
+            new AlertDialog.Builder(activity)
+                    .setIcon(activity.getApplicationInfo().icon)
+                    .setTitle("提示")
+                    .setMessage("当前版本：" + AppVersionUtil.getVersionName() + "（" + AppVersionUtil.getVersionCode() + "）不支持，请到MaskWechat主页查看支持的版本")
+                    .setPositiveButton("知道了", null)
+                    .show();
+
+            return;
+        }
         if (pluginMode == Constrant.VALUE_INTENT_PLUGIN_MODE_ADD && !isShowingAddConfigTipUI) {
             showAddTipDialog(activity);
         } else if (pluginMode == Constrant.VALUE_INTENT_PLUGIN_MODE_MANAGER) {
@@ -94,8 +103,11 @@ public class WXConfigPlugin implements IPlugin {
     private void showAddTipDialog(Activity activity) {
         activity.runOnUiThread(() -> {
             new AlertDialog.Builder(activity)
-                    .setMessage("去点击用户进行配置吧~")
-                    .setNegativeButton("知道了", ((dialog, which) -> {
+                    .setTitle("配置提示")
+                    .setIcon(activity.getApplicationInfo().icon)
+                    .setMessage("点击用户发起聊天，就可以对用户进行配置噢~")
+                    .setCancelable(false)
+                    .setPositiveButton("继续", ((dialog, which) -> {
                         isOnDoingConfig = true;
                     }))
                     .setNeutralButton("忽略", (dialog, which) -> {

@@ -2,7 +2,7 @@ package com.lu.wxmask.bean
 
 import androidx.annotation.Keep
 import com.google.gson.JsonObject
-import com.lu.magic.frame.baseutils.kxt.optInt
+import com.lu.magic.util.kxt.optInt
 import com.lu.wxmask.Constrant
 
 

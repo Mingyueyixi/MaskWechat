@@ -22,8 +22,13 @@ jobs:
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+#    - name: Build with Gradle
+#      run: ./gradlew build
     - name: Build with Gradle
-      run: ./gradlew build
+      uses: gradle/gradle-build-action@v2
+      with:
+        gradle-version: wrapper
+        arguments: build
 
     - name: Prepare Artifact
       if: success()

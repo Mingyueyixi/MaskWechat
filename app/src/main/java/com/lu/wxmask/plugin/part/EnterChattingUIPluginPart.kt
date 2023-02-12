@@ -214,7 +214,7 @@ class EnterChattingHookAction(
         if (chatListView != null) {
             chatListView.visibility = View.INVISIBLE
 
-            val quick = QuickTemporaryBean(ConfigUtil.getTemporaryJson()?: JsonObject())
+            val quick = QuickTemporaryBean(ConfigUtil.getTemporaryJson() ?: JsonObject())
             QuickCountClickListenerUtil.register(chatListView.parent as? View?, quick.clickCount, quick.duration) {
                 chatListView.visibility = View.VISIBLE
             }
@@ -235,6 +235,8 @@ class EnterChattingHookAction(
     private fun handleAlertMode(uiContext: Context, item: MaskItemBean) {
         //提示模式
         AlertDialog.Builder(uiContext)
+            .setTitle("提示")
+            .setIcon(uiContext.applicationInfo.icon)
             .setMessage(MaskItemBean.TipData.from(item).mess)
             .setNegativeButton("知道了", null)
             .show()

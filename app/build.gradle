@@ -14,8 +14,8 @@ android {
         applicationId "com.lu.wxmask"
         minSdk 24
         targetSdk 33
-        versionCode 12
-        versionName "1.11"
+        versionCode 13
+        versionName "1.12"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -73,8 +73,10 @@ android {
 
 dependencies {
     implementation(fileTree(dir: "libs", include: ["*.jar", "*.aar"]))
-    implementation(deps['com.github.Mingyueyixi:frame-base-utils'])
-    implementation(deps['com.github.Mingyueyixi:frame-ui'])
+    implementation(deps['com.github.Mingyueyixi.frame-base-utils:core'])
+    implementation(deps['com.github.Mingyueyixi.frame-ui:ui-appcompat'])
+//    implementation('com.github.Mingyueyixi.frame-ui:ui-appcompat:1.0')
+
     implementation(deps['com.github.Mingyueyixi.lposed:xposed-api2'])
     implementation(deps['com.github.Mingyueyixi.lposed:plugin'])
 

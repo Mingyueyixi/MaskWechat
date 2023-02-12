@@ -2,11 +2,13 @@ package com.lu.wxmask.util
 
 import com.lu.magic.util.AppUtil
 import com.lu.magic.util.log.LogUtil
+import com.lu.wxmask.Constrant
 
 class AppVersionUtil {
     companion object {
         private var versionCode = -1
         private var versionName = ""
+
         @JvmStatic
         fun getVersionName(): String? {
             if (versionName.isBlank()) {
@@ -37,5 +39,12 @@ class AppVersionUtil {
             return versionCode
         }
 
+        @JvmStatic
+        fun isSupportWechat(): Boolean {
+            return when (getVersionCode()) {
+                Constrant.WX_CODE_8_0_22, Constrant.WX_CODE_8_0_32 -> true
+                else -> false
+            }
+        }
     }
 }

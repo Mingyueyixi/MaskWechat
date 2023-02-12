@@ -1,0 +1,9 @@
+{
+  "mainUi": {
+    "donateCard": {
+      "title": "打赏",
+      "des": "万水千山总是情，打赏一点也是情",
+      "show": true
+    }
+  }
+}
