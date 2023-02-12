@@ -17,16 +17,18 @@ class AppConfigUtil {
         fun load(callBack: ((config: AppConfig, fromRemote: Boolean) -> Unit)? = null) {
             val releatePath = "res/raw/app_config.json"
             val rawUrl = "https://raw.githubusercontent.com/Mingyueyixi/MaskWechat/main/$releatePath"
-            val cdnUrl = "https://cdn.jsdelivr.net/gh/Mingyueyixi/MaskWechat@main/$releatePath"
+            val cdnUrl = "https://cdn.jsdelivr.net/gh/Mingyueyixi/MaskWechat@vv1.12%2Fdev/$releatePath"
 
             HttpConnectUtil.get(rawUrl, HttpConnectUtil.noCacheHttpHeader) { raw ->
                 if (raw.error != null || raw.code != 200) {
+                    LogUtil.d("request raw fail, $rawUrl", raw)
                     HttpConnectUtil.get(cdnUrl, HttpConnectUtil.noCacheHttpHeader) { cdn ->
                         if (cdn.error == null && cdn.code == 200) {
                             parseConfig(cdn.body)
                             saveConfig(cdn.body)
                             callBack?.invoke(config, true)
                         } else {
+                            LogUtil.d("request cdn fail, $cdnUrl", cdn)
                             //本地读取
                             parseLocalConfig()
                             callBack?.invoke(config, false)
