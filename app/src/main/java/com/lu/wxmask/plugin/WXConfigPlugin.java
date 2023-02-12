@@ -10,7 +10,6 @@ import android.view.View;
 import com.lu.lposed.api2.XC_MethodHook2;
 import com.lu.lposed.api2.XposedHelpers2;
 import com.lu.lposed.plugin.IPlugin;
-import com.lu.magic.util.AppUtil;
 import com.lu.magic.util.GsonUtil;
 import com.lu.magic.util.log.LogUtil;
 import com.lu.wxmask.ClazzN;
@@ -95,6 +94,7 @@ public class WXConfigPlugin implements IPlugin {
         activity.runOnUiThread(() -> {
             new AlertDialog.Builder(activity)
                     .setTitle("配置提示")
+                    .setIcon(activity.getApplicationInfo().icon)
                     .setMessage("点击用户发起聊天，就可以对用户进行配置噢~")
                     .setCancelable(false)
                     .setPositiveButton("继续", ((dialog, which) -> {
