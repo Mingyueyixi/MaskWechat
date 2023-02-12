@@ -77,6 +77,16 @@ public class WXConfigPlugin implements IPlugin {
             LogUtil.w("ignore not from mask");
             return;
         }
+        if (!AppVersionUtil.isSupportWechat()) {
+            new AlertDialog.Builder(activity)
+                    .setIcon(activity.getApplicationInfo().icon)
+                    .setTitle("提示")
+                    .setMessage("当前版本：" + AppVersionUtil.getVersionName() + "（" + AppVersionUtil.getVersionCode() + "）不支持，请到MaskWechat主页查看支持的版本")
+                    .setPositiveButton("知道了", null)
+                    .show();
+
+            return;
+        }
         if (pluginMode == Constrant.VALUE_INTENT_PLUGIN_MODE_ADD && !isShowingAddConfigTipUI) {
             showAddTipDialog(activity);
         } else if (pluginMode == Constrant.VALUE_INTENT_PLUGIN_MODE_MANAGER) {
