@@ -56,6 +56,7 @@ class EditMaskItemUI(
         ui.tipSpinner.setSelection(selectModeIndex)
         AlertDialog.Builder(context)
             .setTitle("编辑配置")
+            .setIcon(context.applicationInfo.icon)
             .setView(ui.root)
             .setPositiveButton("确定", null)
             .setNegativeButton("取消", null)
