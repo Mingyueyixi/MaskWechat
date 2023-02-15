@@ -89,7 +89,7 @@ class MaskAppRouter {
             when (name) {
                 "webView" -> {
                     val url = uri.getQueryParameter("url")
-                    val intent = Intent(AppUtil.getContext(), WebViewActivity::class.java)
+                    val intent = Intent(context, WebViewActivity::class.java)
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     intent.putExtra("url", url)
                     context.startActivity(intent)

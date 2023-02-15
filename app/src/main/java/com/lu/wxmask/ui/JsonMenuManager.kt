@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.Menu
 import android.view.MenuItem
 import androidx.annotation.Keep
+import com.lu.magic.util.AppUtil
 import com.lu.magic.util.GsonUtil
 import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.R
@@ -19,7 +20,9 @@ class JsonMenuManager {
         var order: Int = 0,
         var title: String? = "",
         var link: String? = "",
-        var appLink: AppLink? = null
+        var appLink: AppLink? = null,
+        /**最低支持app版本，小于则不显示*/
+        var since: Int = 0
     )
 
     @Keep
@@ -32,6 +35,10 @@ class JsonMenuManager {
 
         fun inflate(context: Context, menu: Menu) {
             for (menuBean in readMenuList(context)) {
+                if (AppUtil.getVersionCode() < menuBean.since) {
+                    //不支持的版本，忽略
+                    continue
+                }
                 val menuItem = menu.add(menuBean.groupId, menuBean.itemId, menuBean.order, menuBean.title)
                 menuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW)
                 menuItem.setOnMenuItemClickListener {

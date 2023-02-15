@@ -1,5 +1,6 @@
 package com.lu.wxmask.util
 
+import android.content.res.Resources.NotFoundException
 import com.lu.magic.util.log.LogUtil
 import com.lu.magic.util.thread.AppExecutor
 import com.lu.wxmask.util.http.HttpConnectUtil
@@ -21,20 +22,22 @@ class AppUpdateCheckUtil {
             return LocalKVUtil.getDefaultTable().getBoolean(key_check_app_update_on_enter, true)
         }
 
-        fun checkUpdate(callBack: (downloadUrl: String, name: String) -> Unit) {
+        fun checkUpdate(callBack: (downloadUrl: String, name: String, err: Throwable?) -> Unit) {
             val currVersionCode = AppVersionUtil.getVersionCode()
             if (currVersionCode == -1) {
-                callBack.invoke("", "")
+                AppExecutor.executeMain {
+                    callBack.invoke("", "", IllegalStateException("无法获取当前版本号"))
+                }
                 return
             }
             checkLastReleaseByRepo { url, code, name, err ->
-                if (err != null) {
-                    LogUtil.e(err)
-                    return@checkLastReleaseByRepo
-                }
                 if (url != null && code > currVersionCode) {
                     AppExecutor.executeMain {
-                        callBack.invoke(url, name)
+                        callBack.invoke(url, name, null)
+                    }
+                } else {
+                    AppExecutor.executeMain {
+                        callBack.invoke("", "", err)
                     }
                 }
             }

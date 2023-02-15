@@ -19,8 +19,8 @@ class AppUpdateViewModel : ViewModel() {
         }
         hasOnCheckAction = true
 
-        AppUpdateCheckUtil.checkUpdate { url, name ->
-            if (url.isBlank() || name.isBlank()) {
+        AppUpdateCheckUtil.checkUpdate { url, name, err ->
+            if (url.isBlank() || name.isBlank() || err != null) {
                 hasOnCheckAction = false
                 return@checkUpdate
             }
@@ -41,14 +41,15 @@ class AppUpdateViewModel : ViewModel() {
         }
     }
 
-    fun checkOnce(context: Context) {
+    fun checkOnce(context: Context, fallBackText: String = "未检查到新版本") {
         if (hasOnCheckAction) {
             return
         }
         hasOnCheckAction = true
-        AppUpdateCheckUtil.checkUpdate { url, name ->
+        AppUpdateCheckUtil.checkUpdate { url, name, err ->
             if (url.isBlank() || name.isBlank()) {
                 hasOnCheckAction = false
+                ToastUtil.show(fallBackText)
                 return@checkUpdate
             }
             AlertDialog.Builder(context)

@@ -15,12 +15,14 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.arch.core.util.Function
 import androidx.core.view.contains
 import com.lu.magic.util.kxt.toElseEmptyString
 import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.route.MaskAppRouter
 
 class WebViewProvider(val context: Context) {
+    private var onPageFinishCallBack: ((view: WebView?, url: String?) -> Unit)? = null
     val webView = WebView(context)
 
     init {
@@ -52,6 +54,7 @@ class WebViewProvider(val context: Context) {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
                 LogUtil.i("webViewLinker onPageFinished", url)
+                onPageFinishCallBack?.invoke(view, url)
             }
 
             override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
@@ -88,8 +91,10 @@ class WebViewProvider(val context: Context) {
 
     }
 
-    fun loadUrl(url: String) {
+    fun loadUrl(url: String, onPageFinishCallBack: ((view: WebView?, url: String?) -> Unit)? = null) {
+        this.onPageFinishCallBack = onPageFinishCallBack
         webView.loadUrl(url)
+        LogUtil.i("webview load url:", url)
     }
 
     fun attachView(root: ViewGroup): WebViewProvider {
