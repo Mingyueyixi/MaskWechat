@@ -2,9 +2,10 @@ package com.lu.wxmask.ui.vm
 
 import android.app.AlertDialog
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import androidx.lifecycle.ViewModel
+import com.lu.magic.util.ToastUtil
+import com.lu.magic.util.log.LogUtil
+import com.lu.wxmask.route.MaskAppRouter
 import com.lu.wxmask.util.AppUpdateCheckUtil
 
 class AppUpdateViewModel : ViewModel() {
@@ -28,7 +29,7 @@ class AppUpdateViewModel : ViewModel() {
                 .setMessage("检查到新版本：$name，是否更新？")
                 .setNegativeButton("取消", null)
                 .setNeutralButton("确定") { _, _ ->
-                    openUri(context, url)
+                    openBrowserDownloadUrl(context, url)
                 }
                 .setPositiveButton("不再提示") { _, _ ->
                     AppUpdateCheckUtil.setCheckFlagOnEnter(false)
@@ -55,7 +56,7 @@ class AppUpdateViewModel : ViewModel() {
                 .setMessage("检查到新版本$name，是否更新？")
                 .setNegativeButton("取消", null)
                 .setNeutralButton("确定") { _, _ ->
-                    openUri(context, url)
+                    openBrowserDownloadUrl(context, url)
                 }
                 .setOnDismissListener {
                     hasOnCheckAction = false
@@ -64,12 +65,13 @@ class AppUpdateViewModel : ViewModel() {
         }
     }
 
-    private fun openUri(context: Context, url: String) {
-        val intent = Intent()
-        intent.action = Intent.ACTION_VIEW
-        intent.data = Uri.parse(url)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        context.startActivity(intent)
+    private fun openBrowserDownloadUrl(context: Context, url: String) {
+        try {
+            MaskAppRouter.route(context, url)
+        } catch (e: Exception) {
+            ToastUtil.show("下载链接打开失败")
+            LogUtil.w(e)
+        }
     }
 
 }

@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
 import com.lu.magic.ui.BaseFragment
 import com.lu.magic.ui.LifecycleAutoViewBinding
 import com.lu.magic.util.SizeUtil
@@ -16,7 +15,6 @@ import com.lu.magic.util.log.LogUtil
 import com.lu.magic.util.ripple.RectangleRippleBuilder
 import com.lu.magic.util.ripple.RippleApplyUtil
 import com.lu.magic.util.thread.AppExecutor
-import com.lu.mask.donate.DonatePresenter
 import com.lu.wxmask.BuildConfig
 import com.lu.wxmask.ClazzN
 import com.lu.wxmask.Constrant
@@ -27,14 +25,12 @@ import com.lu.wxmask.adapter.CommonListAdapter
 import com.lu.wxmask.config.AppConfigUtil
 import com.lu.wxmask.databinding.FragmentMainBinding
 import com.lu.wxmask.databinding.ItemIconTextBinding
-import com.lu.wxmask.ui.vm.AppUpdateViewModel
+import com.lu.wxmask.route.MaskAppRouter
 
 
 class MainFragment : BaseFragment() {
     private var itemBinding: ItemIconTextBinding by LifecycleAutoViewBinding<MainFragment, ItemIconTextBinding>()
     private var mainBinding: FragmentMainBinding by LifecycleAutoViewBinding<MainFragment, FragmentMainBinding>()
-    private val donatePresenter by lazy { DonatePresenter.create() }
-    private val mAppUpdateUI by lazy { ViewModelProvider(requireActivity())[AppUpdateViewModel::class.java] }
     private val donateCardId = 10086
 
     private var mListAdapter: CommonListAdapter<Int, ItemBindingViewHolder>? = null
@@ -66,10 +62,10 @@ class MainFragment : BaseFragment() {
                             val itemValue = getItem(layoutPosition)
 
                             when (itemValue) {
-                                1 -> mAppUpdateUI.checkOnce(it.context)
+                                1 -> MaskAppRouter.routeCheckAppUpdateFeat()
                                 2 -> jumpWxManagerConfigUI(Constrant.VALUE_INTENT_PLUGIN_MODE_ADD)
                                 3 -> jumpWxManagerConfigUI(Constrant.VALUE_INTENT_PLUGIN_MODE_MANAGER)
-                                donateCardId -> donatePresenter.lecturing(view.context)
+                                donateCardId -> MaskAppRouter.routeDonateFeat()
                             }
                         }
 

@@ -67,6 +67,12 @@ android {
 //            println("${it.key} --》 ${it.value}")
 //        }
 //        println("------------"+ variant.outputs)
+
+//        testOptions {
+//            //使javaTest可以使用外部库的代码，例如android.jar
+//            //但是，api实际没有结果。
+//            unitTests.returnDefaultValues = true
+//        }
     }
 
 }
