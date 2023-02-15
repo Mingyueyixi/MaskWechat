@@ -1,5 +1,6 @@
 package com.lu.wxmask.route
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -23,12 +24,12 @@ class MaskAppRouter {
         val vailHost = "com.lu.wxmask"
         private val appUpdateViewModel = ViewModelProvider(App.instance)[AppUpdateViewModel::class.java]
         private val donatePresenter by lazy { DonatePresenter.create() }
-        fun routeCheckAppUpdateFeat() {
-            route(AppUtil.getContext(), "maskwechat://com.lu.wxmask/feat/checkAppUpdate")
+        fun routeCheckAppUpdateFeat(activity: Activity) {
+            route(activity, "maskwechat://com.lu.wxmask/feat/checkAppUpdate")
         }
 
-        fun routeDonateFeat() {
-            route(AppUtil.getContext(), "maskwechat://com.lu.wxmask/feat/donate")
+        fun routeDonateFeat(activity: Activity) {
+            route(activity, "maskwechat://com.lu.wxmask/feat/donate")
         }
 
         fun isMaskAppLink(uri: Uri?): Boolean {
@@ -40,21 +41,26 @@ class MaskAppRouter {
 
 
         @JvmOverloads
-        fun route(context: Context = AppUtil.getContext(), url: String) {
-            val uri = Uri.parse(url)
-            if (isMaskAppLink(uri)) {
-                val pathSegments = uri.pathSegments
-                if (pathSegments.size == 2) {
-                    val group = pathSegments[0] ?: ""
-                    val name = pathSegments[1] ?: ""
-                    routeMaskAppLink(context, uri, group, name)
+        fun route(context: Context = AppUtil.getContext(), url: String, onFail: ((e: Throwable) -> Unit)? = null) {
+            try {
+                val uri = Uri.parse(url)
+                if (isMaskAppLink(uri)) {
+                    val pathSegments = uri.pathSegments
+                    if (pathSegments.size == 2) {
+                        val group = pathSegments[0] ?: ""
+                        val name = pathSegments[1] ?: ""
+                        routeMaskAppLink(context, uri, group, name)
+                    } else {
+                        LogUtil.w("is Mask App link ,but pathSegments‘s size is not enough")
+                    }
                 } else {
-                    LogUtil.w("is Mask App link ,but pathSegments‘s size is not enough")
+                    val intent = Intent.parseUri(url, Intent.URI_ALLOW_UNSAFE)
+                    //                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(intent)
                 }
-            } else {
-                val intent = Intent.parseUri(url, Intent.URI_ALLOW_UNSAFE)
-//                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(intent)
+            } catch (e: Throwable) {
+                LogUtil.w(e)
+                onFail?.invoke(e)
             }
         }
 

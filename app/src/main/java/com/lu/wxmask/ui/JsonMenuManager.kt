@@ -86,7 +86,9 @@ class JsonMenuManager {
             if (link == null) {
                 throw IllegalArgumentException("link is null")
             }
-            MaskAppRouter.route(context, link)
+            MaskAppRouter.route(context, link){
+                throw it
+            }
         }
 
         private fun readMenuList(context: Context): ArrayList<MenuBean> {

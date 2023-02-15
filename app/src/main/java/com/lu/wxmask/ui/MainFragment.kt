@@ -2,6 +2,7 @@ package com.lu.wxmask.ui
 
 import android.content.ComponentName
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.lu.magic.ui.BaseFragment
 import com.lu.magic.ui.LifecycleAutoViewBinding
+import com.lu.magic.util.AppUtil
 import com.lu.magic.util.SizeUtil
 import com.lu.magic.util.ToastUtil
 import com.lu.magic.util.log.LogUtil
@@ -62,10 +64,10 @@ class MainFragment : BaseFragment() {
                             val itemValue = getItem(layoutPosition)
 
                             when (itemValue) {
-                                1 -> MaskAppRouter.routeCheckAppUpdateFeat()
+                                1 -> MaskAppRouter.routeCheckAppUpdateFeat(requireActivity())
                                 2 -> jumpWxManagerConfigUI(Constrant.VALUE_INTENT_PLUGIN_MODE_ADD)
                                 3 -> jumpWxManagerConfigUI(Constrant.VALUE_INTENT_PLUGIN_MODE_MANAGER)
-                                donateCardId -> MaskAppRouter.routeDonateFeat()
+                                donateCardId -> MaskAppRouter.routeDonateFeat(requireActivity())
                             }
                         }
 

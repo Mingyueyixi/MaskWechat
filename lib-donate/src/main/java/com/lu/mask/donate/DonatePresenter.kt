@@ -3,6 +3,7 @@ package com.lu.mask.donate
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import com.lu.magic.util.AppUtil
 import com.lu.magic.util.log.LogUtil
 import com.lu.mask.donate.dialog.PayDialog
 import java.net.URLEncoder
@@ -23,8 +24,8 @@ class DonatePresenter {
         lecturingWith(context)
             .setAlipayQRPersonLink(alipayQRPersonLink)
             .addPayImgRes(R.mipmap.ic_alipay_qr, "alipay_qr.webp")
-            .runWith { ctx, imgResId, fileName ->
-                showDonateDialog(ctx, imgResId, fileName)
+            .runWith { imgResId, fileName ->
+                showDonateDialog(context, imgResId, fileName)
             }
     }
 
@@ -37,10 +38,10 @@ class DonatePresenter {
             dialog.dismiss()
         }.setQRIconLongClickListener { dialog, _ ->
             dialog.dismiss()
-            savePayImgAndTip(context, payImgResId, fileName)
+            savePayImgAndTip(AppUtil.getContext(), payImgResId, fileName)
         }.setDownloadIconClickListener { dialog, _ ->
             dialog.dismiss()
-            savePayImgAndTip(context, payImgResId, fileName)
+            savePayImgAndTip(AppUtil.getContext(), payImgResId, fileName)
         }.show()
     }
 
@@ -71,13 +72,13 @@ class DonatePresenter {
             return this
         }
 
-        fun runWith(elseBlock: (ctx: Context, imgResId: Int, fileName: String) -> Unit) {
+        fun runWith(elseBlock: (imgResId: Int, fileName: String) -> Unit) {
             val index = Random.nextInt(0, payImgResIdStore.size)
             val resInt = payImgResIdStore.keys.toMutableList()[index]
             val fileName = payImgResIdStore[resInt]
 
             if (alipayQRPersonLink.isNullOrBlank()) {
-                elseBlock.invoke(context, resInt, fileName ?: "")
+                elseBlock.invoke(resInt, fileName ?: "")
             } else {
                 //支付宝个人收钱码，二维码内容
                 val qrPersonLink = URLEncoder.encode(alipayQRPersonLink, "UTF-8")
@@ -91,7 +92,7 @@ class DonatePresenter {
                     context.startActivity(intent)
                 } catch (e: android.content.ActivityNotFoundException) {
                     LogUtil.e(TAG, "支付宝跳转失败")
-                    elseBlock.invoke(context, resInt, fileName ?: "")
+                    elseBlock.invoke(resInt, fileName ?: "")
                 }
             }
 
