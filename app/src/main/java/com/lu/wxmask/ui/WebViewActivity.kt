@@ -8,11 +8,10 @@ import com.lu.wxmask.ui.wrapper.WebViewProvider
 
 class WebViewActivity : BaseActivity() {
     val webViewProvider by lazy { WebViewProvider(this) }
-
+    var hasLoadUrl = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val contentLayout = FrameLayout(this)
-        webViewProvider.attachView(contentLayout)
         setContentView(contentLayout)
 
         val webUrl = intent.getStringExtra("url")
@@ -24,10 +23,19 @@ class WebViewActivity : BaseActivity() {
             return
         }
         LogUtil.i("onCreate")
+        webViewProvider.attachView(contentLayout)
         webViewProvider.loadUrl(webUrl) { view, url ->
             view?.title?.let {
                 title = it
             }
+        }
+        hasLoadUrl = true
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (hasLoadUrl) {
+            webViewProvider.destroy()
         }
     }
 }

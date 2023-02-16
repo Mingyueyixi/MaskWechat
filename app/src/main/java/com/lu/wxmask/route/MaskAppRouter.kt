@@ -10,6 +10,7 @@ import com.lu.magic.util.log.LogUtil
 import com.lu.mask.donate.DonatePresenter
 import com.lu.wxmask.App
 import com.lu.wxmask.ui.WebViewActivity
+import com.lu.wxmask.ui.WebViewDialog
 import com.lu.wxmask.ui.vm.AppUpdateViewModel
 
 /**
@@ -17,6 +18,7 @@ import com.lu.wxmask.ui.vm.AppUpdateViewModel
  * maskwechat://com.lu.wxmask/feat/checkAppUpdate
  * maskwechat://com.lu.wxmask/page/about
  * maskwechat://com.lu.wxmask/page/webView?url=http://www.baidu.com
+ * maskwechat://com.lu.wxmask/page/webViewDialog?url=http://www.baidu.com
  */
 class MaskAppRouter {
     companion object {
@@ -32,6 +34,25 @@ class MaskAppRouter {
             route(activity, "maskwechat://com.lu.wxmask/feat/donate")
         }
 
+        fun routeWebViewPage(activity: Context, webUrl: String, title: String, isDialogUI: Boolean = false) {
+            val name = if (isDialogUI) "webViewDialog" else "webView"
+            val uri = Uri.parse("maskwechat://com.lu.wxmask/page/$name")
+                .buildUpon()
+                .appendQueryParameter("url", webUrl)
+                .appendQueryParameter("title", title)
+                .build()
+            route(activity, uri.toString())
+        }
+
+        fun routeWebViewPage(webUrl: String, title: String) {
+            val uri = Uri.parse("maskwechat://com.lu.wxmask/page/webView")
+                .buildUpon()
+                .appendQueryParameter("url", webUrl)
+                .appendQueryParameter("title", title)
+                .build()
+            route(AppUtil.getContext(), uri.toString())
+        }
+
         fun isMaskAppLink(uri: Uri?): Boolean {
             if (uri == null) {
                 return false
@@ -41,7 +62,7 @@ class MaskAppRouter {
 
 
         @JvmOverloads
-        fun route(context: Context = AppUtil.getContext(), url: String, onFail: ((e: Throwable) -> Unit)? = null) {
+        fun route(context: Context = AppUtil.getContext(), url: String?, onFail: ((e: Throwable) -> Unit)? = null) {
             try {
                 val uri = Uri.parse(url)
                 if (isMaskAppLink(uri)) {
@@ -94,11 +115,21 @@ class MaskAppRouter {
         private fun routePageGroup(context: Context, uri: Uri, name: String) {
             when (name) {
                 "webView" -> {
-                    val url = uri.getQueryParameter("url")
                     val intent = Intent(context, WebViewActivity::class.java)
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    intent.putExtra("url", url)
+                    intent.putExtra("url", uri.getQueryParameter("url"))
+                    intent.putExtra("title", uri.getQueryParameter("title"))
                     context.startActivity(intent)
+                }
+
+                "webViewDialog" -> {
+                    WebViewDialog(
+                        context,
+                        uri.getQueryParameter("url") ?: "about:blank",
+                        uri.getQueryParameter("title") ?: context.applicationInfo.name
+                    ).show()
+
+
                 }
 
                 else -> LogUtil.w(name, "for mask link pageGroup not impl")

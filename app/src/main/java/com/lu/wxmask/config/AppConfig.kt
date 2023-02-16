@@ -12,7 +12,8 @@ class AppConfig(
 
 @Keep
 class MainUi(
-    var donateCard: DonateCard?
+    var donateCard: DonateCard?,
+    var moduleCard: ModuleCard?
 )
 
 @Keep
@@ -21,3 +22,6 @@ class DonateCard(
     var show: Boolean = false,
     var title: String?
 )
+
+@Keep
+class ModuleCard(var link: String?)
