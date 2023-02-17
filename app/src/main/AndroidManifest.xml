@@ -30,6 +30,7 @@
 
         <activity
             android:name=".ui.MainActivity"
+            android:launchMode="singleInstance"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -39,6 +40,7 @@
 
                 <!-- 取消launcher分类，使之在桌面无图标 -->
                 <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+                <!-- 使用xpose manager可以启动它 -->
                 <category android:name="de.robv.android.xposed.category.MODULE_SETTINGS" />
             </intent-filter>
         </activity>

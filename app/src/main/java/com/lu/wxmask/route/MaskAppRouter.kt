@@ -10,6 +10,7 @@ import com.lu.magic.util.log.LogUtil
 import com.lu.mask.donate.DonatePresenter
 import com.lu.wxmask.App
 import com.lu.wxmask.config.AppConfigUtil
+import com.lu.wxmask.ui.MainActivity
 import com.lu.wxmask.ui.WebViewActivity
 import com.lu.wxmask.ui.WebViewDialog
 import com.lu.wxmask.ui.vm.AppUpdateViewModel
@@ -17,7 +18,7 @@ import com.lu.wxmask.ui.vm.AppUpdateViewModel
 /**
  * app内部跳转协议实现，如：
  * maskwechat://com.lu.wxmask/feat/checkAppUpdate
- * maskwechat://com.lu.wxmask/page/about
+ * maskwechat://com.lu.wxmask/page/main
  * maskwechat://com.lu.wxmask/page/webView?forceHtml=false&isDialog=true&url=http://www.baidu.com
  * maskwechat://com.lu.wxmask/page/releasesNote?isDialog=true&title=更新日记
  */
@@ -162,9 +163,17 @@ class MaskAppRouter {
                         context.startActivity(intent)
                     }
                 }
-
+                "main" ->{
+                    val intent = Intent(context, MainActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(intent)
+                }
                 else -> LogUtil.w(name, "for mask link pageGroup not impl")
             }
+        }
+
+        fun routeMainPage(context: Context) {
+            route(context, "maskwechat://com.lu.wxmask/page/main")
         }
 
     }
