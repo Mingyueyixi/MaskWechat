@@ -14,7 +14,6 @@
             margin: 0;
             font-size: 14px;
         }
-
         ul,
         li,
         ol {
@@ -43,6 +42,9 @@
             height: 100%;
             box-sizing: border-box;
         }
+        #app-root >*{
+            margin-top: 24px;
+        }
 
         .breakword {
             word-wrap: break-word;
@@ -50,35 +52,47 @@
 
         pre {
             white-space: pre-wrap !important;
-            word-wrap: break-word !important;
+            word-wrap: break-all !important;
             *white-space: normal !important;
-            text-align: justify;
+            text-align: left;
         }
 
         .title-text {
             font-size: 24px
         }
-        .min-text{
+
+        .min-text {
             font-size: 12px
         }
-        .download-row{
-            margin-top: 10px;
 
+        .download-row {
+            margin-top: 10px;
+        }
+        #info-tag{
+            display: block;  
+            text-align: right;
+            box-sizing: content-box;
+            padding-bottom: 24px;
         }
     </style>
 </head>
 
 <body>
-    <div id="app-root"></div>
+    <div id="app-root">
+        <div id="list-note-wrap"></div>
+        <div id="info-tag"></div>
+    </div>
     <script>
-        function buildOneassetsHtml(assets) {
+        function processOneAssetsData(assets) {
             if (!assets) return ""
             let result = ""
+            let count = 0
             for (let index = 0; index < assets.length; index++) {
                 const element = assets[index];
                 const name = element["name"]
                 const url = element['browser_download_url']
                 const downloadCount = element['download_count']
+                count += downloadCount
                 let size = element['size']
                 if (size < 1024 * 1024) {
                     size = (size / 1024).toFixed(0) + "kb"
@@ -88,7 +102,10 @@
 
                 result += `<div class="download-row"><a href="${url}">${name}</a><div class="min-text">${size}/${downloadCount}次下载</div></div>  `
             }
-            return result
+            return {
+                html: result,
+                count: count
+            }
         }
         // let releaseUrl = "https://api.github.com/repos/Mingyueyixi/MaskWechat/releases"
         let releaseUrl = "https://api.github.com/repos/Xposed-Modules-Repo/com.lu.wxmask/releases"
@@ -103,20 +120,26 @@
             .then(resp => resp.json())
             .then(dataList => {
                 let releaseNoteHtml = "<ul>"
+                let allDownloadCount = 0
                 for (let index = 0; index < dataList.length; index++) {
                     const element = dataList[index];
                     const name = element['name']
                     const body = element['body']
-                    const assetsHtml = buildOneassetsHtml(element['assets'])
+                    const assetsData = processOneAssetsData(element['assets'])
+                    const publishedAt = element['published_at']
+
+                    allDownloadCount += assetsData.count
                     releaseNoteHtml += `<li>
                     <span class="title-text">${name}</span>
+                    <div class="min-text">发布时间：${new Date(publishedAt).toLocaleString()}</div>
                     <pre class="breakword">${body}</pre>
                     <div>附件下载：</div>
-                    ${assetsHtml}
+                    ${assetsData.html}
                     </li>`
                 }
                 releaseNoteHtml += "</ul>"
-                document.querySelector("#app-root").innerHTML = releaseNoteHtml
+                document.querySelector("#list-note-wrap").innerHTML = releaseNoteHtml
+                document.querySelector("#info-tag").innerText = `统计：${dataList.length}个版本/${allDownloadCount}次下载`
 
             })
             .catch(err => {
