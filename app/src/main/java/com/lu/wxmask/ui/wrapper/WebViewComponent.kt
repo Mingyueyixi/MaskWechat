@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslError
 import android.os.Build
-import android.os.Message
 import android.util.Log
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
@@ -18,14 +17,13 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.core.view.contains
-import androidx.lifecycle.ViewModel
 import com.lu.magic.util.kxt.toElseEmptyString
 import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.route.MaskAppRouter
 
-class WebViewProvider(context: Context) {
+class WebViewComponent(context: Context) {
     companion object {
-        private val TAG: String = "WebViewProvider"
+        private val TAG: String = WebViewComponent::class.java.name
     }
 
     private var onPageFinishCallBack: ((view: WebView?, url: String?) -> Unit)? = null
@@ -132,7 +130,7 @@ class WebViewProvider(context: Context) {
         LogUtil.i(TAG, "webview load url:", url)
     }
 
-    fun attachView(root: ViewGroup): WebViewProvider {
+    fun attachView(root: ViewGroup): WebViewComponent {
         if (root.contains(webView)) {
             return this
         }
