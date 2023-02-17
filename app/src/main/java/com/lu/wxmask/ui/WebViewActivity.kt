@@ -1,9 +1,11 @@
 package com.lu.wxmask.ui
 
 import android.os.Bundle
+import android.webkit.WebView
 import android.widget.FrameLayout
 import com.lu.magic.ui.BaseActivity
 import com.lu.magic.util.log.LogUtil
+import com.lu.wxmask.ui.wrapper.WebViewComponentCallBack
 import com.lu.wxmask.ui.wrapper.WebViewComponent
 
 class WebViewActivity : BaseActivity() {
@@ -16,8 +18,9 @@ class WebViewActivity : BaseActivity() {
 
         val webUrl = intent.getStringExtra("url")
         val forceHtml = intent.getBooleanExtra("forceHtml", false)
-        val preTitleText = intent.getStringExtra("title")?.also {
-            title = it
+        val preTitleText = intent.getStringExtra("title")
+        if (!preTitleText.isNullOrBlank()) {
+            title = preTitleText
         }
 
         if (webUrl.isNullOrBlank()) {
@@ -27,13 +30,13 @@ class WebViewActivity : BaseActivity() {
         LogUtil.i("onCreate")
         webViewComponent.forceHtml = forceHtml
         webViewComponent.attachView(contentLayout)
-        webViewComponent.loadUrl(webUrl) { view, url ->
-            view?.title?.let {
-                if (preTitleText == null) {
-                    title = it
+        webViewComponent.loadUrl(webUrl, object : WebViewComponentCallBack {
+            override fun onReceivedTitle(view: WebView?, title: String?) {
+                if (preTitleText.isNullOrBlank() && !title.isNullOrBlank()) {
+                    setTitle(title)
                 }
             }
-        }
+        })
         hasLoadUrl = true
     }
 

@@ -9,9 +9,7 @@ import android.util.Log
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
 import android.webkit.ConsoleMessage
-import android.webkit.MimeTypeMap
 import android.webkit.SslErrorHandler
-import android.webkit.URLUtil
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
@@ -22,17 +20,16 @@ import androidx.core.view.contains
 import com.lu.magic.util.kxt.toElseEmptyString
 import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.route.MaskAppRouter
-import java.net.HttpURLConnection
 import java.net.URL
-import java.net.URLConnection
 
 class WebViewComponent(context: Context) {
     var forceHtml = false
+
     companion object {
         private val TAG: String = WebViewComponent::class.java.simpleName
     }
 
-    private var onPageFinishCallBack: ((view: WebView?, url: String?) -> Unit)? = null
+    private var webviewComponentCallBack: WebViewComponentCallBack? = null
     val webView = WebView(context)
 
     init {
@@ -87,7 +84,7 @@ class WebViewComponent(context: Context) {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
                 LogUtil.i(TAG, "onPageFinished", url)
-                onPageFinishCallBack?.invoke(view, url)
+                webviewComponentCallBack?.onPageFinish(view, url)
             }
 
             override fun onReceivedError(view: WebView?, errorCode: Int, description: String?, failingUrl: String?) {
@@ -136,12 +133,17 @@ class WebViewComponent(context: Context) {
                 return super.onConsoleMessage(consoleMessage)
             }
 
+            override fun onReceivedTitle(view: WebView?, title: String?) {
+                super.onReceivedTitle(view, title)
+                webviewComponentCallBack?.onReceivedTitle(view, title)
+            }
+
         }
 
     }
 
-    fun loadUrl(url: String, onPageFinishCallBack: ((view: WebView?, url: String?) -> Unit)? = null) {
-        this.onPageFinishCallBack = onPageFinishCallBack
+    fun loadUrl(url: String, callBack: WebViewComponentCallBack? = null) {
+        this.webviewComponentCallBack = callBack
         webView.loadUrl(url)
         LogUtil.i(TAG, "webview load url:", url)
     }

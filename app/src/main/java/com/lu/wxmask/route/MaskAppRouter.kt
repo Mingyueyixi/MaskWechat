@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModelProvider
 import com.lu.magic.util.AppUtil
 import com.lu.magic.util.log.LogUtil
@@ -19,7 +20,7 @@ import com.lu.wxmask.ui.vm.AppUpdateViewModel
  * app内部跳转协议实现，如：
  * maskwechat://com.lu.wxmask/feat/checkAppUpdate
  * maskwechat://com.lu.wxmask/page/main
- * maskwechat://com.lu.wxmask/page/webView?forceHtml=false&isDialog=true&url=http://www.baidu.com
+ * maskwechat://com.lu.wxmask/page/webView?forceHtml=false&isDialog=true&url=https://www.baidu.com
  * maskwechat://com.lu.wxmask/page/releasesNote?isDialog=true&title=更新日记
  */
 class MaskAppRouter {
@@ -68,7 +69,13 @@ class MaskAppRouter {
             }
             return vailScheme == uri.scheme && vailHost == uri.host
         }
-
+        fun isPageGroup(uri: Uri): Boolean {
+            val segments = uri.pathSegments
+            if (segments.size >= 1) {
+                return segments[0] == "page"
+            }
+            return false
+        }
 
         @JvmOverloads
         fun route(context: Context = AppUtil.getContext(), url: String?, onFail: ((e: Throwable) -> Unit)? = null) {
@@ -82,7 +89,8 @@ class MaskAppRouter {
                         val name = pathSegments[1] ?: ""
                         routeMaskAppLink(context, uri, group, name)
                     } else {
-                        LogUtil.w("is Mask App link ,but pathSegments‘s size is not enough")
+                        LogUtil.w("is Mask App link ,but pathSegments‘s size is not match. Jump to main Page")
+                        jumpMainPage(context, uri)
                     }
                 } else {
                     val intent = Intent.parseUri(url, Intent.URI_ALLOW_UNSAFE)
@@ -130,7 +138,7 @@ class MaskAppRouter {
                         WebViewDialog(
                             context,
                             uri.getQueryParameter("url") ?: "about:blank",
-                            uri.getQueryParameter("title") ?: context.applicationInfo.name,
+                            uri.getQueryParameter("title"),
                             uri.getQueryParameter("forceHtml").toBoolean()
                         ).show()
                     } else {
@@ -163,18 +171,28 @@ class MaskAppRouter {
                         context.startActivity(intent)
                     }
                 }
-                "main" ->{
-                    val intent = Intent(context, MainActivity::class.java)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    context.startActivity(intent)
-                }
+
+                "main" -> jumpMainPage(context, uri)
+
                 else -> LogUtil.w(name, "for mask link pageGroup not impl")
             }
         }
 
-        fun routeMainPage(context: Context) {
-            route(context, "maskwechat://com.lu.wxmask/page/main")
+        fun routeMainPage(context: Context, intentData: Uri? = null) {
+            val routeUri = Uri.parse("maskwechat://com.lu.wxmask/page/main").buildUpon()
+                .appendQueryParameter("data", intentData.toString())
+                .build()
+                .toString()
+            route(context, routeUri)
         }
 
+        fun jumpMainPage(context: Context, uri: Uri) {
+            val intent = Intent(context, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            uri.getQueryParameter("data")?.let {
+                intent.data = Uri.parse(it)
+            }
+            context.startActivity(intent)
+        }
     }
 }
