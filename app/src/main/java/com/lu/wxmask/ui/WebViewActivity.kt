@@ -4,10 +4,10 @@ import android.os.Bundle
 import android.widget.FrameLayout
 import com.lu.magic.ui.BaseActivity
 import com.lu.magic.util.log.LogUtil
-import com.lu.wxmask.ui.wrapper.WebViewProvider
+import com.lu.wxmask.ui.wrapper.WebViewComponent
 
 class WebViewActivity : BaseActivity() {
-    val webViewProvider by lazy { WebViewProvider(this) }
+    val webViewComponent by lazy { WebViewComponent(this) }
     var hasLoadUrl = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,8 +23,8 @@ class WebViewActivity : BaseActivity() {
             return
         }
         LogUtil.i("onCreate")
-        webViewProvider.attachView(contentLayout)
-        webViewProvider.loadUrl(webUrl) { view, url ->
+        webViewComponent.attachView(contentLayout)
+        webViewComponent.loadUrl(webUrl) { view, url ->
             view?.title?.let {
                 title = it
             }
@@ -35,7 +35,7 @@ class WebViewActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         if (hasLoadUrl) {
-            webViewProvider.destroy()
+            webViewComponent.destroy()
         }
     }
 }

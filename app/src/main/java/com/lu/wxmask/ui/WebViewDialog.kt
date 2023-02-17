@@ -7,10 +7,10 @@ import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatDialog
 import com.lu.magic.util.AppUtil
-import com.lu.wxmask.ui.wrapper.WebViewProvider
+import com.lu.wxmask.ui.wrapper.WebViewComponent
 
 class WebViewDialog(context: Context, var webUrl: String, var dialogTitle: String) : AppCompatDialog(context) {
-    val webViewProvider = WebViewProvider(context).also {
+    val webViewComponent = WebViewComponent(context).also {
         it.loadUrl(webUrl)
     }
 
@@ -20,7 +20,7 @@ class WebViewDialog(context: Context, var webUrl: String, var dialogTitle: Strin
         val contentView = FrameLayout(context).also {
             it.layoutParams = MarginLayoutParams(MarginLayoutParams.MATCH_PARENT, MarginLayoutParams.MATCH_PARENT)
         }
-        webViewProvider.attachView(contentView)
+        webViewComponent.attachView(contentView)
         setContentView(contentView)
 
         val height = AppUtil.getContext().resources.displayMetrics.heightPixels * 0.6f
