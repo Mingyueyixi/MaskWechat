@@ -4,9 +4,11 @@ import android.content.ComponentName
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.google.gson.JsonObject
 import com.lu.magic.ui.BaseFragment
 import com.lu.magic.ui.LifecycleAutoViewBinding
 import com.lu.magic.util.SizeUtil
@@ -26,11 +28,15 @@ import com.lu.wxmask.config.AppConfigUtil
 import com.lu.wxmask.databinding.FragmentMainBinding
 import com.lu.wxmask.databinding.ItemIconTextBinding
 import com.lu.wxmask.route.MaskAppRouter
+import org.json.JSONObject
 
 
 class MainFragment : BaseFragment() {
     private var itemBinding: ItemIconTextBinding by LifecycleAutoViewBinding<MainFragment, ItemIconTextBinding>()
     private var mainBinding: FragmentMainBinding by LifecycleAutoViewBinding<MainFragment, FragmentMainBinding>()
+    private val buildInfoJson by lazy {
+        JSONObject(Base64.decode(BuildConfig.buildInfoJson64, Base64.DEFAULT).toString(Charsets.UTF_8))
+    }
     private val donateCardId = 10086
 
     private var mListAdapter: CommonListAdapter<Int, ItemBindingViewHolder>? = null
@@ -77,7 +83,18 @@ class MainFragment : BaseFragment() {
                 if (position != 0) {
                     applyCommonItemRipple(vh.binding.layoutItem)
                 }
-                when (getItem(position)) {
+                val position = getItem(position)
+                if (position == 1) {
+                    vh.binding.tvItemTitleSub2.text = "提交哈希：" + buildInfoJson.optString("commit").subSequence(0, 11)
+                    vh.binding.tvItemTitleSub3.text = "构建时间：" + buildInfoJson.optString("time")
+                    vh.binding.tvItemTitleSub2.visibility = View.VISIBLE
+                    vh.binding.tvItemTitleSub3.visibility = View.VISIBLE
+                } else {
+                    vh.binding.tvItemTitleSub2.visibility = View.GONE
+                    vh.binding.tvItemTitleSub3.visibility = View.GONE
+                }
+
+                when (position) {
                     1 -> {
                         if (SelfHook.getInstance().isModuleEnable) {
                             vh.binding.ivItemIcon.setImageResource(R.drawable.ic_icon_check)
@@ -152,7 +169,7 @@ class MainFragment : BaseFragment() {
     private fun clickModuleCard() {
         val moduleCard = AppConfigUtil.config.mainUi?.moduleCard
         if (moduleCard == null || moduleCard.link.isNullOrBlank()) {
-        MaskAppRouter.routeCheckAppUpdateFeat(requireActivity())
+            MaskAppRouter.routeCheckAppUpdateFeat(requireActivity())
 //            MaskAppRouter.routeWebViewPage(requireActivity(), "http://192.168.3.116:5500/releases.html", "更新日志", true)
 //            MaskAppRouter.routeWebViewPage(
 //                requireActivity(),
