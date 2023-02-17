@@ -9,7 +9,9 @@ import android.util.Log
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
 import android.webkit.ConsoleMessage
+import android.webkit.MimeTypeMap
 import android.webkit.SslErrorHandler
+import android.webkit.URLUtil
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
@@ -20,10 +22,14 @@ import androidx.core.view.contains
 import com.lu.magic.util.kxt.toElseEmptyString
 import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.route.MaskAppRouter
+import java.net.HttpURLConnection
+import java.net.URL
+import java.net.URLConnection
 
 class WebViewComponent(context: Context) {
+    var forceHtml = false
     companion object {
-        private val TAG: String = WebViewComponent::class.java.name
+        private val TAG: String = WebViewComponent::class.java.simpleName
     }
 
     private var onPageFinishCallBack: ((view: WebView?, url: String?) -> Unit)? = null
@@ -38,9 +44,9 @@ class WebViewComponent(context: Context) {
             it.allowFileAccess = true
             it.allowContentAccess = true
             it.allowFileAccessFromFileURLs = true
-            it.allowUniversalAccessFromFileURLs=true
+            it.allowUniversalAccessFromFileURLs = true
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                it.isAlgorithmicDarkeningAllowed=true
+                it.isAlgorithmicDarkeningAllowed = true
             }
         }
         webView.webViewClient = object : WebViewClient() {
@@ -58,8 +64,18 @@ class WebViewComponent(context: Context) {
                 return super.shouldOverrideUrlLoading(view, url)
             }
 
-            override fun shouldInterceptRequest(view: WebView?, url: String?): WebResourceResponse? {
-                LogUtil.i(TAG, "shouldInterceptRequest")
+            override fun shouldInterceptRequest(view: WebView?, url: String): WebResourceResponse? {
+                LogUtil.i(TAG, "shouldInterceptRequest", url)
+                if (forceHtml && url.endsWith(".html")) {
+                    val iStream = try {
+                        URL(url).openStream()
+                    } catch (e: Throwable) {
+                        null
+                    }
+                    if (iStream != null) {
+                        return WebResourceResponse("text/html", "utf-8", iStream)
+                    }
+                }
                 return super.shouldInterceptRequest(view, url)
             }
 
@@ -150,6 +166,10 @@ class WebViewComponent(context: Context) {
             if (uri == null || view == null) return false
 
             val scheme = uri.scheme.toElseEmptyString().lowercase()
+            if (uri.toString().matches(Regex("https?://.+\\.(?:apk|zip|rar|gzip)", RegexOption.IGNORE_CASE))) {
+                MaskAppRouter.route(view.context, uri.toString())
+                return true
+            }
             if (!"http".equals(scheme, true)
                 && !"https".equals(scheme, true)
                 && !"file".equals(scheme, true)

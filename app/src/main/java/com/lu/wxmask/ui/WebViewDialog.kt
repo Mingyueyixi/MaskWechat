@@ -9,8 +9,15 @@ import androidx.appcompat.app.AppCompatDialog
 import com.lu.magic.util.AppUtil
 import com.lu.wxmask.ui.wrapper.WebViewComponent
 
-class WebViewDialog(context: Context, var webUrl: String, var dialogTitle: String) : AppCompatDialog(context) {
+
+class WebViewDialog @JvmOverloads constructor(
+    context: Context,
+    var webUrl: String,
+    var dialogTitle: String,
+    var forceHtml: Boolean = false
+) : AppCompatDialog(context) {
     val webViewComponent = WebViewComponent(context).also {
+        it.forceHtml = forceHtml
         it.loadUrl(webUrl)
     }
 

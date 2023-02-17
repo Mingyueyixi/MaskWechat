@@ -8,8 +8,10 @@ import com.lu.magic.util.AppUtil
 import com.lu.magic.util.GsonUtil
 import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.R
+import com.lu.wxmask.config.AppConfigUtil
 import com.lu.wxmask.route.MaskAppRouter
 import com.lu.wxmask.util.http.HttpConnectUtil
+import java.io.File
 import java.nio.charset.Charset
 
 class JsonMenuManager {
@@ -30,8 +32,8 @@ class JsonMenuManager {
 
     companion object {
         private var isRemoteUpdating: Boolean = false
-        private val menuFileName = "menu_ui.json"
         private var lastUpdateSuccessMills = 0L
+        private val menuFilePath = "res/raw/menu_ui.json"
 
         fun inflate(context: Context, menu: Menu) {
             for (menuBean in readMenuList(context)) {
@@ -86,20 +88,23 @@ class JsonMenuManager {
             if (link == null) {
                 throw IllegalArgumentException("link is null")
             }
-            MaskAppRouter.route(context, link){
+            MaskAppRouter.route(context, link) {
                 throw it
             }
         }
 
         private fun readMenuList(context: Context): ArrayList<MenuBean> {
-            val file = context.getFileStreamPath(menuFileName)
+            val file = File(context.filesDir, menuFilePath)
             val retType = GsonUtil.getType(ArrayList::class.java, MenuBean::class.java)
 
             val ret: ArrayList<MenuBean> = try {
                 if (file.exists()) {
                     GsonUtil.fromJson(file.readText(), retType)
                 } else {
-                    GsonUtil.fromJson(readMenuJsonTextFromRaw(context), retType)
+                    file.parentFile.mkdirs()
+                    val text = readMenuJsonTextFromRaw(context)
+                    file.writeText(text)
+                    GsonUtil.fromJson(text, retType)
                 }
             } catch (e: Exception) {
                 GsonUtil.fromJson(readMenuJsonTextFromRaw(context), retType)
@@ -121,10 +126,9 @@ class JsonMenuManager {
         }
 
         fun updateMenuListFromRemote(ctx: Context) {
-            val releatePath = "res/raw/menu_ui.json"
             val context = ctx.applicationContext
 
-            val rawJsonMenuUrl = "https://raw.githubusercontent.com/Mingyueyixi/MaskWechat/main/$releatePath"
+            val rawJsonMenuUrl = "${AppConfigUtil.githubMainUrl}/$menuFilePath"
             isRemoteUpdating = true
             HttpConnectUtil.getWithRetry(rawJsonMenuUrl, HttpConnectUtil.noCacheHttpHeader, 1, { retryCount, res ->
                 LogUtil.i("onFetch retry:$retryCount", rawJsonMenuUrl)
@@ -133,11 +137,9 @@ class JsonMenuManager {
                     writeRemoteToLocal(context, it.body)
                     isRemoteUpdating = false
                 } else {
-                    LogUtil.w("request raw remote menu fail", it);
-                    //val githubRawPath = "https://github.com/$releatePath"
-                    //@main分支 或者@v1.6， commit id之类的，直接在写/main有时候不行
-                    //不指定版本，则取最后一个https://www.jsdelivr.com/?docs=gh
-                    val cdnRawPath = "https://cdn.jsdelivr.net/gh/Mingyueyixi/MaskWechat@main/$releatePath"
+                    LogUtil.w("request raw remote menu fail", it)
+
+                    val cdnRawPath = "${AppConfigUtil.cdnMainUrl}/$menuFilePath"
                     LogUtil.i("request $cdnRawPath")
                     HttpConnectUtil.get(cdnRawPath, HttpConnectUtil.noCacheHttpHeader) { cdnRes ->
                         if (cdnRes.error == null && cdnRes.code == 200 && cdnRes.body.isNotEmpty()) {
@@ -154,7 +156,7 @@ class JsonMenuManager {
         }
 
         private fun writeRemoteToLocal(context: Context, body: ByteArray) {
-            context.openFileOutput(menuFileName, Context.MODE_PRIVATE).use { out ->
+            File(context.filesDir, menuFilePath).outputStream().use { out ->
                 out.write(body)
             }
             lastUpdateSuccessMills = System.currentTimeMillis()

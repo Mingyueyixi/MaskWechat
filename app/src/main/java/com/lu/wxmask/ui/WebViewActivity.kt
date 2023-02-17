@@ -15,18 +15,23 @@ class WebViewActivity : BaseActivity() {
         setContentView(contentLayout)
 
         val webUrl = intent.getStringExtra("url")
-        intent.getStringExtra("title")?.let {
+        val forceHtml = intent.getBooleanExtra("forceHtml", false)
+        val preTitleText = intent.getStringExtra("title")?.also {
             title = it
         }
+
         if (webUrl.isNullOrBlank()) {
             finish()
             return
         }
         LogUtil.i("onCreate")
+        webViewComponent.forceHtml = forceHtml
         webViewComponent.attachView(contentLayout)
         webViewComponent.loadUrl(webUrl) { view, url ->
             view?.title?.let {
-                title = it
+                if (preTitleText == null) {
+                    title = it
+                }
             }
         }
         hasLoadUrl = true

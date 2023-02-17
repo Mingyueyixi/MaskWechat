@@ -169,16 +169,11 @@ class MainFragment : BaseFragment() {
     private fun clickModuleCard() {
         val moduleCard = AppConfigUtil.config.mainUi?.moduleCard
         if (moduleCard == null || moduleCard.link.isNullOrBlank()) {
-            MaskAppRouter.routeCheckAppUpdateFeat(requireActivity())
-//            MaskAppRouter.routeWebViewPage(requireActivity(), "http://192.168.3.116:5500/releases.html", "更新日志", true)
-//            MaskAppRouter.routeWebViewPage(
-//                requireActivity(),
-//                "https://cdn.jsdelivr.net/gh/Mingyueyixi/MaskWechat@main/res/html/releases.html",
-//                "更新日记",
-//                true
-//            )
+            MaskAppRouter.routeReleasesNotePage(requireActivity(), "更新日记")
+//            MaskAppRouter.routeCheckAppUpdateFeat(requireActivity())
         } else {
             MaskAppRouter.route(requireActivity(), moduleCard.link)
+//            MaskAppRouter.routeReleasesNotePage(requireActivity(), "更新日记")
         }
     }
 
