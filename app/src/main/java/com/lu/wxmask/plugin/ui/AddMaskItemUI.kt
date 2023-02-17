@@ -58,6 +58,7 @@ class AddMaskItemUI(
 
         AlertDialog.Builder(context)
             .setTitle("添加配置")
+            .setIcon(context.applicationInfo.icon)
             .setView(ui.root)
             .setNegativeButton("关闭", null)
             .setPositiveButton("确定", null)

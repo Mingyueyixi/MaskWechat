@@ -1,9 +1,59 @@
+import org.json.JSONObject
+
+import java.text.SimpleDateFormat
+
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
 }
 apply {
     from rootProject.file('props.gradle')
+}
+def buildInfoJson = {
+    def p = "git branch --show-current".execute()
+    //当前分支
+    def currentBranch = p.text.trim()
+    p.destroy()
+    //最后1个提交ID
+    p = "git rev-parse HEAD".execute()
+    def lastedCommit = p.text.trim()
+    p.destroy()
+
+    def buildDate = new SimpleDateFormat("YYYY/MM/dd hh:mm:ss").format(new Date())
+    def gitBranch = currentBranch
+    def gitCommit = lastedCommit;
+
+    def jsonObj = new JSONObject()
+    jsonObj.put("time", buildDate)
+    jsonObj.put("branch", gitBranch)
+    jsonObj.put("commit", gitCommit)
+    return jsonObj.toString()
+}()
+
+def writeBuildInfoJson(dirPath, jsonText) {
+    println "----------Commit Info------------"
+
+    def buildInfoPath = "$dirPath/build_info.json".replace("\\", "/")
+    def jsonFile = file(buildInfoPath)
+    jsonFile.parentFile.mkdirs()
+    jsonFile.withWriter('utf-8') {
+        it.write(jsonText)
+    }
+    println "commit info file: $buildInfoPath"
+
+}
+
+this.afterEvaluate {
+    project.tasks.forEach {
+        if (it.name.startsWith("process") && it.name.endsWith("JavaRes")) {
+            //将构建信息打包到apk中，这个方法似乎不太靠谱，改为写入buildConfig
+            it.doLast {
+                println(">>> ${it.name} attach build json")
+                writeBuildInfoJson(it.destinationDir.path, buildInfoJson)
+            }
+        }
+    }
+
 }
 
 android {
@@ -14,11 +64,19 @@ android {
         applicationId "com.lu.wxmask"
         minSdk 24
         targetSdk 33
-        versionCode 13
-        versionName "1.12"
+        versionCode 14
+        versionName "1.13"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
     }
+//    sourceSets {
+//        main{
+//            resources{
+//                srcDir("src/main/reouserces")
+//            }
+//        }
+//    }
     signingConfigs {
         alpha {
             storeFile file("${rootDir}/app/key-store-test.jks")
@@ -32,14 +90,20 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.alpha
+
+            buildConfigField "String", "buildInfoJson64", "\"${buildInfoJson.bytes.encodeBase64()}\""
         }
         release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.alpha
+
+            buildConfigField "String", "buildInfoJson64", "\"${buildInfoJson.bytes.encodeBase64()}\""
         }
+
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -67,6 +131,12 @@ android {
 //            println("${it.key} --》 ${it.value}")
 //        }
 //        println("------------"+ variant.outputs)
+
+//        testOptions {
+//            //使javaTest可以使用外部库的代码，例如android.jar
+//            //但是，api实际没有结果。
+//            unitTests.returnDefaultValues = true
+//        }
     }
 
 }

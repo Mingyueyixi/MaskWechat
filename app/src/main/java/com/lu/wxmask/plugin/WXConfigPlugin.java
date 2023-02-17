@@ -153,8 +153,9 @@ public class WXConfigPlugin implements IPlugin {
                 return;
             }
             Activity activity = XposedHelpers2.callMethod(param.thisObject, "getActivity");
-            if (!ClazzN.LauncherUI.equals(activity.getClass().getName())) {
-                LogUtil.w("isNot Activity");
+            String activityClazzName = activity.getClass().getName();
+            if (!ClazzN.LauncherUI.equals(activityClazzName) && !ClazzN.ChattingUI.equals(activityClazzName)) {
+                LogUtil.w("isNot Match Activity", activityClazzName);
                 return;
             }
             Bundle arguments = XposedHelpers2.callMethod(param.thisObject, "getArguments");

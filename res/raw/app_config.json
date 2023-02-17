@@ -4,6 +4,9 @@
       "title": "打赏",
       "des": "万水千山总是情，打赏一点也是情",
       "show": true
+    },
+    "moduleCard": {
+      "link": "maskwechat://com.lu.wxmask/page/webViewDialog?title=更新日记&url=https%3A%2F%2Fapi.github.com%2Frepos%2FXposed-Modules-Repo%2Fcom.lu.wxmask%2Freleases"
     }
   }
 }

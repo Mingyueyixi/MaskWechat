@@ -1,15 +1,14 @@
 package com.lu.wxmask.ui
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.view.Menu
 import android.view.MenuItem
 import androidx.annotation.Keep
-import com.lu.lposed.api2.function.Consumer
+import com.lu.magic.util.AppUtil
 import com.lu.magic.util.GsonUtil
 import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.R
+import com.lu.wxmask.route.MaskAppRouter
 import com.lu.wxmask.util.http.HttpConnectUtil
 import java.nio.charset.Charset
 
@@ -21,7 +20,9 @@ class JsonMenuManager {
         var order: Int = 0,
         var title: String? = "",
         var link: String? = "",
-        var appLink: AppLink? = null
+        var appLink: AppLink? = null,
+        /**最低支持app版本，小于则不显示*/
+        var since: Int = 0
     )
 
     @Keep
@@ -34,6 +35,10 @@ class JsonMenuManager {
 
         fun inflate(context: Context, menu: Menu) {
             for (menuBean in readMenuList(context)) {
+                if (AppUtil.getVersionCode() < menuBean.since) {
+                    //不支持的版本，忽略
+                    continue
+                }
                 val menuItem = menu.add(menuBean.groupId, menuBean.itemId, menuBean.order, menuBean.title)
                 menuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW)
                 menuItem.setOnMenuItemClickListener {
@@ -41,24 +46,31 @@ class JsonMenuManager {
                     val clickLinkPriority = 0
                     val appLinks = appLink?.links
                     if (appLink == null || clickLinkPriority > appLink.priority || appLinks.isNullOrEmpty()) {
-                        openLinkWith(context, menuBean.link) { err ->
-                            LogUtil.w("open link error", err)
+                        try {
+                            openLinkWith(context, menuBean.link)
+                        } catch (e: Throwable) {
+                            LogUtil.w("open link error", e)
                         }
                     } else {
                         var failCount = 0
                         for (link in appLinks) {
-                            openLinkWith(context, link) { err ->
+                            try {
+                                openLinkWith(context, link)
+                            } catch (e: Throwable) {
                                 failCount++;
-                                LogUtil.w("open link faild", err)
+                                LogUtil.w("open link faild", e)
                             }
                             if (failCount == 0) {
+                                //成功，跳出循环
                                 break
                             }
                         }
                         if (failCount == appLinks.size) {
                             LogUtil.w("open appLink with all error", it)
-                            openLinkWith(context, menuBean.link) { err ->
-                                LogUtil.w("try open link alse error", err)
+                            try {
+                                openLinkWith(context, menuBean.link)
+                            } catch (e: Throwable) {
+                                LogUtil.w("try open link also error", e)
                             }
                         }
 
@@ -70,22 +82,13 @@ class JsonMenuManager {
 
         }
 
-        private fun openLinkWith(context: Context, link: String?, onFail: Consumer<Throwable>? = null): Boolean {
-            var openSuccess = true
-            try {
-                if (link == null) {
-                    throw IllegalArgumentException("link is null")
-                }
-                val intent = Intent()
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                intent.action = Intent.ACTION_VIEW
-                intent.data = Uri.parse(link)
-                context.startActivity(intent)
-            } catch (e: Throwable) {
-                openSuccess = false
-                onFail?.accept(e)
+        private fun openLinkWith(context: Context, link: String?) {
+            if (link == null) {
+                throw IllegalArgumentException("link is null")
             }
-            return openSuccess
+            MaskAppRouter.route(context, link){
+                throw it
+            }
         }
 
         private fun readMenuList(context: Context): ArrayList<MenuBean> {
