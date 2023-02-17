@@ -6,7 +6,7 @@
       "show": true
     },
     "moduleCard": {
-      "link": "maskwechat://com.lu.wxmask/page/webViewDialog?title=更新日记&url=https%3A%2F%2Fcdn.jsdelivr.net%2Fgh%2FMingyueyixi%2FMaskWechat%40main%2Fres%2Fhtml%2Freleases.html"
+      "link": "maskwechat://com.lu.wxmask/page/releasesNote?isDialog=true&title=更新日记"
     }
   }
 }

@@ -30,7 +30,8 @@
 
         <activity
             android:name=".ui.MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <!-- 在Android-11及以上，不能够通过调用 pm.setComponentEnabledSetting 禁用组件的方式来实现动态显示/隐藏图标 -->
@@ -39,13 +40,30 @@
 
                 <!-- 取消launcher分类，使之在桌面无图标 -->
                 <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+                <!-- 使用xpose manager可以启动它 -->
                 <category android:name="de.robv.android.xposed.category.MODULE_SETTINGS" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.DeepLinkActivity"
+            android:exported="true"
+            android:theme="@style/Theme.MaskWechat.Transparent">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="com.lu.wxmask"
+                    android:scheme="maskwechat" />
             </intent-filter>
         </activity>
 
         <activity
             android:name="com.lu.magic.util.permission.PermissionActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.MaskWechat.Transparent" />
         <activity
             android:name=".ui.WebViewActivity"
             android:exported="false" />
