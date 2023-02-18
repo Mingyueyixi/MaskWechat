@@ -5,7 +5,11 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>更新日记</title>
+    <!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css" />-->
+    <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>-->
+    <script src="https://cdn.jsdelivr.net/npm/marked@4.2.12/marked.min.js"></script>
+
     <style>
         html,
         head,
@@ -14,25 +18,13 @@
             margin: 0;
             font-size: 14px;
         }
-        ul,
-        li,
-        ol {
-            padding: 0;
-            list-style: none;
-        }
-
-        li {
-            width: 100%;
-            padding-bottom: 36px;
-        }
 
         body {
             position: absolute;
             top: 0;
             bottom: 0;
             left: 0;
-            bottom: 0;
-
+            right: 0;
         }
 
         #app-root {
@@ -42,19 +34,13 @@
             height: 100%;
             box-sizing: border-box;
         }
-        #app-root >*{
+
+        #app-root>* {
             margin-top: 24px;
         }
 
         .breakword {
             word-wrap: break-word;
-        }
-
-        pre {
-            white-space: pre-wrap !important;
-            word-wrap: break-all !important;
-            *white-space: normal !important;
-            text-align: left;
         }
 
         .title-text {
@@ -68,13 +54,46 @@
         .download-row {
             margin-top: 10px;
         }
-        #info-tag{
-            display: block;  
+
+        #info-tag {
+            display: block;
             text-align: right;
             box-sizing: content-box;
             padding-bottom: 24px;
         }
+
+        .release-wrap {
+            margin: 0;
+            padding: 0;
+            text-align: left;
+        }
+
+        .release-item {
+            position: relative;
+            margin: 0 0 36px 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        ul,
+        ol,
+        li {
+            margin: 0;
+            padding: 0;
+        }
+
+        .markdown-body {
+            box-sizing: border-box;
+            width: 100%;
+            margin: 0;
+            padding: 16px 24px;
+        }
+
+        code {
+            word-break: break-all !important;
+        }
     </style>
+
 </head>
 
 <body>
@@ -83,6 +102,24 @@
         <div id="info-tag"></div>
     </div>
     <script>
+        // marked.setOptions({
+        //     renderer: new marked.Renderer(),
+        //     gfm: true,
+        //     tables: true,
+        //     breaks: false,
+        //     pedantic: false,
+        //     sanitize: false,
+        //     smartLists: true,
+        //     smartypants: false,
+        //     highlight: function (code, lang) {
+        //         if (lang && hljs.getLanguage(lang)) {
+        //             return hljs.highlight(lang, code, true).value;
+        //         } else {
+        //             return hljs.highlightAuto(code).value;
+        //         }
+        //     }
+        // });
+
         function processOneAssetsData(assets) {
             if (!assets) return ""
             let result = ""
@@ -118,21 +155,22 @@
             }
         })
             .then(resp => resp.json())
+            .catch((error => fetch()))
             .then(dataList => {
-                let releaseNoteHtml = "<ul>"
+                let releaseNoteHtml = "<ul class='release-wrap'>"
                 let allDownloadCount = 0
                 for (let index = 0; index < dataList.length; index++) {
                     const element = dataList[index];
                     const name = element['name']
-                    const body = element['body']
+                    const body = marked.parse(element['body'].replace("\r","\n"))
                     const assetsData = processOneAssetsData(element['assets'])
                     const publishedAt = element['published_at']
 
                     allDownloadCount += assetsData.count
-                    releaseNoteHtml += `<li>
+                    releaseNoteHtml += `<li class="release-item">
                     <span class="title-text">${name}</span>
                     <div class="min-text">发布时间：${new Date(publishedAt).toLocaleString()}</div>
-                    <pre class="breakword">${body}</pre>
+                    <article class="markdown-body">${body}</article>
                     <div>附件下载：</div>
                     ${assetsData.html}
                     </li>`
