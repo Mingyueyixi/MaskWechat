@@ -38,18 +38,31 @@ v1.7版本新增功能（预计**Only For 8.0.32**）当Wechat主页发起的搜
 通过`配置管理`清除即可
 
 
-PS.
-
+**PS.**  
 - 模块仅仅是隐藏了视图，不对用户数据进行修改
 - 模块目前仅隐藏聊天记录，防止被偷窥，而不会”伪装“或修改好友/群组信息，此类功能暂时不会添加
 - 模块正常只隐藏主页相关消息，不包括通知栏等渠道的消息，有较强隐私需求用户，建议关闭微信的`通知显示消息详情`
+
+
+### 隐藏App图标（Since V1.13）
+
+v1.13版本开始，默认隐藏App在桌面的图标。隐藏以后，打开模块App可以通过以下途径：    
+1. 从 lsp 模块管理器打开App
+2. 从网页链接（deeplink）打开App
+
+**PS.**   
+- App主页跳转链接：[maskwechat://com.lu.wxmask](maskwechat://com.lu.wxmask)  
+- 小米系统可通过系统的”扫一扫“扫描当前二维马直接打开，其他app如浏览器需可点击短链打开：[https://sourl.cn/sPfEeY](https://sourl.cn/sPfEeY)  
+- 微信/QQ不支持通过此类链接跳转  
+- 自行配置 html 如：`<a href="maskwechat://com.lu.wxmask">maskwechat://com.lu.wxmask</a>`  
+
 
 ## 适配版本
 
 8.0.22 (2140) 2022-04-29    
 8.0.32 (2300) 2023-01-06
 
-PS.
+**PS.**  
 - 其他版本号以及32位版本未经测试，不保证功能可用
 - 模块一般只测试通过了最后一个适配的微信版本，因为作者精力有限+穷没有多余手机测试
 - 微信版本集合： https://weixin.qq.com/cgi-bin/readtemplate?lang=zh_CN&t=weixin_faq_list&head=true
