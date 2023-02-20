@@ -13,6 +13,7 @@ import com.lu.magic.ui.BaseFragment
 import com.lu.magic.ui.LifecycleAutoViewBinding
 import com.lu.magic.util.SizeUtil
 import com.lu.magic.util.ToastUtil
+import com.lu.magic.util.kxt.toElseString
 import com.lu.magic.util.log.LogUtil
 import com.lu.magic.util.ripple.RectangleRippleBuilder
 import com.lu.magic.util.ripple.RippleApplyUtil
@@ -121,9 +122,14 @@ class MainFragment : BaseFragment() {
                     }
 
                     donateCardId -> {
+                        val donateCard = AppConfigUtil.config.mainUi?.donateCard
+                        vh.binding.tvItemTitle.text = donateCard?.title.toElseString(
+                            getString(R.string.donate)
+                        )
+                        vh.binding.tvItemTitleSub.text = donateCard?.des.toElseString(
+                            getString(R.string.donate_description)
+                        )
                         vh.binding.ivItemIcon.setImageResource(R.drawable.ic_icon_dollar)
-                        vh.binding.tvItemTitle.setText(R.string.donate)
-                        vh.binding.tvItemTitleSub.setText(R.string.donate_description)
                     }
 
                 }
