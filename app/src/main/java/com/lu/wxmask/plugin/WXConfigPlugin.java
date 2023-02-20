@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 
@@ -11,6 +12,7 @@ import com.lu.lposed.api2.XC_MethodHook2;
 import com.lu.lposed.api2.XposedHelpers2;
 import com.lu.lposed.plugin.IPlugin;
 import com.lu.magic.util.GsonUtil;
+import com.lu.magic.util.ToastUtil;
 import com.lu.magic.util.log.LogUtil;
 import com.lu.wxmask.ClazzN;
 import com.lu.wxmask.Constrant;
@@ -19,6 +21,7 @@ import com.lu.wxmask.plugin.ui.AddMaskItemUI;
 import com.lu.wxmask.plugin.ui.ConfigManagerUI;
 import com.lu.wxmask.plugin.ui.EditMaskItemUI;
 import com.lu.wxmask.plugin.ui.MaskUtil;
+import com.lu.wxmask.route.MaskAppRouter;
 import com.lu.wxmask.util.AppVersionUtil;
 import com.lu.wxmask.util.ConfigUtil;
 
@@ -81,12 +84,27 @@ public class WXConfigPlugin implements IPlugin {
             new AlertDialog.Builder(activity)
                     .setIcon(activity.getApplicationInfo().icon)
                     .setTitle("提示")
-                    .setMessage("当前版本：" + AppVersionUtil.getVersionName() + "（" + AppVersionUtil.getVersionCode() + "）不支持，请到MaskWechat主页查看支持的版本")
-                    .setPositiveButton("知道了", null)
+                    .setMessage("当前WeiXin版本：" + AppVersionUtil.getVersionName() + "（" + AppVersionUtil.getVersionCode() + "）不支持，继续使用极可能无效，请到MaskWechat主页查看支持的版本")
+                    .setNegativeButton("继续使用", (dialog, which) -> {
+                        onEnterConfigUI(activity, intent);
+                    })
+                    .setPositiveButton("糊脸主页", (dialog, which) -> {
+                        try {
+                            String uri = "maskwechat://com.lu.wxmask/page/webView?&url=https://github.com/Mingyueyixi/MaskWechat";
+                            Intent openIntent = Intent.parseUri(uri, Intent.URI_ALLOW_UNSAFE);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            activity.startActivity(openIntent);
+                        } catch (Throwable e) {
+                            ToastUtil.show("打开糊脸主页失败");
+                        }
+                    })
                     .show();
-
             return;
         }
+        onEnterConfigUI(activity, intent);
+    }
+
+    private void onEnterConfigUI(Activity activity, Intent intent) {
         if (pluginMode == Constrant.VALUE_INTENT_PLUGIN_MODE_ADD && !isShowingAddConfigTipUI) {
             showAddTipDialog(activity);
         } else if (pluginMode == Constrant.VALUE_INTENT_PLUGIN_MODE_MANAGER) {
