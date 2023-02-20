@@ -67,8 +67,8 @@ android {
         applicationId "com.lu.wxmask"
         minSdk 24
         targetSdk 33
-        versionCode 14
-        versionName "1.13"
+        versionCode 15
+        versionName "1.14"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -122,8 +122,9 @@ android {
     applicationVariants.all { variant ->
         def outputs = variant.outputs
         def size = outputs.size()
+        def commit = new JSONObject(buildInfoJson).optString("commit").substring(0, 6)
         outputs.eachWithIndex { Object output, int index ->
-            def fontName = "maskwechat-v${variant.versionName}-${variant.name}"
+            def fontName = "maskwechat-v${variant.versionName}-${commit}-${variant.name}"
             if (size == 1) {
                 output.outputFileName = "${fontName}.apk"
             } else {
