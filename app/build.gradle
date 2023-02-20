@@ -19,12 +19,15 @@ def buildInfoJson = {
     def lastedCommit = p.text.trim()
     p.destroy()
 
-    def buildDate = new SimpleDateFormat("YYYY/MM/dd hh:mm:ss").format(new Date())
+    //github等服务器打包时，因时区不同，格式化的时间与本地时间对不上
+    //故直接保存毫秒
+    def buildTime = System.currentTimeMillis()
+
     def gitBranch = currentBranch
     def gitCommit = lastedCommit;
 
     def jsonObj = new JSONObject()
-    jsonObj.put("time", buildDate)
+    jsonObj.put("time", buildTime)
     jsonObj.put("branch", gitBranch)
     jsonObj.put("commit", gitCommit)
     return jsonObj.toString()

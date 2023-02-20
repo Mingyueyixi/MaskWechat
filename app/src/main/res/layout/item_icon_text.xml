@@ -60,7 +60,7 @@
                 android:layout_marginStart="8dp"
                 android:gravity="left"
                 android:textSize="14sp"
-                tools:text="commit: c1271c3e" />
+                tools:text="代码分支: main" />
 
             <TextView
                 android:id="@+id/tvItemTitleSub3"
@@ -69,7 +69,16 @@
                 android:layout_marginStart="8dp"
                 android:gravity="left"
                 android:textSize="14sp"
-                tools:text="日期: 2023/02/17" />
+                tools:text="提交哈希: c1271c3e" />
+
+            <TextView
+                android:id="@+id/tvItemTitleSub4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:gravity="left"
+                android:textSize="14sp"
+                tools:text="构建时间: 2023/02/17" />
 
         </LinearLayout>
 
