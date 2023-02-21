@@ -52,7 +52,7 @@ def main():
 
 
 if __name__ == '__main__':
-    tag_name = os.environ.get("TAG_NAME")
+    tag_name = os.environ.get("tag_name")
     github_token = os.environ.get("github_token")
     chat_id = os.environ.get("chat_id")
     bot_token = os.environ.get("bot_token")
