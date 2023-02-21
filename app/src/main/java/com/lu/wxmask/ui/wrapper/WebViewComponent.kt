@@ -19,6 +19,7 @@ import android.webkit.WebViewClient
 import androidx.core.view.contains
 import com.lu.magic.util.kxt.toElseEmptyString
 import com.lu.magic.util.log.LogUtil
+import com.lu.wxmask.BuildConfig
 import com.lu.wxmask.route.MaskAppRouter
 import java.net.URL
 
@@ -33,6 +34,9 @@ class WebViewComponent(context: Context) {
     val webView = WebView(context)
 
     init {
+        if (BuildConfig.DEBUG) {
+            WebView.setWebContentsDebuggingEnabled(true)
+        }
         webView.settings.let {
             it.domStorageEnabled = true
             it.javaScriptEnabled = true

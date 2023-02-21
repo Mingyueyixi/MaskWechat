@@ -4,15 +4,14 @@ import android.content.ComponentName
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.google.gson.JsonObject
 import com.lu.magic.ui.BaseFragment
 import com.lu.magic.ui.LifecycleAutoViewBinding
 import com.lu.magic.util.SizeUtil
 import com.lu.magic.util.ToastUtil
+import com.lu.magic.util.kxt.toElseString
 import com.lu.magic.util.log.LogUtil
 import com.lu.magic.util.ripple.RectangleRippleBuilder
 import com.lu.magic.util.ripple.RippleApplyUtil
@@ -20,6 +19,7 @@ import com.lu.magic.util.thread.AppExecutor
 import com.lu.wxmask.BuildConfig
 import com.lu.wxmask.ClazzN
 import com.lu.wxmask.Constrant
+import com.lu.wxmask.MaskAppBuildInfo
 import com.lu.wxmask.R
 import com.lu.wxmask.SelfHook
 import com.lu.wxmask.adapter.AbsListAdapter
@@ -28,15 +28,13 @@ import com.lu.wxmask.config.AppConfigUtil
 import com.lu.wxmask.databinding.FragmentMainBinding
 import com.lu.wxmask.databinding.ItemIconTextBinding
 import com.lu.wxmask.route.MaskAppRouter
-import org.json.JSONObject
 
 
 class MainFragment : BaseFragment() {
     private var itemBinding: ItemIconTextBinding by LifecycleAutoViewBinding<MainFragment, ItemIconTextBinding>()
     private var mainBinding: FragmentMainBinding by LifecycleAutoViewBinding<MainFragment, FragmentMainBinding>()
-    private val buildInfoJson by lazy {
-        JSONObject(Base64.decode(BuildConfig.buildInfoJson64, Base64.DEFAULT).toString(Charsets.UTF_8))
-    }
+    private val buildInfo = MaskAppBuildInfo.of()
+
     private val donateCardId = 10086
 
     private var mListAdapter: CommonListAdapter<Int, ItemBindingViewHolder>? = null
@@ -85,13 +83,16 @@ class MainFragment : BaseFragment() {
                 }
                 val position = getItem(position)
                 if (position == 1) {
-                    vh.binding.tvItemTitleSub2.text = "提交哈希：" + buildInfoJson.optString("commit").subSequence(0, 11)
-                    vh.binding.tvItemTitleSub3.text = "构建时间：" + buildInfoJson.optString("time")
+                    vh.binding.tvItemTitleSub2.text = "代码分支：" + buildInfo.branch
+                    vh.binding.tvItemTitleSub3.text = "提交哈希：" + buildInfo.commit
+                    vh.binding.tvItemTitleSub4.text = "构建时间：" + buildInfo.buildTime
                     vh.binding.tvItemTitleSub2.visibility = View.VISIBLE
                     vh.binding.tvItemTitleSub3.visibility = View.VISIBLE
+                    vh.binding.tvItemTitleSub4.visibility = View.VISIBLE
                 } else {
                     vh.binding.tvItemTitleSub2.visibility = View.GONE
                     vh.binding.tvItemTitleSub3.visibility = View.GONE
+                    vh.binding.tvItemTitleSub4.visibility = View.GONE
                 }
 
                 when (position) {
@@ -121,9 +122,14 @@ class MainFragment : BaseFragment() {
                     }
 
                     donateCardId -> {
+                        val donateCard = AppConfigUtil.config.mainUi?.donateCard
+                        vh.binding.tvItemTitle.text = donateCard?.title.toElseString(
+                            getString(R.string.donate)
+                        )
+                        vh.binding.tvItemTitleSub.text = donateCard?.des.toElseString(
+                            getString(R.string.donate_description)
+                        )
                         vh.binding.ivItemIcon.setImageResource(R.drawable.ic_icon_dollar)
-                        vh.binding.tvItemTitle.setText(R.string.donate)
-                        vh.binding.tvItemTitleSub.setText(R.string.donate_description)
                     }
 
                 }

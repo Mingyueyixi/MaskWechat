@@ -20,6 +20,16 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
+    # debug
+    - name: Dump Env
+      run: env | sort
+
+    - name: Dump GitHub context
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: |
+        echo "$GITHUB_CONTEXT"
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 #    - name: Build with Gradle
