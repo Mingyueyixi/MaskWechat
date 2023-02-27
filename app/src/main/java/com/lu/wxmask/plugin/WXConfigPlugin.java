@@ -210,6 +210,22 @@ public class WXConfigPlugin implements IPlugin {
     }
 
     private Object findChatUserObject(Object fragmentObj) {
+        if (AppVersionUtil.getVersionCode() == Constrant.WX_CODE_8_0_33){
+            try {
+                //oi3.b
+                Object f = XposedHelpers2.getObjectField(fragmentObj, "f");
+                if (f != null) {
+                    //com.tencent.mm.storage.y1
+                    Object v = XposedHelpers2.getObjectField(f, "h");
+                    if (ClazzN.from(ClazzN.BaseContact).isAssignableFrom(v.getClass())) {
+                        return v;
+                    }
+                }
+
+            }catch (Throwable e){
+                LogUtil.w("找不到当前聊天的用户信息", e);
+            }
+        }
         if (AppVersionUtil.getVersionCode() == Constrant.WX_CODE_8_0_32) {
             try {
                 //of3.b

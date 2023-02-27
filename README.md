@@ -59,13 +59,48 @@ v1.13版本开始，默认隐藏App在桌面的图标。隐藏以后，打开模
 
 ## 适配版本
 
-8.0.22 (2140) 2022-04-29    
-8.0.32 (2300) 2023-01-06
+8.0.22 (2140) 2022-04-29  
+8.0.32 (2300) 2023-01-06  
 
-**PS.**  
-- 其他版本号以及32位版本未经测试，不保证功能可用
+**PS.**
+- 仅支持上述版本，所有其他版本号以及32位版本未经测试，预计百分之九十九不可用
 - 模块一般只测试通过了最后一个适配的微信版本，因为作者精力有限+穷没有多余手机测试
-- 微信版本集合： https://weixin.qq.com/cgi-bin/readtemplate?lang=zh_CN&t=weixin_faq_list&head=true
+- 微信更新记录官网： https://weixin.qq.com/cgi-bin/readtemplate?lang=zh_CN&t=weixin_faq_list&head=true
+
+如果你版本是受支持的，但无法正常使用，请参考以下问题：
+
+**问题1：为什么我的微信版本是8.0.32，但是无法正常使用，什么反应都没有？**  
+答：微信实际上特么的有很多个8.0.32版本，而你的版本悲剧了不支持。在官网上，截止当前时间（2023/02/24），作者能找到的8.0.32就有8个版本下载链接：  
+（1）[https://dldir1.qq.com/weixin/android/weixin8032android2300_arm64.apk](https://dldir1.qq.com/weixin/android/weixin8032android2300_arm64.apk)  
+（2）[https://dldir1.qq.com/weixin/android/weixin8032android2300_arm64_1.apk](https://dldir1.qq.com/weixin/android/weixin8032android2300_arm64_1.apk)   
+（3）[https://dldir1.qq.com/weixin/android/weixin8032android2300_arm64_2.apk](https://dldir1.qq.com/weixin/android/weixin8032android2300_arm64_2.apk)  
+（4）[https://dldir1.qq.com/weixin/android/weixin8032android2300_arm64_3.apk](https://dldir1.qq.com/weixin/android/weixin8032android2300_arm64_3.apk)  
+（5）[https://dldir1.qq.com/weixin/android/weixin8032android2300.apk](https://dldir1.qq.com/weixin/android/weixin8032android2300.apk)  
+（6）[https://dldir1.qq.com/weixin/android/weixin8032android2300_1.apk](https://dldir1.qq.com/weixin/android/weixin8032android2300_1.apk)  
+（7）[https://dldir1.qq.com/weixin/android/weixin8032android2300_2.apk](https://dldir1.qq.com/weixin/android/weixin8032android2300_2.apk)  
+（8）[https://dldir1.qq.com/weixin/android/weixin8032android2300_3.apk](https://dldir1.qq.com/weixin/android/weixin8032android2300_3.apk)  
+
+**问题2：为什么我的微信版本是8.0.32，仍然弹出不支持的版本对话框？**  
+答：原因类似问题1，只不过你的微信版本号不是2300，仅仅是版本名称叫8.0.32，而这、导致模块不支持。由此可见，8.0.32的安装包也远不止问题1所列。假如你能正常使用，但是弹窗，请反馈版本号以便去除弹窗。
+
+
+**问题3：上面列举了那么多个下载链接，到底下载那个？**  
+答：以下链接来自官网：  
+8.0.22（2140）：[https://dldir1.qq.com/weixin/android/weixin8022android2140_arm64.apk](https://dldir1.qq.com/weixin/android/weixin8022android2140_arm64.apk)  
+SHA1: 2FAB9BF8E160F38494FE7D6D4D7A56DF63B6EB58  
+
+8.0.32（2300）：[https://dldir1.qq.com/weixin/android/weixin8032android2300_arm64_3.apk](https://dldir1.qq.com/weixin/android/weixin8032android2300_arm64_3.apk)  
+SHA1: 45A408C5222C1A03D3B7C84F06DA97AD2F5B4ADC  
+
+8.0.33（2320）：[https://dldir1.qq.com/weixin/android/weixin8033android2320_arm64.apk](https://dldir1.qq.com/weixin/android/weixin8033android2320_arm64.apk)  
+SHA1: 8069F4730CF8839BE68609EF2F4702349E23A86B  
+
+推荐8.0.32（2300），因为自2.11版本以来，正在逐步放弃支持8.0.22版本微信
+
+**问题4：是否支持Google Play版本？**  
+答：不支持。  
+（1）如前所述，微信的版本是如此之多，作者没有充足的时间和精力，只能随便摇骰子选一个来适配，而Google Play版没摇中  
+（2）Google Play版并非主流使用版本，故未来也没有计划支持Google Play版  
 
 
 ## 交流
@@ -76,7 +111,7 @@ telegram普通群：点击添加 [https://t.me/MaskWechatX](https://t.me/MaskWec
 
 ## 声明
 
-1. 项目旨在测试与学习开发，请勿用于商业用途，请勿用于非法用途  
+1. 项目旨在个人测试与学习开发，请勿用于商业用途，请勿用于非法用途  
 2. 项目所发布的所有App版本，虽名为release，实际均为开发包，均使用同一个测试签名，因此它将不会在应用市场发布  
 3. 项目只保证自身不会包含任何恶意代码，不会主动收集任何个人信息，但不能保证第三方库安全  
 4. 您应当知道并理解使用`模块`的风险，使用此模块如造成问题与作者无关  
