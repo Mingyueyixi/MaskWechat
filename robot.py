@@ -19,7 +19,12 @@ class GithubApi(object):
         self.token = token
 
     def getReleases(self, tag):
-        result = github_release
+        result = None
+        try:
+            result = json.loads(github_release)
+        except Exception as e:
+            print(e)
+            print(github_release)
         if not result:
             url = f"https://api.github.com/repos/Mingyueyixi/MaskWechat/releases/tags/{tag}"
             headers = {
