@@ -6,7 +6,9 @@ import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
 import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.BuildConfig
+import com.lu.wxmask.Constrant
 import com.lu.wxmask.plugin.WXMaskPlugin
+import com.lu.wxmask.util.AppVersionUtil
 import com.lu.wxmask.util.dev.DebugUtil
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.callbacks.XC_LoadPackage
@@ -137,8 +139,16 @@ class HideSearchListUIPluginPart : IPlugin {
             null
         }
         if (chatUser == null) {
-            val fieldValue: Any = XposedHelpers2.getObjectField<Any?>(itemData, "o") ?: return false
-            chatUser = XposedHelpers2.getObjectField<String?>(fieldValue, "e")
+            when(AppVersionUtil.getVersionCode()){
+                Constrant.WX_CODE_8_0_33 ->{
+                    val fieldValue: Any = XposedHelpers2.getObjectField<Any?>(itemData, "p") ?: return false
+                    chatUser = XposedHelpers2.getObjectField<String?>(fieldValue, "e")
+                }
+                Constrant.WX_CODE_8_0_32 -> {
+                    val fieldValue: Any = XposedHelpers2.getObjectField<Any?>(itemData, "o") ?: return false
+                    chatUser = XposedHelpers2.getObjectField<String?>(fieldValue, "e")
+                }
+            }
         }
         if (chatUser == null) {
             return false

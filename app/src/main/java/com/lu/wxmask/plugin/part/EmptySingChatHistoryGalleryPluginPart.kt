@@ -9,9 +9,12 @@ import com.lu.lposed.api2.XC_MethodHook2
 import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
 import com.lu.magic.util.log.LogUtil
+import com.lu.wxmask.Constrant
 import com.lu.wxmask.plugin.WXMaskPlugin
+import com.lu.wxmask.util.AppVersionUtil
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.callbacks.XC_LoadPackage
+import java.util.ArrayList
 
 /**
  * 置空单聊页面菜单的“查找聊天记录”搜索结果
@@ -72,11 +75,28 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
      * 处理通过顶部ActionBar搜索框进行的结果
      */
     private fun setEmptyActionBarTabPageUI(context: Context, lpparam: XC_LoadPackage.LoadPackageParam?) {
+        val commonResultMethodName:String? = when (AppVersionUtil.getVersionCode()){
+            Constrant.WX_CODE_8_0_32 -> "N"
+            Constrant.WX_CODE_8_0_33 -> "O"
+            else-> {
+                val method = XposedHelpers2.findMethodsByExactParameters(
+                    Class.forName("com.tencent.mm.ui.chatting.search.multi.fragment.FTSMultiAllResultFragment"),
+                    Void.TYPE,
+                    ArrayList::class.java
+                )
+                if (method.size != 1){
+                    null
+                }else{
+                    method[0].name
+                }
+            }
+        }?: return
+
         //tab==全部，搜索结果置空
         XposedHelpers2.findAndHookMethod(
             "com.tencent.mm.ui.chatting.search.multi.fragment.FTSMultiAllResultFragment",
             context.classLoader,
-            "N",
+            commonResultMethodName,
             java.util.ArrayList::class.java,
             object : XC_MethodHook2() {
 
@@ -94,7 +114,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
         XposedHelpers2.findAndHookMethod(
             "com.tencent.mm.ui.chatting.search.multi.fragment.FTSMultiNormalResultFragment",
             context.classLoader,
-            "N",
+            commonResultMethodName,
             java.util.ArrayList::class.java,
             object : XC_MethodHook2() {
 

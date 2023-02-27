@@ -31,6 +31,7 @@ class Constrant {
         //微信版本号
         const val WX_CODE_8_0_22 = 2140
         const val WX_CODE_8_0_32 = 2300
+        const val WX_CODE_8_0_33 = 2320
     }
 
 }
