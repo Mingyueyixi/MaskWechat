@@ -3,7 +3,7 @@
     "donateCard": {
       "title": "打赏",
       "des": "江湖冷暖总是情，鸡毛鸡粪也可行",
-      "show": true
+      "show": false
     },
     "moduleCard": {
       "link": "maskwechat://com.lu.wxmask/page/releasesNote?isDialog=true&title=更新日记"

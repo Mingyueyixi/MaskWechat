@@ -28,6 +28,16 @@
     }
   },
   {
+    "title": "QQ群二",
+    "link": "https://qm.qq.com/cgi-bin/qm/qr?k=LLG2sLpBUb-xcSekQUAKa6_2EW0S8PQs&authKey=VbVwb48LFwekGyr9GWEsggodHVe2fCiWcMs1vBx0gK3wc0hl5Q9pAwTnsTYyH2wf&noverify=0",
+    "appLink": {
+      "priority": 0,
+      "links": [
+        "mqqopensdkapi://bizAgent/qm/qr?url=https%3A%2F%2Fqm.qq.com%2Fcgi-bin%2Fqm%2Fqr%3Fk%3DLLG2sLpBUb-xcSekQUAKa6_2EW0S8PQs%26jump_from%3D%26auth%3D%26app_name%3D%26authSig%3D%26source_id%3D3_40001"
+      ]
+    }
+  },
+  {
     "title": "检查更新",
     "link": "maskwechat://com.lu.wxmask/feat/checkAppUpdate",
     "since": 14
