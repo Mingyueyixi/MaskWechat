@@ -104,7 +104,7 @@ class EnterChattingUIPluginPart() : IPlugin {
             val enterAction = EnterChattingHookAction(context, lpparam, tagConst)
             val doResumeAction = DoResumeAction(context, lpparam, tagConst)
 
-            XposedHelpers2.hookMethod(dispatchMethod, object : XC_MethodHook() {
+            XposedHelpers2.hookMethod(method, object : XC_MethodHook() {
                 override fun afterHookedMethod(param: MethodHookParam) {
                     when (param.args[0]) {
                         //onEnterBegin，发起聊天
