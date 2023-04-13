@@ -23,7 +23,7 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
         fun containChatUser(chatUser: String?): Boolean {
             val self = PluginProviders.from(WXMaskPlugin::class.java)
             if (chatUser.isNullOrBlank()) {
-                LogUtil.w("chatUser is null or blan")
+                LogUtil.w("chatUser is null or blank")
                 return false
             }
             return self.maskIdList.contains(chatUser)

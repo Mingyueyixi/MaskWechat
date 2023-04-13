@@ -30,7 +30,7 @@ class HideMainUIListPluginPart : IPlugin {
     //隐藏指定用户的主页的消息
     private fun handleMainUIChattingListView(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
         val adapterName = when (AppVersionUtil.getVersionCode()) {
-            Constrant.WX_CODE_8_0_32,Constrant.WX_CODE_8_0_33 -> "com.tencent.mm.ui.conversation.p"
+            Constrant.WX_CODE_8_0_32, Constrant.WX_CODE_8_0_33, Constrant.WX_CODE_8_0_34 -> "com.tencent.mm.ui.conversation.p"
             Constrant.WX_CODE_8_0_22 -> "com.tencent.mm.ui.conversation.k"
             else -> null
         }
@@ -101,7 +101,7 @@ class HideMainUIListPluginPart : IPlugin {
                 private fun hideUnReadTipView(itemView: View, param: MethodHookParam) {
                     //带文字的未读红点
                     val tipTvIdText = when (AppVersionUtil.getVersionCode()) {
-                        Constrant.WX_CODE_8_0_32,Constrant.WX_CODE_8_0_33 -> "kmv"
+                        Constrant.WX_CODE_8_0_32, Constrant.WX_CODE_8_0_33, Constrant.WX_CODE_8_0_34 -> "kmv"
                         else -> "tipcnt_tv"
                     }
                     val packageName = AppUtil.getContext().packageName
@@ -110,7 +110,7 @@ class HideMainUIListPluginPart : IPlugin {
 
                     //头像上的小红点
                     when (AppVersionUtil.getVersionCode()) {
-                        Constrant.WX_CODE_8_0_32,Constrant.WX_CODE_8_0_33 -> {
+                        Constrant.WX_CODE_8_0_32, Constrant.WX_CODE_8_0_33, Constrant.WX_CODE_8_0_34 -> {
                             val viewId = AppUtil.getContext().resources.getIdentifier("a2f", "id", packageName)
                             itemView.findViewById<View>(viewId)?.visibility = View.INVISIBLE
                         }
@@ -122,7 +122,7 @@ class HideMainUIListPluginPart : IPlugin {
                 private fun hideLastMsgView(itemView: View, param: MethodHookParam) {
                     val resource = AppUtil.getContext().resources
                     val msgTvIdName = when (AppVersionUtil.getVersionCode()) {
-                        Constrant.WX_CODE_8_0_32,Constrant.WX_CODE_8_0_33 -> "fhs"
+                        Constrant.WX_CODE_8_0_32, Constrant.WX_CODE_8_0_33, Constrant.WX_CODE_8_0_34 -> "fhs"
                         else -> "last_msg_tv"
                     }
                     val lastMsgViewId = resource.getIdentifier(msgTvIdName, "id", AppUtil.getContext().packageName)

@@ -9,6 +9,7 @@ import com.lu.lposed.api2.XC_MethodHook2
 import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
 import com.lu.magic.util.log.LogUtil
+import com.lu.wxmask.ClazzN
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.plugin.WXMaskPlugin
 import com.lu.wxmask.util.AppVersionUtil
@@ -75,26 +76,30 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
      * 处理通过顶部ActionBar搜索框进行的结果
      */
     private fun setEmptyActionBarTabPageUI(context: Context, lpparam: XC_LoadPackage.LoadPackageParam?) {
+        val Clazz_FTSMultiAllResultFragment =  "com.tencent.mm.ui.chatting.search.multi.fragment.FTSMultiAllResultFragment"
         val commonResultMethodName:String? = when (AppVersionUtil.getVersionCode()){
             Constrant.WX_CODE_8_0_32 -> "N"
             Constrant.WX_CODE_8_0_33 -> "O"
+//            Constrant.WX_CODE_8_0_34 -> "R"
             else-> {
                 val method = XposedHelpers2.findMethodsByExactParameters(
-                    Class.forName("com.tencent.mm.ui.chatting.search.multi.fragment.FTSMultiAllResultFragment"),
+                    ClazzN.from(Clazz_FTSMultiAllResultFragment),
                     Void.TYPE,
                     ArrayList::class.java
                 )
                 if (method.size != 1){
                     null
                 }else{
+                    LogUtil.w("找到 ", method[0], AppVersionUtil.getVersionName(), )
                     method[0].name
                 }
             }
+
         }?: return
 
         //tab==全部，搜索结果置空
         XposedHelpers2.findAndHookMethod(
-            "com.tencent.mm.ui.chatting.search.multi.fragment.FTSMultiAllResultFragment",
+            Clazz_FTSMultiAllResultFragment,
             context.classLoader,
             commonResultMethodName,
             java.util.ArrayList::class.java,

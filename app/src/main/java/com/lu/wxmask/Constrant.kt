@@ -32,6 +32,7 @@ class Constrant {
         const val WX_CODE_8_0_22 = 2140
         const val WX_CODE_8_0_32 = 2300
         const val WX_CODE_8_0_33 = 2320
+        const val WX_CODE_8_0_34 = 2340
     }
 
 }
