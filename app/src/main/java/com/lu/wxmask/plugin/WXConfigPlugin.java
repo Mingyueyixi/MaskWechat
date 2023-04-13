@@ -10,10 +10,12 @@ import android.view.View;
 
 import com.lu.lposed.api2.XC_MethodHook2;
 import com.lu.lposed.api2.XposedHelpers2;
+import com.lu.lposed.api2.function.Predicate;
 import com.lu.lposed.plugin.IPlugin;
 import com.lu.magic.util.GsonUtil;
 import com.lu.magic.util.ToastUtil;
 import com.lu.magic.util.log.LogUtil;
+import com.lu.wxmask.App;
 import com.lu.wxmask.ClazzN;
 import com.lu.wxmask.Constrant;
 import com.lu.wxmask.bean.MaskItemBean;
@@ -25,6 +27,7 @@ import com.lu.wxmask.route.MaskAppRouter;
 import com.lu.wxmask.util.AppVersionUtil;
 import com.lu.wxmask.util.ConfigUtil;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 import de.robv.android.xposed.XC_MethodHook;
@@ -210,31 +213,36 @@ public class WXConfigPlugin implements IPlugin {
     }
 
     private Object findChatUserObject(Object fragmentObj) {
-        if (AppVersionUtil.getVersionCode() == Constrant.WX_CODE_8_0_33){
+        if (AppVersionUtil.getVersionCode() >= Constrant.WX_CODE_8_0_32) {
             try {
-                //oi3.b
+                //8.0.32: of3.b
+                //8.0.33: oi3.b
+                //8.0.34: ck3.b
                 Object f = XposedHelpers2.getObjectField(fragmentObj, "f");
                 if (f != null) {
                     //com.tencent.mm.storage.y1
-                    Object v = XposedHelpers2.getObjectField(f, "h");
-                    if (ClazzN.from(ClazzN.BaseContact).isAssignableFrom(v.getClass())) {
+                    if (AppVersionUtil.getVersionCode() == Constrant.WX_CODE_8_0_32) {
+                        Object v = XposedHelpers2.getObjectField(f, "e");
+                        if (ClazzN.from(ClazzN.BaseContact).isAssignableFrom(v.getClass())) {
+                            return v;
+                        }
+                    } else if (AppVersionUtil.getVersionCode() == Constrant.WX_CODE_8_0_33) {
+                        Object v = XposedHelpers2.getObjectField(f, "h");
+                        if (ClazzN.from(ClazzN.BaseContact).isAssignableFrom(v.getClass())) {
+                            return v;
+                        }
+                    } else if (AppVersionUtil.getVersionCode() == Constrant.WX_CODE_8_0_34) {
+                        //8.0.34开始，数据库基类改变。包：com.tencent.mm.autogen.table 已经不存在，不再校验
+                        Object v = XposedHelpers2.getObjectField(f, "h");
                         return v;
-                    }
-                }
-
-            }catch (Throwable e){
-                LogUtil.w("找不到当前聊天的用户信息", e);
-            }
-        }
-        if (AppVersionUtil.getVersionCode() == Constrant.WX_CODE_8_0_32) {
-            try {
-                //of3.b
-                Object f = XposedHelpers2.getObjectField(fragmentObj, "f");
-                if (f != null) {
-                    //com.tencent.mm.storage.y1
-                    Object v = XposedHelpers2.getObjectField(f, "e");
-                    if (ClazzN.from(ClazzN.BaseContact).isAssignableFrom(v.getClass())) {
-                        return v;
+                    } else {
+                        //8.0.33与8.0.34共同的父类： com.tencent.mm.contact.d
+                        Field[] hitFields = XposedHelpers2.findFieldsByExactPredicate(f.getClass(), field -> ClazzN.from("com.tencent.mm.contact.d").isAssignableFrom(field.getType()));
+                        if (hitFields.length > 0) {
+                            Object result = hitFields[0].get(f);
+                            LogUtil.w("find user info object", result);
+                            return result;
+                        }
                     }
                 }
             } catch (Throwable e) {

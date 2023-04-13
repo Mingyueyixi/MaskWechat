@@ -80,7 +80,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
         val commonResultMethodName:String? = when (AppVersionUtil.getVersionCode()){
             Constrant.WX_CODE_8_0_32 -> "N"
             Constrant.WX_CODE_8_0_33 -> "O"
-//            Constrant.WX_CODE_8_0_34 -> "R"
+            Constrant.WX_CODE_8_0_34 -> "R"
             else-> {
                 val method = XposedHelpers2.findMethodsByExactParameters(
                     ClazzN.from(Clazz_FTSMultiAllResultFragment),
