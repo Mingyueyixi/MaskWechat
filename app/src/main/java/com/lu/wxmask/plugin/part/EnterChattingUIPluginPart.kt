@@ -43,6 +43,7 @@ class EnterChattingUIPluginPart() : IPlugin {
         if (onEnterBeginMethod == null) {
             LogUtil.w("onEnterBegin function == null")
         } else {
+            //8.0.22
             LogUtil.d("hook onEnterBegin")
             XposedHelpers2.hookMethod(onEnterBeginMethod,
                 object : XC_MethodHook() {
@@ -56,14 +57,20 @@ class EnterChattingUIPluginPart() : IPlugin {
         }
 
         //版本8.0.32-arm64反编译代码, I函数
+       val dispatchMethodName =  when (AppVersionUtil.getVersionCode()) {
+            Constrant.WX_CODE_8_0_32,Constrant.WX_CODE_8_0_33 -> "I"
+            Constrant.WX_CODE_8_0_34 -> "M"
+            else -> null
+        }
         val dispatchMethod = XposedHelpers2.findMethodExactIfExists(
             ClazzN.BaseChattingUIFragment,
             context.classLoader,
-            "I",
+            dispatchMethodName,
             //==int.class
             java.lang.Integer.TYPE,
             Runnable::class.java,
         )
+
         if (dispatchMethod == null) {
             LogUtil.w("I function is null")
         } else {
@@ -103,7 +110,7 @@ class EnterChattingUIPluginPart() : IPlugin {
             val tagConst = "chatting-I-list-$index"
             val enterAction = EnterChattingHookAction(context, lpparam, tagConst)
             val doResumeAction = DoResumeAction(context, lpparam, tagConst)
-
+            LogUtil.w("each I list function： ", method)
             XposedHelpers2.hookMethod(method, object : XC_MethodHook() {
                 override fun afterHookedMethod(param: MethodHookParam) {
                     when (param.args[0]) {
