@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ListAdapter
 import android.widget.ListView
+import android.widget.TextView
 import com.lu.lposed.api2.XC_MethodHook2
 import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
@@ -13,6 +14,7 @@ import com.lu.magic.util.log.LogUtil
 import com.lu.magic.util.view.ChildDeepCheck
 import com.lu.wxmask.ClazzN
 import com.lu.wxmask.Constrant
+import com.lu.wxmask.MainHook
 import com.lu.wxmask.plugin.WXMaskPlugin
 import com.lu.wxmask.util.AppVersionUtil
 import de.robv.android.xposed.callbacks.XC_LoadPackage
@@ -22,8 +24,7 @@ import java.lang.reflect.Method
  * 主页UI（即微信底部“微信”Tab选中时所在页面）处理，消息、小红点相关逻辑
  */
 class HideMainUIListPluginPart : IPlugin {
-    //咩啥用
-    private val hookMethodNameRecord = linkedSetOf<String>()
+
     override fun handleHook(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
         handleMainUIChattingListView(context, lpparam)
     }
@@ -54,8 +55,10 @@ class HideMainUIListPluginPart : IPlugin {
                 object : XC_MethodHook2() {
                     override fun afterHookedMethod(param: MethodHookParam) {
                         val adapter = param.args[0] ?: return
-                        LogUtil.w("adapter: ", param.args[0])
-                        hookListViewAdapter(adapter.javaClass)
+                        if (adapter::class.java.name.startsWith("com.tencent.mm.ui.conversation")) {
+                            LogUtil.w(AppVersionUtil.getSmartVersionName(), "guess adapter: ", adapter)
+                            hookListViewAdapter(adapter.javaClass)
+                        }
                     }
                 }
             )
@@ -72,7 +75,8 @@ class HideMainUIListPluginPart : IPlugin {
             View::class.java,
             ViewGroup::class.java
         ) ?: return
-        if (hookMethodNameRecord.contains(getViewMethod.toString())) {
+        val getViewMethodIDText = getViewMethod.toString()
+        if (MainHook.uniqueMetaStore.contains(getViewMethodIDText)) {
             return
         }
         val baseConversationClazz = ClazzN.from(ClazzN.BaseConversation)
@@ -92,7 +96,7 @@ class HideMainUIListPluginPart : IPlugin {
                         //不是所需类型
                         //LogUtil.d(chatUser, GsonUtil.toJson(itemData))
                         LogUtil.w(
-                            AppVersionUtil.getVersionCode(),
+                            AppVersionUtil.getSmartVersionName(),
                             "类型检查错误，尝试继续",
                             itemData::class.java,
                             itemData::class.java.classes
@@ -131,7 +135,7 @@ class HideMainUIListPluginPart : IPlugin {
                 private fun hideMsgViewItemText(itemView: View, param: MethodHookParam) {
                     val resource = AppUtil.getContext().resources
                     val msgTvIdName = when (AppVersionUtil.getVersionCode()) {
-                        in Constrant.WX_CODE_8_0_32..Constrant.WX_CODE_8_0_33 -> "fhs"
+                        in Constrant.WX_CODE_8_0_32..Constrant.WX_CODE_8_0_34 -> "fhs"
                         else -> "last_msg_tv"
                     }
                     val lastMsgViewId = resource.getIdentifier(msgTvIdName, "id", AppUtil.getContext().packageName)
@@ -145,11 +149,13 @@ class HideMainUIListPluginPart : IPlugin {
                         }
                     } else {
                         //
-                        LogUtil.w("主页last消息id版本不适配，开启暴力隐藏", AppVersionUtil.getVersionCode())
+                        LogUtil.w("主页last消息id版本不适配，开启暴力隐藏", AppVersionUtil.getSmartVersionName())
                         val ClazzNoMeasuredTextView = ClazzN.from("com.tencent.mm.ui.base.NoMeasuredTextView")
                         ChildDeepCheck().each(itemView) { child ->
                             try {
-                                if (ClazzNoMeasuredTextView?.isAssignableFrom(child::class.java) == true) {
+                                if (ClazzNoMeasuredTextView?.isAssignableFrom(child::class.java) == true
+                                    || TextView::class.java.isAssignableFrom(child::class.java)
+                                ) {
                                     XposedHelpers2.callMethod<String?>(child, "setText", "")
                                 }
                             } catch (e: Throwable) {
@@ -160,8 +166,7 @@ class HideMainUIListPluginPart : IPlugin {
                 }
 
             })
-        LogUtil.i(getViewMethod.toString())
-        hookMethodNameRecord.add(getViewMethod.toString())
+        MainHook.uniqueMetaStore.add(getViewMethodIDText)
     }
 
 

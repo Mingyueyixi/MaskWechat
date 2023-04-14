@@ -4,18 +4,15 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 
 import com.lu.lposed.api2.XC_MethodHook2;
 import com.lu.lposed.api2.XposedHelpers2;
-import com.lu.lposed.api2.function.Predicate;
 import com.lu.lposed.plugin.IPlugin;
 import com.lu.magic.util.GsonUtil;
 import com.lu.magic.util.ToastUtil;
 import com.lu.magic.util.log.LogUtil;
-import com.lu.wxmask.App;
 import com.lu.wxmask.ClazzN;
 import com.lu.wxmask.Constrant;
 import com.lu.wxmask.bean.MaskItemBean;
@@ -23,7 +20,6 @@ import com.lu.wxmask.plugin.ui.AddMaskItemUI;
 import com.lu.wxmask.plugin.ui.ConfigManagerUI;
 import com.lu.wxmask.plugin.ui.EditMaskItemUI;
 import com.lu.wxmask.plugin.ui.MaskUtil;
-import com.lu.wxmask.route.MaskAppRouter;
 import com.lu.wxmask.util.AppVersionUtil;
 import com.lu.wxmask.util.ConfigUtil;
 
@@ -80,14 +76,14 @@ public class WXConfigPlugin implements IPlugin {
         boolean isFromMaskPlugin = intent.getBooleanExtra(Constrant.KEY_INTENT_FROM_MASK, false);
         pluginMode = intent.getIntExtra(Constrant.KEY_INTENT_PLUGIN_MODE, -1);
         if (!isFromMaskPlugin) {
-            LogUtil.w("ignore not from mask");
+            LogUtil.i("ignore not from mask");
             return;
         }
         if (!AppVersionUtil.isSupportWechat()) {
             new AlertDialog.Builder(activity)
                     .setIcon(activity.getApplicationInfo().icon)
                     .setTitle("提示")
-                    .setMessage("当前WeiXin版本：" + AppVersionUtil.getVersionName() + "（" + AppVersionUtil.getVersionCode() + "）不支持，继续使用极可能无效，请到MaskWechat主页查看支持的版本")
+                    .setMessage("当前WeiXin版本：" + AppVersionUtil.getSmartVersionName() + "不支持，继续使用极可能无效，请到MaskWechat主页查看支持的版本")
                     .setNegativeButton("继续使用", (dialog, which) -> {
                         onEnterConfigUI(activity, intent);
                     })
@@ -113,7 +109,7 @@ public class WXConfigPlugin implements IPlugin {
         } else if (pluginMode == Constrant.VALUE_INTENT_PLUGIN_MODE_MANAGER) {
             showManagerConfigUI(activity, intent);
         } else {
-            LogUtil.w("entry wechat ui, but support plugin mode", pluginMode);
+            LogUtil.i("entry wechat ui, but support plugin mode", pluginMode);
         }
     }
 
@@ -139,7 +135,7 @@ public class WXConfigPlugin implements IPlugin {
                     })
                     .show();
             isShowingAddConfigTipUI = true;
-            LogUtil.w("show WebChatTipConfigUI");
+            LogUtil.i("show WebChatTipConfigUI");
         });
 
     }
@@ -164,7 +160,7 @@ public class WXConfigPlugin implements IPlugin {
             LogUtil.d("ignore show config ui");
             return;
         }
-        LogUtil.w("start config ui");
+        LogUtil.i("start config ui");
         View view = XposedHelpers2.callMethod(param.thisObject, "getView");
         view.post(() -> {
 
@@ -240,7 +236,7 @@ public class WXConfigPlugin implements IPlugin {
                         Field[] hitFields = XposedHelpers2.findFieldsByExactPredicate(f.getClass(), field -> ClazzN.from("com.tencent.mm.contact.d").isAssignableFrom(field.getType()));
                         if (hitFields.length > 0) {
                             Object result = hitFields[0].get(f);
-                            LogUtil.w("find user info object", result);
+                            LogUtil.w(AppVersionUtil.getSmartVersionName(), "find user info object", result);
                             return result;
                         }
                     }
@@ -260,7 +256,7 @@ public class WXConfigPlugin implements IPlugin {
                 LogUtil.w("找不到当前聊天的用户信息", e);
             }
         } else {
-            LogUtil.w("未适配的版本", AppVersionUtil.getVersionName(), AppVersionUtil.getVersionCode());
+            LogUtil.w("未适配的版本", AppVersionUtil.getSmartVersionName());
         }
         return null;
     }

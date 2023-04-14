@@ -101,7 +101,7 @@ class EnterChattingUIPluginPart() : IPlugin {
             Runnable::class.java
         )
         if (dispatchMethodArray.isNullOrEmpty()) {
-            LogUtil.w("经过遍历查找，仍然不支持的版本：", AppVersionUtil.getVersionName())
+            LogUtil.w("经过遍历查找，仍然不支持的版本：", AppVersionUtil.getSmartVersionName())
             return
         }
         LogUtil.d("hook I list function")
@@ -141,7 +141,7 @@ class EnterChattingHookAction(
         val activity = ReflectUtil.invokeMethod(fragmentObj, "getActivity") as Activity
 
         if (arguments != null) {
-            LogUtil.w("hook onEnterBegin ", arguments)
+            LogUtil.i("hook onEnterBegin ", arguments)
             val chatUser = arguments.getString("Chat_User")
             //命中配置的微信号
             if (chatUser != null && WXMaskPlugin.containChatUser(chatUser)) {
@@ -150,7 +150,7 @@ class EnterChattingHookAction(
                 showChatListUI(fragmentObj)
             }
         } else {
-            LogUtil.w("chattingUI's arguments if null")
+            LogUtil.w("chattingUI's arguments is null")
         }
     }
 

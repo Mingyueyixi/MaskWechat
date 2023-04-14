@@ -29,7 +29,7 @@ class HideSearchListUIPluginPart : IPlugin {
             object : XC_MethodHook2() {
                 override fun afterHookedMethod(param: MethodHookParam) {
                     if (needHideUserName(param, param.result)) {
-                        LogUtil.w(param.result)
+                        LogUtil.d(param.result)
                         param.result = try {
                             //将命中的用户数据抹除掉
                             param.result::class.java.newInstance()
@@ -51,7 +51,7 @@ class HideSearchListUIPluginPart : IPlugin {
             object : XC_MethodHook2() {
                 override fun afterHookedMethod(param: MethodHookParam) {
                     if (needHideUserName(param, param.result)) {
-                        LogUtil.w(param.result)
+                        LogUtil.d(param.result)
                         param.result = try {
                             //将命中的用户数据抹除掉
                             param.result::class.java.newInstance()

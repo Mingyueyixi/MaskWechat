@@ -182,7 +182,7 @@ class WebViewComponent(context: Context) {
                 && !"about".equals(scheme, true)
             ) {
 //                webViewLinker.callBack?.invoke(view, uri)
-                LogUtil.w(TAG, "webView appLink:", uri)
+                LogUtil.i(TAG, "webView appLink:", uri)
                 MaskAppRouter.route(view.context, uri.toString())
                 return true
             }
