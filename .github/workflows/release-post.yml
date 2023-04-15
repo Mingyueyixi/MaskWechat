@@ -31,7 +31,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests
+          pip install requests 
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       # GIT_TAG=$(git describe --exact-match --abbrev=0 --tags "${COMMIT}" 2> /dev/null || true)
@@ -45,6 +45,9 @@ jobs:
           GIT_COMMIT=$(git rev-parse HEAD)
           echo "GIT_COMMIT=$GIT_COMMIT$">> $GITHUB_ENV
           echo "GIT_TAG=$GIT_TAG">> $GITHUB_ENV
+          echo "GITHUB_RUN_URL=$github_run_url">> $GITHUB_ENV
+          echo "GIT_BRANCH=`git branch --show-current`" >>  $GITHUB_ENV
+
       - name: Robot Post Message
         env:
           tag_name: ${{ github.event.release.tag_name }}
@@ -52,6 +55,8 @@ jobs:
           bot_token: ${{ secrets.TG_CI_BOT_TOKEN }}
           github_user: ${{ github.actor }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          github_release: ${{ toJson(github.event.release) }}
+#          github_release: ${{ toJson(github.event.release) }}
+          GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
+          echo "${{ toJson(github) }}">> github_context.txt
           python robot.py -e release
