@@ -97,7 +97,14 @@ SHA1: 45A408C5222C1A03D3B7C84F06DA97AD2F5B4ADC
 8.0.33（2320）：[https://dldir1.qq.com/weixin/android/weixin8033android2320_arm64.apk](https://dldir1.qq.com/weixin/android/weixin8033android2320_arm64.apk)  
 SHA1: 8069F4730CF8839BE68609EF2F4702349E23A86B  
 
-推荐8.0.32（2300），因为自2.11版本以来，正在逐步放弃支持8.0.22版本微信
+8.0.34（2340）: [https://dldir1.qq.com/weixin/android/weixin8034android2340_arm64_1.apk](https://dldir1.qq.com/weixin/android/weixin8034android2340_arm64_1.apk)  
+SHA1: 30D0D0C25561D367A9E359A1804EA90352BEA7F5  
+
+推荐8.0.32（2300）、8.0.33（2320），因为：
+
+- 自2.11版本以来，正在逐步放弃支持8.0.22版本微信
+- 8.0.34虽然适配，但是可能存在未知的bug  
+
 
 **问题4：是否支持Google Play版本？**  
 答：不支持。  
