@@ -77,7 +77,7 @@ public class TextCheckUtil {
                         m.setAccessible(true);
                         Object v = m.invoke(view);
                         stringList.add(v + "");
-                        LogUtil.w("reflect ", view);
+                        LogUtil.d("reflect ", view);
                     }
                 } catch (Exception e) {
 

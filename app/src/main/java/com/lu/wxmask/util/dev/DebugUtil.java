@@ -46,7 +46,7 @@ public class DebugUtil {
     public static void printAllFields(Object obj) {
         Map<String, Map<String, Object>> data = getAllFields(obj);
         try {
-            LogUtil.w(GsonUtil.toJson(data));
+            LogUtil.d(GsonUtil.toJson(data));
         } catch (Exception e) {
             for (Map.Entry<String, Map<String, Object>> ele1 : data.entrySet()) {
                 String k1 = ele1.getKey();
@@ -68,7 +68,7 @@ public class DebugUtil {
                 }
             }
             try {
-                LogUtil.w(GsonUtil.toJson(data));
+                LogUtil.d(GsonUtil.toJson(data));
             } catch (Exception ex) {
                 LogUtil.e(ex);
             }

@@ -1,18 +1,14 @@
 package com.lu.wxmask;
 
-import android.app.Activity;
 import android.app.Application;
 import android.app.Instrumentation;
 import android.content.Context;
-import android.content.pm.InstrumentationInfo;
-import android.os.Bundle;
 
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 
 import com.lu.lposed.api2.XC_MethodHook2;
 import com.lu.lposed.api2.XposedHelpers2;
-import com.lu.lposed.api2.function.Predicate;
 import com.lu.lposed.plugin.PluginRegistry;
 import com.lu.magic.util.AppUtil;
 import com.lu.magic.util.log.LogUtil;
@@ -21,19 +17,16 @@ import com.lu.wxmask.plugin.CommonPlugin;
 import com.lu.wxmask.plugin.WXConfigPlugin;
 import com.lu.wxmask.plugin.WXMaskPlugin;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
-import kotlin.collections.ArraysKt;
 
 @Keep
 public class MainHook implements IXposedHookLoadPackage {
-
+    public static CopyOnWriteArraySet<String> uniqueMetaStore = new CopyOnWriteArraySet<>();
     private boolean hasInit = false;
-
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
@@ -58,7 +51,7 @@ public class MainHook implements IXposedHookLoadPackage {
                 }
             }
         });
-        LogUtil.w("start main plugin for wechat");
+        LogUtil.i("start main plugin for wechat");
         XposedHelpers2.Config.setThrowableCallBack(throwable -> LogUtil.e("MaskPlugin error", throwable));
 
         XposedHelpers2.findAndHookMethod(
@@ -125,7 +118,7 @@ public class MainHook implements IXposedHookLoadPackage {
         if (hasInit) {
             return;
         }
-        LogUtil.w("start init Plugin");
+        LogUtil.i("start init Plugin");
         hasInit = true;
         AppUtil.attachContext(context);
         //目前生成的plugin都是单例的
@@ -134,7 +127,7 @@ public class MainHook implements IXposedHookLoadPackage {
                 WXConfigPlugin.class,
                 WXMaskPlugin.class
         ).handleHooks(context, lpparam);
-        LogUtil.w("init plugin finish");
+        LogUtil.i("init plugin finish");
     }
 
 }

@@ -40,6 +40,11 @@ class AppVersionUtil {
         }
 
         @JvmStatic
+        fun getSmartVersionName(): String {
+            return "${getVersionName()}(${getVersionCode()})"
+        }
+
+        @JvmStatic
         fun isSupportWechat(): Boolean {
             return when (getVersionCode()) {
                 Constrant.WX_CODE_8_0_22, Constrant.WX_CODE_8_0_32, Constrant.WX_CODE_8_0_33, Constrant.WX_CODE_8_0_34 -> true

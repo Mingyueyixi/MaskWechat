@@ -90,7 +90,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
                 if (method.size != 1){
                     null
                 }else{
-                    LogUtil.w("找到 ", method[0], AppVersionUtil.getVersionName(), )
+                    LogUtil.w(AppVersionUtil.getSmartVersionName(), "find search method", method[0])
                     method[0].name
                 }
             }

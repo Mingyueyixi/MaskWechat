@@ -11,6 +11,7 @@ import com.lu.wxmask.plugin.part.HideSearchListUIPluginPart
 import com.lu.wxmask.util.ConfigUtil
 import com.lu.wxmask.util.ConfigUtil.ConfigSetObserver
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam
+import java.util.concurrent.CopyOnWriteArraySet
 
 class WXMaskPlugin : IPlugin, ConfigSetObserver {
     lateinit var maskIdList: Array<String?>
