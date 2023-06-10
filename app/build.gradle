@@ -67,8 +67,8 @@ android {
         applicationId "com.lu.wxmask"
         minSdk 24
         targetSdk 34
-        versionCode 17
-        versionName "1.16-bug"
+        versionCode 18
+        versionName "1.17-bug"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
