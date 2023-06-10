@@ -140,7 +140,7 @@ class HideSearchListUIPluginPart : IPlugin {
         }
         if (chatUser == null) {
             when (AppVersionUtil.getVersionCode()) {
-                Constrant.WX_CODE_8_0_33, Constrant.WX_CODE_8_0_34 -> {
+                in Constrant.WX_CODE_8_0_33.. Constrant.WX_CODE_8_0_34 -> {
                     val fieldValue: Any = XposedHelpers2.getObjectField<Any?>(itemData, "p") ?: return false
                     chatUser = XposedHelpers2.getObjectField<String?>(fieldValue, "e")
                 }

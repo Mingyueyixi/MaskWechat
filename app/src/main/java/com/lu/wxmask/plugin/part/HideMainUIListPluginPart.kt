@@ -6,12 +6,16 @@ import android.view.ViewGroup
 import android.widget.ListAdapter
 import android.widget.ListView
 import android.widget.TextView
+import androidx.core.util.rangeTo
 import com.lu.lposed.api2.XC_MethodHook2
 import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
 import com.lu.magic.util.AppUtil
+import com.lu.magic.util.GsonUtil
+import com.lu.magic.util.ResUtil
 import com.lu.magic.util.log.LogUtil
 import com.lu.magic.util.view.ChildDeepCheck
+import com.lu.wxmask.App
 import com.lu.wxmask.ClazzN
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.MainHook
@@ -19,6 +23,7 @@ import com.lu.wxmask.plugin.WXMaskPlugin
 import com.lu.wxmask.util.AppVersionUtil
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import java.lang.reflect.Method
+import kotlin.math.max
 
 /**
  * 主页UI（即微信底部“微信”Tab选中时所在页面）处理，消息、小红点相关逻辑
@@ -32,8 +37,15 @@ class HideMainUIListPluginPart : IPlugin {
     //隐藏指定用户的主页的消息
     private fun handleMainUIChattingListView(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
         val adapterName = when (AppVersionUtil.getVersionCode()) {
-            Constrant.WX_CODE_8_0_32, Constrant.WX_CODE_8_0_33, Constrant.WX_CODE_8_0_34 -> "com.tencent.mm.ui.conversation.p"
             Constrant.WX_CODE_8_0_22 -> "com.tencent.mm.ui.conversation.k"
+            in Constrant.WX_CODE_8_0_32..Constrant.WX_CODE_8_0_34 -> {
+                if (AppVersionUtil.getVersionName() == "8.0.35") {
+                    "com.tencent.mm.ui.conversation.r"
+                } else {
+                    "com.tencent.mm.ui.conversation.p"
+                }
+            }
+
             else -> null
         }
         var adapterClazz: Class<*>? = null
@@ -41,6 +53,7 @@ class HideMainUIListPluginPart : IPlugin {
             adapterClazz = XposedHelpers2.findClassIfExists(adapterName, AppUtil.getContext().classLoader)
         }
         if (adapterClazz != null) {
+            LogUtil.d("WeChat MainUI main Tap List Adapter", adapterClazz)
             hookListViewAdapter(adapterClazz)
         } else {
             LogUtil.w("WeChat MainUI not found Adapter for ListView, guess start.")
@@ -55,6 +68,7 @@ class HideMainUIListPluginPart : IPlugin {
                 object : XC_MethodHook2() {
                     override fun afterHookedMethod(param: MethodHookParam) {
                         val adapter = param.args[0] ?: return
+                        LogUtil.w("List adapter ", adapter)
                         if (adapter::class.java.name.startsWith("com.tencent.mm.ui.conversation")) {
                             LogUtil.w(AppVersionUtil.getSmartVersionName(), "guess adapter: ", adapter)
                             hookListViewAdapter(adapter.javaClass)
@@ -89,7 +103,7 @@ class HideMainUIListPluginPart : IPlugin {
                     val position: Int = (param.args[0] as? Int?) ?: return
                     val itemData: Any = adapter.getItem(position) ?: return
 
-//                    LogUtil.d("after getView", adapter.javaClass, GsonUtil.toJson(itemData))
+                    LogUtil.d("after getView", adapter.javaClass, GsonUtil.toJson(itemData))
                     if (baseConversationClazz?.isAssignableFrom(itemData.javaClass) != true
                         && !itemData::class.java.name.startsWith("com.tencent.mm.storage")
                     ) {
@@ -107,36 +121,44 @@ class HideMainUIListPluginPart : IPlugin {
                     if (WXMaskPlugin.containChatUser(chatUser)) {
                         hideUnReadTipView(itemView, param)
                         hideMsgViewItemText(itemView, param)
+                        hideLastMsgTime(itemView, param)
                     }
+                }
+
+                private fun hideLastMsgTime(itemView: View, params: MethodHookParam) {
+                    val viewId = AppUtil.getContext().resources.getIdentifier("l0s", "id", AppUtil.getContext().packageName)
+                    itemView.findViewById<View>(viewId)?.visibility = View.INVISIBLE
+
                 }
 
                 //隐藏未读消息红点
                 private fun hideUnReadTipView(itemView: View, param: MethodHookParam) {
                     //带文字的未读红点
                     val tipTvIdText = when (AppVersionUtil.getVersionCode()) {
-                        Constrant.WX_CODE_8_0_32, Constrant.WX_CODE_8_0_33, Constrant.WX_CODE_8_0_34 -> "kmv"
-                        else -> "tipcnt_tv"
+                        in 0..Constrant.WX_CODE_8_0_22 -> "tipcnt_tv"
+                        in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_34 -> "kmv"
+                        else -> "kmv"
                     }
                     val packageName = AppUtil.getContext().packageName
                     val tipTvId = AppUtil.getContext().resources.getIdentifier(tipTvIdText, "id", packageName)
                     itemView.findViewById<View>(tipTvId)?.visibility = View.INVISIBLE
 
                     //头像上的小红点
-                    when (AppVersionUtil.getVersionCode()) {
-                        Constrant.WX_CODE_8_0_32, Constrant.WX_CODE_8_0_33, Constrant.WX_CODE_8_0_34 -> {
-                            val viewId = AppUtil.getContext().resources.getIdentifier("a2f", "id", packageName)
-                            itemView.findViewById<View>(viewId)?.visibility = View.INVISIBLE
-                        }
+                    val small_red = when (AppVersionUtil.getVersionCode()) {
+                        in 0..Constrant.WX_CODE_8_0_34 -> "a2f"
+                        else -> "a2f"
                     }
-
+                    val viewId = AppUtil.getContext().resources.getIdentifier(small_red, "id", packageName)
+                    itemView.findViewById<View>(viewId)?.visibility = View.INVISIBLE
                 }
 
                 //隐藏最后一条消息等
                 private fun hideMsgViewItemText(itemView: View, param: MethodHookParam) {
                     val resource = AppUtil.getContext().resources
                     val msgTvIdName = when (AppVersionUtil.getVersionCode()) {
-                        in Constrant.WX_CODE_8_0_32..Constrant.WX_CODE_8_0_34 -> "fhs"
-                        else -> "last_msg_tv"
+                        in 0..Constrant.WX_CODE_8_0_22 -> "last_msg_tv"
+                        in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_34 -> "fhs"
+                        else -> "fhs"
                     }
                     val lastMsgViewId = resource.getIdentifier(msgTvIdName, "id", AppUtil.getContext().packageName)
                     LogUtil.d("mask last msg textView", lastMsgViewId)

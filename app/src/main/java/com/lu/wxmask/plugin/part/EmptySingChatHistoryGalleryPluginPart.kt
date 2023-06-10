@@ -9,6 +9,7 @@ import com.lu.lposed.api2.XC_MethodHook2
 import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
 import com.lu.magic.util.log.LogUtil
+import com.lu.wxmask.App
 import com.lu.wxmask.ClazzN
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.plugin.WXMaskPlugin
@@ -76,26 +77,35 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
      * 处理通过顶部ActionBar搜索框进行的结果
      */
     private fun setEmptyActionBarTabPageUI(context: Context, lpparam: XC_LoadPackage.LoadPackageParam?) {
-        val Clazz_FTSMultiAllResultFragment =  "com.tencent.mm.ui.chatting.search.multi.fragment.FTSMultiAllResultFragment"
-        val commonResultMethodName:String? = when (AppVersionUtil.getVersionCode()){
+        val Clazz_FTSMultiAllResultFragment = "com.tencent.mm.ui.chatting.search.multi.fragment.FTSMultiAllResultFragment"
+        var commonResultMethodName: String? = when (AppVersionUtil.getVersionCode()) {
             Constrant.WX_CODE_8_0_32 -> "N"
             Constrant.WX_CODE_8_0_33 -> "O"
-            Constrant.WX_CODE_8_0_34 -> "R"
-            else-> {
-                val method = XposedHelpers2.findMethodsByExactParameters(
-                    ClazzN.from(Clazz_FTSMultiAllResultFragment),
-                    Void.TYPE,
-                    ArrayList::class.java
-                )
-                if (method.size != 1){
-                    null
-                }else{
-                    LogUtil.w(AppVersionUtil.getSmartVersionName(), "find search method", method[0])
-                    method[0].name
-                }
+            Constrant.WX_CODE_8_0_34 -> {
+                if (AppVersionUtil.getVersionName() != "8.0.35") "R"
+                else "P"
             }
 
-        }?: return
+            else -> null
+
+        }
+        LogUtil.d("common search method is :", commonResultMethodName)
+        if (commonResultMethodName == null) {
+            val method = XposedHelpers2.findMethodsByExactParameters(
+                ClazzN.from(Clazz_FTSMultiAllResultFragment),
+                Void.TYPE,
+                ArrayList::class.java
+            )
+            if (method.isNotEmpty()) {
+                LogUtil.w(AppVersionUtil.getSmartVersionName(), "find search method", method[0])
+                commonResultMethodName = method[0].name
+            }
+        }
+
+        if (commonResultMethodName == null) {
+            LogUtil.w("find common search method:", null)
+            return
+        }
 
         //tab==全部，搜索结果置空
         XposedHelpers2.findAndHookMethod(
