@@ -45,6 +45,7 @@ class HideMainUIListPluginPart : IPlugin {
                     "com.tencent.mm.ui.conversation.p"
                 }
             }
+            in Constrant.WX_CODE_8_0_35 .. Constrant.WX_CODE_8_0_37 -> "com.tencent.mm.ui.conversation.x"
 
             else -> null
         }

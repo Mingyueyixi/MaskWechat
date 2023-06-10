@@ -58,9 +58,10 @@ class EnterChattingUIPluginPart() : IPlugin {
 
         //版本8.0.32-arm64反编译代码, I函数
        val dispatchMethodName =  when (AppVersionUtil.getVersionCode()) {
-            Constrant.WX_CODE_8_0_32,Constrant.WX_CODE_8_0_33 -> "I"
-            Constrant.WX_CODE_8_0_34 -> "M"
-            else -> null
+            in Constrant.WX_CODE_8_0_32 .. Constrant.WX_CODE_8_0_33 -> "I"
+            in Constrant.WX_CODE_8_0_35 .. Constrant.WX_CODE_8_0_34 -> "M"
+            in Constrant.WX_CODE_8_0_35 .. Constrant.WX_CODE_8_0_37 -> "K"
+            else -> "K"
         }
         val dispatchMethod = XposedHelpers2.findMethodExactIfExists(
             ClazzN.BaseChattingUIFragment,

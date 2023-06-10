@@ -9,13 +9,13 @@ import com.lu.lposed.api2.XC_MethodHook2
 import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
 import com.lu.magic.util.log.LogUtil
-import com.lu.wxmask.App
 import com.lu.wxmask.ClazzN
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.plugin.WXMaskPlugin
 import com.lu.wxmask.util.AppVersionUtil
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.callbacks.XC_LoadPackage
+import java.lang.reflect.Method
 import java.util.ArrayList
 
 /**
@@ -28,33 +28,82 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
     }
 
     private fun setEmptyDetailHistoryUI(context: Context, lpparam: XC_LoadPackage.LoadPackageParam?) {
-        XposedHelpers2.findAndHookMethod(
-            "com.tencent.mm.ui.chatting.gallery.MediaHistoryListUI",
-            context.classLoader,
-            "k",
-            java.lang.Boolean.TYPE,
-            java.lang.Integer.TYPE,
-            object : XC_MethodHook2() {
-                override fun beforeHookedMethod(param: MethodHookParam) {
-                    val activity: Activity = param.thisObject as Activity
-                    val intent = activity.intent
-                    val userName = intent.getStringExtra("kintent_talker")
-                    if (userName.isNullOrBlank()) {
-                        LogUtil.w("MediaHistoryListUI‘s user is empty", userName)
-                        return
-                    }
-                    if (WXMaskPlugin.containChatUser(userName)) {
-                        param.args[1] = 0
-                        LogUtil.i("empty MediaHistoryListUI data")
-                    }
+        setEmptyDetailHistoryUIForMedia(context, lpparam)
+        setEmptyDetailHistoryUIForGallery(context, lpparam)
+    }
+
+    private fun setEmptyDetailHistoryUIForMedia(context: Context, lpparam: XC_LoadPackage.LoadPackageParam?) {
+        var mediaMethodName = when (AppVersionUtil.getVersionCode()) {
+            in Constrant.WX_CODE_8_0_32..Constrant.WX_CODE_8_0_35 -> "k"
+            else -> null
+        }
+        val MediaHistoryListUI = "com.tencent.mm.ui.chatting.gallery.MediaHistoryListUI"
+        var mediaMethod: Method? = null
+        if (AppVersionUtil.getVersionCode() < Constrant.WX_CODE_8_0_35) {
+            mediaMethod = XposedHelpers2.findMethodExactIfExists(
+                MediaHistoryListUI,
+                context.classLoader,
+                "k",
+                java.lang.Boolean.TYPE,
+                java.lang.Integer.TYPE
+            )
+        }
+        if (mediaMethod == null) {
+            val guessMethods = XposedHelpers2.findMethodsByExactParameters(
+                ClazzN.from(MediaHistoryListUI), Void.TYPE,
+                java.lang.Boolean.TYPE,
+                Integer.TYPE
+            )
+            if (guessMethods.size >= 1) {
+                mediaMethod = guessMethods[0]
+            }
+        }
+        LogUtil.w("MediaHistoryListUI empty method is ", mediaMethod)
+        if (mediaMethod == null) {
+            return
+        }
+        XposedHelpers2.hookMethod(mediaMethod, object : XC_MethodHook2() {
+            override fun beforeHookedMethod(param: MethodHookParam) {
+                val activity: Activity = param.thisObject as Activity
+                val intent = activity.intent
+                val userName = intent.getStringExtra("kintent_talker")
+                if (userName.isNullOrBlank()) {
+                    LogUtil.w("MediaHistoryListUI‘s user is empty", userName)
+                    return
                 }
-            })
-        XposedHelpers2.findAndHookMethod(
-            "com.tencent.mm.ui.chatting.gallery.MediaHistoryGalleryUI",
+                if (WXMaskPlugin.containChatUser(userName)) {
+                    param.args[1] = 0
+                    LogUtil.i("empty MediaHistoryListUI data")
+                }
+            }
+        })
+    }
+
+    private fun setEmptyDetailHistoryUIForGallery(context: Context, lpparam: XC_LoadPackage.LoadPackageParam?) {
+        val MediaHistoryGalleryUI = "com.tencent.mm.ui.chatting.gallery.MediaHistoryGalleryUI"
+        var galleryMethod: Method? = XposedHelpers2.findMethodExactIfExists(
+            MediaHistoryGalleryUI,
             context.classLoader,
             "k",
             java.lang.Boolean.TYPE,
             java.lang.Integer.TYPE,
+        )
+        if (galleryMethod == null) {
+            val guessMethods = XposedHelpers2.findMethodsByExactParameters(
+                ClazzN.from(MediaHistoryGalleryUI),
+                java.lang.Boolean.TYPE,
+                java.lang.Integer.TYPE,
+            )
+            if (guessMethods.size >= 1) {
+                galleryMethod = guessMethods[0]
+            }
+        }
+        LogUtil.d("MediaHistoryGalleryUI empty method is ", galleryMethod)
+        if (galleryMethod == null) {
+            return
+        }
+        XposedHelpers2.hookMethod(
+            galleryMethod,
             object : XC_MethodHook2() {
                 override fun beforeHookedMethod(param: MethodHookParam) {
                     val activity: Activity = param.thisObject as Activity
@@ -72,6 +121,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
             })
 
     }
+
 
     /**
      * 处理通过顶部ActionBar搜索框进行的结果
@@ -103,9 +153,11 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
         }
 
         if (commonResultMethodName == null) {
-            LogUtil.w("find common search method:", null)
+            LogUtil.w("find setEmptyActionBarTabPageUI method:", commonResultMethodName)
             return
         }
+
+        LogUtil.d("find common search method:")
 
         //tab==全部，搜索结果置空
         XposedHelpers2.findAndHookMethod(
