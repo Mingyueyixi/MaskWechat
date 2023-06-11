@@ -13,6 +13,7 @@ import com.lu.lposed.plugin.IPlugin
 import com.lu.lposed.plugin.PluginProviders
 import com.lu.magic.util.ReflectUtil
 import com.lu.magic.util.log.LogUtil
+import com.lu.wxmask.App
 import com.lu.wxmask.ClazzN
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.bean.MaskItemBean
@@ -24,6 +25,7 @@ import com.lu.wxmask.util.ConfigUtil
 import com.lu.wxmask.util.QuickCountClickListenerUtil
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.callbacks.XC_LoadPackage
+import java.lang.reflect.Method
 
 /**
  * 聊天页页面处理：
@@ -59,18 +61,25 @@ class EnterChattingUIPluginPart() : IPlugin {
         //版本8.0.32-arm64反编译代码, I函数
         val dispatchMethodName = when (AppVersionUtil.getVersionCode()) {
             in Constrant.WX_CODE_8_0_32..Constrant.WX_CODE_8_0_33 -> "I"
-            in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_34 -> "M"
-            in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_37 -> "K"
+            Constrant.WX_CODE_8_0_34 -> {
+                if (AppVersionUtil.getVersionName() == "8.0.35") "J"
+                else "M"
+            }
+            Constrant.WX_CODE_8_0_35 -> "J"
+            Constrant.WX_CODE_8_0_37 -> "K"
             else -> null
         }
-        var dispatchMethod = XposedHelpers2.findMethodExactIfExists(
-            ClazzN.BaseChattingUIFragment,
-            context.classLoader,
-            dispatchMethodName,
-            //==int.class
-            java.lang.Integer.TYPE,
-            Runnable::class.java,
-        )
+        var dispatchMethod: Method? = null
+        if (dispatchMethodName != null) {
+            dispatchMethod = XposedHelpers2.findMethodExactIfExists(
+                ClazzN.BaseChattingUIFragment,
+                context.classLoader,
+                dispatchMethodName,
+                //==int.class
+                java.lang.Integer.TYPE,
+                Runnable::class.java,
+            )
+        }
 
         if (dispatchMethod == null) {
             LogUtil.w("dispatchMethod compat is null")

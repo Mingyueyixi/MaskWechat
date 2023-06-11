@@ -9,6 +9,7 @@ import com.lu.lposed.api2.XC_MethodHook2
 import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
 import com.lu.magic.util.log.LogUtil
+import com.lu.wxmask.App
 import com.lu.wxmask.ClazzN
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.plugin.WXMaskPlugin
@@ -35,7 +36,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
         var mediaMethodName = when (AppVersionUtil.getVersionCode()) {
             in Constrant.WX_CODE_8_0_32..Constrant.WX_CODE_8_0_35 -> "k"
             in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_37 -> "l"
-            else -> null
+            else -> "l"
         }
         val MediaHistoryListUI = "com.tencent.mm.ui.chatting.gallery.MediaHistoryListUI"
         var mediaMethod: Method? = XposedHelpers2.findMethodExactIfExists(
@@ -80,18 +81,21 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
 
     private fun setEmptyDetailHistoryUIForGallery(context: Context, lpparam: XC_LoadPackage.LoadPackageParam?) {
         val MediaHistoryGalleryUI = "com.tencent.mm.ui.chatting.gallery.MediaHistoryGalleryUI"
-        var methodName = when (AppVersionUtil.getVersionCode()) {
+        val methodName = when (AppVersionUtil.getVersionCode()) {
             in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_35 -> "k"
             Constrant.WX_CODE_8_0_37 -> "l"
             else -> null
         }
-        var galleryMethod: Method? = XposedHelpers2.findMethodExactIfExists(
-            MediaHistoryGalleryUI,
-            context.classLoader,
-            methodName,
-            java.lang.Boolean.TYPE,
-            java.lang.Integer.TYPE,
-        )
+        var galleryMethod: Method? = null
+        if (methodName != null) {
+            galleryMethod = XposedHelpers2.findMethodExactIfExists(
+                MediaHistoryGalleryUI,
+                context.classLoader,
+                methodName,
+                java.lang.Boolean.TYPE,
+                java.lang.Integer.TYPE,
+            )
+        }
         if (galleryMethod == null) {
             val guessMethods = XposedHelpers2.findMethodsByExactParameters(
                 ClazzN.from(MediaHistoryGalleryUI),
@@ -104,9 +108,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
             }
             LogUtil.w(AppVersionUtil.getSmartVersionName(), "guess MediaHistoryGalleryUI empty method is ", galleryMethod)
         }
-        if (galleryMethod == null) {
-            return
-        }
+
         XposedHelpers2.hookMethod(
             galleryMethod,
             object : XC_MethodHook2() {
@@ -133,41 +135,47 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
      */
     private fun setEmptyActionBarTabPageUI(context: Context, lpparam: XC_LoadPackage.LoadPackageParam?) {
         val Clazz_FTSMultiAllResultFragment = "com.tencent.mm.ui.chatting.search.multi.fragment.FTSMultiAllResultFragment"
-        var commonResultMethodName: String? = when (AppVersionUtil.getVersionCode()) {
+        var commonHookMethodName: String? = when (AppVersionUtil.getVersionCode()) {
             Constrant.WX_CODE_8_0_32 -> "N"
             Constrant.WX_CODE_8_0_33 -> "O"
             Constrant.WX_CODE_8_0_34 -> {
-                if (AppVersionUtil.getVersionName() != "8.0.35") "R"
-                else "P"
+                if (AppVersionUtil.getVersionName() == "8.0.35") "P"
+                else "R"
             }
-
+            Constrant.WX_CODE_8_0_35 -> "P"
             Constrant.WX_CODE_8_0_37 -> "Q"
             else -> null
-
         }
-        LogUtil.d("setEmptyActionBarTabPageUI method is :", commonResultMethodName)
-        if (commonResultMethodName == null) {
-            val method = XposedHelpers2.findMethodsByExactParameters(
+        LogUtil.d("setEmptyActionBarTabPageUI method is :", commonHookMethodName)
+        var preHookMethod: Method? = null
+        if (commonHookMethodName != null) {
+            preHookMethod = XposedHelpers2.findMethodExactIfExists(
+                ClazzN.from(Clazz_FTSMultiAllResultFragment),
+                commonHookMethodName,
+                Void.TYPE,
+                ArrayList::class.java
+            )
+        }
+        if (preHookMethod == null) {
+            val methods = XposedHelpers2.findMethodsByExactParameters(
                 ClazzN.from(Clazz_FTSMultiAllResultFragment),
                 Void.TYPE,
                 ArrayList::class.java
             )
-            if (method.isNotEmpty()) {
-                commonResultMethodName = method[0].name
+            if (methods.isNotEmpty()) {
+                preHookMethod = methods[0]
+                commonHookMethodName = methods[0].name
             }
-            LogUtil.w(AppVersionUtil.getSmartVersionName(), "guess setEmptyActionBarTabPageUI method:", commonResultMethodName)
+            LogUtil.w(AppVersionUtil.getSmartVersionName(), "guess setEmptyActionBarTabPageUI method:", commonHookMethodName)
         }
 
-        if (commonResultMethodName == null) {
+        if (preHookMethod == null) {
             return
         }
 
         //tab==全部，搜索结果置空
-        XposedHelpers2.findAndHookMethod(
-            Clazz_FTSMultiAllResultFragment,
-            context.classLoader,
-            commonResultMethodName,
-            java.util.ArrayList::class.java,
+        XposedHelpers2.hookMethod(
+            preHookMethod,
             object : XC_MethodHook2() {
 
                 override fun beforeHookedMethod(param: MethodHookParam) {
@@ -179,12 +187,11 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
                 }
             }
         )
-
         //其他的/普通的/一般的tab，搜索结果置空
         XposedHelpers2.findAndHookMethod(
             "com.tencent.mm.ui.chatting.search.multi.fragment.FTSMultiNormalResultFragment",
             context.classLoader,
-            commonResultMethodName,
+            commonHookMethodName,
             java.util.ArrayList::class.java,
             object : XC_MethodHook2() {
 

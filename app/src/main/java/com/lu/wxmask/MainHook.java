@@ -17,6 +17,8 @@ import com.lu.wxmask.plugin.CommonPlugin;
 import com.lu.wxmask.plugin.WXConfigPlugin;
 import com.lu.wxmask.plugin.WXMaskPlugin;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
@@ -27,6 +29,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 public class MainHook implements IXposedHookLoadPackage {
     public static CopyOnWriteArraySet<String> uniqueMetaStore = new CopyOnWriteArraySet<>();
     private boolean hasInit = false;
+    private List<XC_MethodHook.Unhook> initUnHookList = new ArrayList<>();
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
@@ -54,7 +57,7 @@ public class MainHook implements IXposedHookLoadPackage {
         LogUtil.i("start main plugin for wechat");
         XposedHelpers2.Config.setThrowableCallBack(throwable -> LogUtil.e("MaskPlugin error", throwable));
 
-        XposedHelpers2.findAndHookMethod(
+        XC_MethodHook.Unhook unhook = XposedHelpers2.findAndHookMethod(
                 Application.class.getName(),
                 lpparam.classLoader,
                 "onCreate",
@@ -65,6 +68,20 @@ public class MainHook implements IXposedHookLoadPackage {
                     }
                 }
         );
+        initUnHookList.add(unhook);
+
+//        initHookCallBack = XposedHelpers2.findAndHookMethod(
+//                Activity.class.getName(),
+//                lpparam.classLoader,
+//                "onCreate",
+//                Bundle.class,
+//                new XC_MethodHook() {
+//                    @Override
+//                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+//                        initPlugin(((Activity) param.thisObject).getApplicationContext(), lpparam);
+//                    }
+//                }
+//        );
 //
         //"com.tencent.mm.app.com.Application"的父类
         //"tencent.tinker.loader.app.TinkerApplication"
@@ -94,7 +111,7 @@ public class MainHook implements IXposedHookLoadPackage {
                     }
                 }
         );
-
+//
 //        XposedHelpers2.findAndHookMethod(
 //                Activity.class.getName(),
 //                lpparam.classLoader,
@@ -127,6 +144,9 @@ public class MainHook implements IXposedHookLoadPackage {
                 WXConfigPlugin.class,
                 WXMaskPlugin.class
         ).handleHooks(context, lpparam);
+        for (XC_MethodHook.Unhook unhook : initUnHookList) {
+            unhook.unhook();
+        }
         LogUtil.i("init plugin finish");
     }
 

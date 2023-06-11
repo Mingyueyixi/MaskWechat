@@ -45,15 +45,15 @@ class HideMainUIListPluginPart : IPlugin {
                     "com.tencent.mm.ui.conversation.p"
                 }
             }
-            in Constrant.WX_CODE_8_0_35 .. Constrant.WX_CODE_8_0_37 -> "com.tencent.mm.ui.conversation.x"
-
+            Constrant.WX_CODE_8_0_35 -> "com.tencent.mm.ui.conversation.r"
+            Constrant.WX_CODE_8_0_37 -> "com.tencent.mm.ui.conversation.x"
             else -> null
         }
         var adapterClazz: Class<*>? = null
         if (adapterName != null) {
-            adapterClazz = XposedHelpers2.findClassIfExists(adapterName, AppUtil.getContext().classLoader)
+            adapterClazz = ClazzN.from(adapterName)
         }
-        if (adapterClazz != null) {
+        if (adapterClazz != null && adapterClazz.isAssignableFrom(ListAdapter::class.java)) {
             LogUtil.d("WeChat MainUI main Tap List Adapter", adapterClazz)
             hookListViewAdapter(adapterClazz)
         } else {
@@ -69,7 +69,7 @@ class HideMainUIListPluginPart : IPlugin {
                 object : XC_MethodHook2() {
                     override fun afterHookedMethod(param: MethodHookParam) {
                         val adapter = param.args[0] ?: return
-                        LogUtil.w("List adapter ", adapter)
+                        LogUtil.d("List adapter ", adapter)
                         if (adapter::class.java.name.startsWith("com.tencent.mm.ui.conversation")) {
                             LogUtil.w(AppVersionUtil.getSmartVersionName(), "guess adapter: ", adapter)
                             hookListViewAdapter(adapter.javaClass)
@@ -94,6 +94,7 @@ class HideMainUIListPluginPart : IPlugin {
         if (MainHook.uniqueMetaStore.contains(getViewMethodIDText)) {
             return
         }
+        LogUtil.w(getViewMethod)
         val baseConversationClazz = ClazzN.from(ClazzN.BaseConversation)
         XposedHelpers2.hookMethod(
             getViewMethod,
@@ -122,7 +123,7 @@ class HideMainUIListPluginPart : IPlugin {
                     if (WXMaskPlugin.containChatUser(chatUser)) {
                         hideUnReadTipView(itemView, param)
                         hideMsgViewItemText(itemView, param)
-                        hideLastMsgTime(itemView, param)
+//                        hideLastMsgTime(itemView, param)
                     }
                 }
 
@@ -138,7 +139,7 @@ class HideMainUIListPluginPart : IPlugin {
                     //带文字的未读红点
                     val tipTvIdText = when (AppVersionUtil.getVersionCode()) {
                         in 0..Constrant.WX_CODE_8_0_22 -> "tipcnt_tv"
-                        in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_34 -> "kmv"
+                        in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_37 -> "kmv"
                         else -> "kmv"
                     }
                     val packageName = AppUtil.getContext().packageName
@@ -147,7 +148,7 @@ class HideMainUIListPluginPart : IPlugin {
 
                     //头像上的小红点
                     val small_red = when (AppVersionUtil.getVersionCode()) {
-                        in 0..Constrant.WX_CODE_8_0_34 -> "a2f"
+                        in 0..Constrant.WX_CODE_8_0_37 -> "a2f"
                         else -> "a2f"
                     }
                     val viewId = AppUtil.getContext().resources.getIdentifier(small_red, "id", packageName)
@@ -159,7 +160,7 @@ class HideMainUIListPluginPart : IPlugin {
                     val resource = AppUtil.getContext().resources
                     val msgTvIdName = when (AppVersionUtil.getVersionCode()) {
                         in 0..Constrant.WX_CODE_8_0_22 -> "last_msg_tv"
-                        in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_34 -> "fhs"
+                        in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_37 -> "fhs"
                         else -> "fhs"
                     }
                     val lastMsgViewId = resource.getIdentifier(msgTvIdName, "id", AppUtil.getContext().packageName)
