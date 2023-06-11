@@ -99,7 +99,7 @@ public class MainHook implements IXposedHookLoadPackage {
 //                }
 //        );
 //
-        XposedHelpers2.findAndHookMethod(
+        unhook = XposedHelpers2.findAndHookMethod(
                 Instrumentation.class.getName(),
                 lpparam.classLoader,
                 "callApplicationOnCreate",
@@ -111,6 +111,7 @@ public class MainHook implements IXposedHookLoadPackage {
                     }
                 }
         );
+        initUnHookList.add(unhook);
 //
 //        XposedHelpers2.findAndHookMethod(
 //                Activity.class.getName(),
@@ -145,7 +146,9 @@ public class MainHook implements IXposedHookLoadPackage {
                 WXMaskPlugin.class
         ).handleHooks(context, lpparam);
         for (XC_MethodHook.Unhook unhook : initUnHookList) {
-            unhook.unhook();
+            if (unhook != null) {
+                unhook.unhook();
+            }
         }
         LogUtil.i("init plugin finish");
     }

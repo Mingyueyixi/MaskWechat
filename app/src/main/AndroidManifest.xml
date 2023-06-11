@@ -31,7 +31,10 @@
         <activity
             android:name=".ui.MainActivity"
             android:exported="true"
-            android:launchMode="singleInstance">
+            android:excludeFromRecents="true"
+            android:autoRemoveFromRecents="true"
+            android:noHistory="true"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <!-- 在Android-11及以上，不能够通过调用 pm.setComponentEnabledSetting 禁用组件的方式来实现动态显示/隐藏图标 -->
