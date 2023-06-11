@@ -126,6 +126,7 @@ class HideMainUIListPluginPart : IPlugin {
                     }
                 }
 
+                //消息条目，时间，暂不隐藏？改成去年？
                 private fun hideLastMsgTime(itemView: View, params: MethodHookParam) {
                     val viewId = AppUtil.getContext().resources.getIdentifier("l0s", "id", AppUtil.getContext().packageName)
                     itemView.findViewById<View>(viewId)?.visibility = View.INVISIBLE
