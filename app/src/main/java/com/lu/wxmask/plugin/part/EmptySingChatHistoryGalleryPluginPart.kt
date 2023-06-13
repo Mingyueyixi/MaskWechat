@@ -9,7 +9,6 @@ import com.lu.lposed.api2.XC_MethodHook2
 import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
 import com.lu.magic.util.log.LogUtil
-import com.lu.wxmask.App
 import com.lu.wxmask.ClazzN
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.plugin.WXMaskPlugin
@@ -142,6 +141,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
                 if (AppVersionUtil.getVersionName() == "8.0.35") "P"
                 else "R"
             }
+
             Constrant.WX_CODE_8_0_35 -> "P"
             Constrant.WX_CODE_8_0_37 -> "Q"
             else -> null
@@ -170,6 +170,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
         }
 
         if (preHookMethod == null) {
+            LogUtil.w(AppVersionUtil.getSmartVersionName(), "setEmptyActionBarTabPageUI is method null")
             return
         }
 
@@ -187,6 +188,10 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
                 }
             }
         )
+        if (commonHookMethodName == null) {
+            LogUtil.i("setEmptyActionBarTabPageUI is null")
+            return
+        }
         //其他的/普通的/一般的tab，搜索结果置空
         XposedHelpers2.findAndHookMethod(
             "com.tencent.mm.ui.chatting.search.multi.fragment.FTSMultiNormalResultFragment",

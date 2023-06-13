@@ -6,16 +6,13 @@ import android.view.ViewGroup
 import android.widget.ListAdapter
 import android.widget.ListView
 import android.widget.TextView
-import androidx.core.util.rangeTo
 import com.lu.lposed.api2.XC_MethodHook2
 import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
 import com.lu.magic.util.AppUtil
 import com.lu.magic.util.GsonUtil
-import com.lu.magic.util.ResUtil
 import com.lu.magic.util.log.LogUtil
 import com.lu.magic.util.view.ChildDeepCheck
-import com.lu.wxmask.App
 import com.lu.wxmask.ClazzN
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.MainHook
@@ -23,7 +20,6 @@ import com.lu.wxmask.plugin.WXMaskPlugin
 import com.lu.wxmask.util.AppVersionUtil
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import java.lang.reflect.Method
-import kotlin.math.max
 
 /**
  * 主页UI（即微信底部“微信”Tab选中时所在页面）处理，消息、小红点相关逻辑
@@ -45,15 +41,16 @@ class HideMainUIListPluginPart : IPlugin {
                     "com.tencent.mm.ui.conversation.p"
                 }
             }
+
             Constrant.WX_CODE_8_0_35 -> "com.tencent.mm.ui.conversation.r"
             Constrant.WX_CODE_8_0_37 -> "com.tencent.mm.ui.conversation.x"
             else -> null
         }
         var adapterClazz: Class<*>? = null
         if (adapterName != null) {
-            adapterClazz = ClazzN.from(adapterName)
+            adapterClazz = ClazzN.from(adapterName, context.classLoader)
         }
-        if (adapterClazz != null && adapterClazz.isAssignableFrom(ListAdapter::class.java)) {
+        if (adapterClazz != null) {
             LogUtil.d("WeChat MainUI main Tap List Adapter", adapterClazz)
             hookListViewAdapter(adapterClazz)
         } else {
@@ -64,6 +61,9 @@ class HideMainUIListPluginPart : IPlugin {
                 "setAdapter",
                 ListAdapter::class.java
             )
+            if (setAdapterMethod != null) {
+                return
+            }
             XposedHelpers2.hookMethod(
                 setAdapterMethod,
                 object : XC_MethodHook2() {

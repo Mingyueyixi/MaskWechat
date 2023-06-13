@@ -97,6 +97,9 @@ class EnterChattingUIPluginPart() : IPlugin {
 
         }
         LogUtil.d("hook dispatchMethod --> ", dispatchMethod)
+        if (dispatchMethod == null) {
+            return
+        }
         XposedHelpers2.hookMethod(dispatchMethod, object : XC_MethodHook() {
             val tagConst = "chatting-I"
             val enterAction = EnterChattingHookAction(context, lpparam, tagConst)
