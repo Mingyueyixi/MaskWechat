@@ -56,7 +56,7 @@ public class MainHook implements IXposedHookLoadPackage {
         });
         LogUtil.i("start main plugin for wechat");
         XposedHelpers2.Config
-                .setThrowableCallBack(throwable -> LogUtil.e("MaskPlugin error", throwable))
+                .setThrowableCallBack(throwable -> LogUtil.w("MaskPlugin error", throwable))
                 .setOnErrorReturnFallback((method, throwable) -> {
                     Class<?> returnType = method.getReturnType();
                     //没什么鸟用。xposed api就没有byte/short/int/long/这些基本类型的返回值函数

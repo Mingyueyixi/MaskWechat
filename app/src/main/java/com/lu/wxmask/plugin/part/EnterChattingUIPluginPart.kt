@@ -8,10 +8,13 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import com.google.gson.JsonObject
+import com.lu.lposed.api2.XC_MethodHook2
 import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
 import com.lu.lposed.plugin.PluginProviders
+import com.lu.magic.util.AppUtil
 import com.lu.magic.util.ReflectUtil
+import com.lu.magic.util.ResUtil
 import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.App
 import com.lu.wxmask.ClazzN
@@ -100,7 +103,7 @@ class EnterChattingUIPluginPart() : IPlugin {
         if (dispatchMethod == null) {
             return
         }
-        XposedHelpers2.hookMethod(dispatchMethod, object : XC_MethodHook() {
+        XposedHelpers2.hookMethod(dispatchMethod, object : XC_MethodHook2() {
             val tagConst = "chatting-I"
             val enterAction = EnterChattingHookAction(context, lpparam, tagConst)
             val doResumeAction = DoResumeAction(context, lpparam, tagConst)

@@ -193,10 +193,11 @@ public class WXConfigPlugin implements IPlugin {
                 field_nickname = XposedHelpers2.getObjectField(chatUserInfo, "field_nickname");
                 LogUtil.d(GsonUtil.toJson(chatUserInfo));
             }
+
             if (idIndex < 0) {
                 new AddMaskItemUI(activity, lst)
                         .setChatUserId(chatUser)
-                        .setTagName(field_conRemark.isEmpty() ? field_nickname : field_conRemark)
+                        .setTagName((field_conRemark == null || field_conRemark.isEmpty()) ? field_nickname : field_conRemark)
                         .setFreeButton("退出配置", (dialog, which) -> isOnDoingConfig = false)
                         .show();
             } else {

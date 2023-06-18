@@ -24,16 +24,13 @@ class AddMaskItemUI(
     //空闲的按钮的文字
     private var freeButtonText: CharSequence? = null
 
-    fun setChatUserId(chatUserId: String): AddMaskItemUI {
-        this.chatUserId = chatUserId
+    fun setChatUserId(chatUserId: String?): AddMaskItemUI {
+        this.chatUserId = chatUserId?:""
         return this
     }
 
-    fun setTagName(tagName: String): AddMaskItemUI {
-        this.tagName = tagName
-        apply {
-
-        }
+    fun setTagName(tagName: String?): AddMaskItemUI {
+        this.tagName = tagName?:""
         return this
     }
 
