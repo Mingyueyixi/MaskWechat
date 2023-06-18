@@ -55,7 +55,34 @@ public class MainHook implements IXposedHookLoadPackage {
             }
         });
         LogUtil.i("start main plugin for wechat");
-        XposedHelpers2.Config.setThrowableCallBack(throwable -> LogUtil.e("MaskPlugin error", throwable));
+        XposedHelpers2.Config
+                .setThrowableCallBack(throwable -> LogUtil.e("MaskPlugin error", throwable))
+                .setOnErrorReturnFallback((method, throwable) -> {
+                    Class<?> returnType = method.getReturnType();
+                    //没什么鸟用。xposed api就没有byte/short/int/long/这些基本类型的返回值函数
+                    if (String.class.equals(returnType) || CharSequence.class.isAssignableFrom(returnType)) {
+                        return "123";
+                    }
+                    if (Integer.TYPE.equals(returnType) || Integer.class.equals(returnType)) {
+                        return 0;
+                    }
+                    if (Long.TYPE.equals(returnType) || Long.class.equals(returnType)) {
+                        return 0L;
+                    }
+                    if (Double.TYPE.equals(returnType) || Double.class.equals(returnType)) {
+                        return 0d;
+                    }
+                    if (Float.TYPE.equals(returnType) || Float.class.equals(returnType)) {
+                        return 0f;
+                    }
+                    if (Byte.TYPE.equals(returnType) || Byte.class.equals(returnType)) {
+                        return new byte[]{};
+                    }
+                    if (Short.TYPE.equals(returnType) || Short.class.equals(returnType)) {
+                        return (short)0;
+                    }
+                    return null;
+                });
 
         XC_MethodHook.Unhook unhook = XposedHelpers2.findAndHookMethod(
                 Application.class.getName(),
