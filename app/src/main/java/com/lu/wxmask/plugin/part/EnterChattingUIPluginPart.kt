@@ -153,14 +153,12 @@ class EnterChattingHookAction(
 
     private fun findChatListView(fragmentObj: Any): View? {
         var listView = runCatching {
-            XposedHelpers2.callMethod(fragmentObj, "getListView") as View
+            ReflectUtil.invokeMethod(fragmentObj, "getListView") as View
         }.getOrNull()
         if (listView == null) {
             listView = runCatching {
                 val mmListViewId = context.resources.getIdentifier("b5n", "id", context.packageName)
-//                val mmListView =
                 XposedHelpers2.callMethod(fragmentObj, "findViewById", mmListViewId) as View
-//                XposedHelpers2.callMethod(mmListView, "getListView") as View
             }.getOrNull()
 
         }
