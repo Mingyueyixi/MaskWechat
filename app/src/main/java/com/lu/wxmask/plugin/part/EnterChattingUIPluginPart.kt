@@ -8,10 +8,12 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import com.google.gson.JsonObject
+import com.lu.lposed.api2.XC_MethodHook2
 import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
 import com.lu.lposed.plugin.PluginProviders
 import com.lu.magic.util.ReflectUtil
+import com.lu.magic.util.ResUtil
 import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.ClazzN
 import com.lu.wxmask.Constrant
@@ -22,8 +24,10 @@ import com.lu.wxmask.plugin.WXMaskPlugin
 import com.lu.wxmask.util.AppVersionUtil
 import com.lu.wxmask.util.ConfigUtil
 import com.lu.wxmask.util.QuickCountClickListenerUtil
+import com.lu.wxmask.util.ext.getViewId
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.callbacks.XC_LoadPackage
+import java.lang.reflect.Method
 
 /**
  * 聊天页页面处理：
@@ -41,7 +45,7 @@ class EnterChattingUIPluginPart() : IPlugin {
             "onEnterBegin"
         )
         if (onEnterBeginMethod == null) {
-            LogUtil.w("onEnterBegin function == null")
+            LogUtil.i("onEnterBegin function == null, maybe change")
         } else {
             //8.0.22
             LogUtil.d("hook onEnterBegin")
@@ -57,72 +61,64 @@ class EnterChattingUIPluginPart() : IPlugin {
         }
 
         //版本8.0.32-arm64反编译代码, I函数
-       val dispatchMethodName =  when (AppVersionUtil.getVersionCode()) {
-            Constrant.WX_CODE_8_0_32,Constrant.WX_CODE_8_0_33 -> "I"
-            Constrant.WX_CODE_8_0_34 -> "M"
+        val dispatchMethodName = when (AppVersionUtil.getVersionCode()) {
+            in Constrant.WX_CODE_8_0_32..Constrant.WX_CODE_8_0_33 -> "I"
+            Constrant.WX_CODE_8_0_34 -> {
+                if (AppVersionUtil.getVersionName() == "8.0.35") "J"
+                else "M"
+            }
+            Constrant.WX_CODE_8_0_35 -> "J"
+            Constrant.WX_CODE_8_0_37 -> "K"
             else -> null
         }
-        val dispatchMethod = XposedHelpers2.findMethodExactIfExists(
-            ClazzN.BaseChattingUIFragment,
-            context.classLoader,
-            dispatchMethodName,
-            //==int.class
-            java.lang.Integer.TYPE,
-            Runnable::class.java,
-        )
+        var dispatchMethod: Method? = null
+        if (dispatchMethodName != null) {
+            dispatchMethod = XposedHelpers2.findMethodExactIfExists(
+                ClazzN.BaseChattingUIFragment,
+                context.classLoader,
+                dispatchMethodName,
+                //==int.class
+                java.lang.Integer.TYPE,
+                Runnable::class.java,
+            )
+        }
 
         if (dispatchMethod == null) {
-            LogUtil.w("I function is null")
-        } else {
-            LogUtil.d("hook I")
-            XposedHelpers2.hookMethod(dispatchMethod, object : XC_MethodHook() {
-                val tagConst = "chatting-I"
-                val enterAction = EnterChattingHookAction(context, lpparam, tagConst)
-                val doResumeAction = DoResumeAction(context, lpparam, tagConst)
+            LogUtil.w("dispatchMethod compat is null")
+            //找不到，尝试根据参数类型查找
+            val dispatchMethodArray = XposedHelpers2.findMethodsByExactParameters(
+                ClazzN.from(ClazzN.BaseChattingUIFragment),
+                Void.TYPE,
+                java.lang.Integer.TYPE,
+                Runnable::class.java
+            )
+            if (!dispatchMethodArray.isNullOrEmpty()) {
+                dispatchMethod = dispatchMethodArray[0]
+                LogUtil.w(AppVersionUtil.getSmartVersionName(), "guess dispatchMethod method： ", dispatchMethod)
+            }
 
-                override fun afterHookedMethod(param: MethodHookParam) {
-                    // onEnterBegin后，调用的函数的参数常量，啥意思不知道
-//                    LogUtil.d("after I method call, first param：", param.args[0])
-                    when (param.args[0]) {
-                        //onEnterBegin
-                        128 -> enterAction.handle(param)
-                        //doResume
-                        8 -> doResumeAction.handle(param)
-                    }
-                }
-            })
+        }
+        LogUtil.d("hook dispatchMethod --> ", dispatchMethod)
+        if (dispatchMethod == null) {
             return
         }
-        //找不到，尝试根据参数类型查找
-        val dispatchMethodArray = XposedHelpers2.findMethodsByExactParameters(
-            XposedHelpers2.findClass(ClazzN.BaseChattingUIFragment, context.classLoader),
-            Void.TYPE,
-            java.lang.Integer.TYPE,
-            Runnable::class.java
-        )
-        if (dispatchMethodArray.isNullOrEmpty()) {
-            LogUtil.w("经过遍历查找，仍然不支持的版本：", AppVersionUtil.getSmartVersionName())
-            return
-        }
-        LogUtil.d("hook I list function")
-        //可能会出问题
-        dispatchMethodArray.forEachIndexed { index, method ->
-            val tagConst = "chatting-I-list-$index"
+        XposedHelpers2.hookMethod(dispatchMethod, object : XC_MethodHook2() {
+            val tagConst = "chatting-I"
             val enterAction = EnterChattingHookAction(context, lpparam, tagConst)
             val doResumeAction = DoResumeAction(context, lpparam, tagConst)
-            LogUtil.w("each I list function： ", method)
-            XposedHelpers2.hookMethod(method, object : XC_MethodHook() {
-                override fun afterHookedMethod(param: MethodHookParam) {
-                    when (param.args[0]) {
-                        //onEnterBegin，发起聊天
-                        128 -> enterAction.handle(param)
-                        //doResume 去配置页
-                        8 -> doResumeAction.handle(param)
-                    }
 
+            override fun afterHookedMethod(param: MethodHookParam) {
+                // onEnterBegin后，调用的函数的参数常量，啥意思不知道
+//                    LogUtil.d("after I method call, first param：", param.args[0])
+                when (param.args[0]) {
+                    //onEnterBegin
+                    128 -> enterAction.handle(param)
+                    //doResume
+                    8 -> doResumeAction.handle(param)
                 }
-            })
-        }
+            }
+        })
+
 
     }
 
@@ -156,14 +152,12 @@ class EnterChattingHookAction(
 
     private fun findChatListView(fragmentObj: Any): View? {
         var listView = runCatching {
-            XposedHelpers2.callMethod(fragmentObj, "getListView") as View
+            ReflectUtil.invokeMethod(fragmentObj, "getListView") as View
         }.getOrNull()
         if (listView == null) {
             listView = runCatching {
-                val mmListViewId = context.resources.getIdentifier("b5n", "id", context.packageName)
-//                val mmListView =
+                val mmListViewId = ResUtil.getViewId("b5n")
                 XposedHelpers2.callMethod(fragmentObj, "findViewById", mmListViewId) as View
-//                XposedHelpers2.callMethod(mmListView, "getListView") as View
             }.getOrNull()
 
         }
@@ -183,8 +177,9 @@ class EnterChattingHookAction(
 //                    XposedHelpers2.callMethod(mmListView, "getListView") as View
                 }
             }.getOrNull()
+            LogUtil.w("guess ChatListView for：", listView)
         }
-        LogUtil.d("findListView result：", listView)
+        LogUtil.d("find ChatListView result：", listView)
         return listView
     }
 
@@ -254,7 +249,7 @@ class EnterChattingHookAction(
         //糊界面一脸
         val contentView = ReflectUtil.invokeMethod(fragmentObj, "getView") as? ViewGroup?
         contentView?.let {
-            val pvId = it.resources.getIdentifier("b49", "id", lpparam.packageName)
+            val pvId = ResUtil.getViewId("b49")
             val parent = contentView.findViewById<ViewGroup>(pvId)
             var maskView = it.findViewWithTag<View>(tagConst)
             if (maskView == null) {

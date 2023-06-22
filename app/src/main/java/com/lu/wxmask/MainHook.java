@@ -17,6 +17,8 @@ import com.lu.wxmask.plugin.CommonPlugin;
 import com.lu.wxmask.plugin.WXConfigPlugin;
 import com.lu.wxmask.plugin.WXMaskPlugin;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
@@ -27,6 +29,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 public class MainHook implements IXposedHookLoadPackage {
     public static CopyOnWriteArraySet<String> uniqueMetaStore = new CopyOnWriteArraySet<>();
     private boolean hasInit = false;
+    private List<XC_MethodHook.Unhook> initUnHookList = new ArrayList<>();
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
@@ -52,9 +55,41 @@ public class MainHook implements IXposedHookLoadPackage {
             }
         });
         LogUtil.i("start main plugin for wechat");
-        XposedHelpers2.Config.setThrowableCallBack(throwable -> LogUtil.e("MaskPlugin error", throwable));
+        XposedHelpers2.Config
+                .setCallMethodWithProxy(true)
+                .setThrowableCallBack(throwable -> LogUtil.w("MaskPlugin error", throwable))
+                .setOnErrorReturnFallback((method, throwable) -> {
+                    Class<?> returnType = method.getReturnType();
+                    // 函数执行错误时，给定一个默认的返回值值。
+                    // 没什么鸟用。xposed api就没有byte/short/int/long/这些基本类型的返回值函数
+                    if (String.class.equals(returnType) || CharSequence.class.isAssignableFrom(returnType)) {
+                        return "";
+                    }
+                    if (Integer.TYPE.equals(returnType) || Integer.class.equals(returnType)) {
+                        return 0;
+                    }
+                    if (Long.TYPE.equals(returnType) || Long.class.equals(returnType)) {
+                        return 0L;
+                    }
+                    if (Double.TYPE.equals(returnType) || Double.class.equals(returnType)) {
+                        return 0d;
+                    }
+                    if (Float.TYPE.equals(returnType) || Float.class.equals(returnType)) {
+                        return 0f;
+                    }
+                    if (Byte.TYPE.equals(returnType) || Byte.class.equals(returnType)) {
+                        return new byte[]{};
+                    }
+                    if (Short.TYPE.equals(returnType) || Short.class.equals(returnType)) {
+                        return (short)0;
+                    }
+                    if (BuildConfig.DEBUG) {
+                        LogUtil.w("setOnErrorReturnFallback", throwable);
+                    }
+                    return null;
+                });
 
-        XposedHelpers2.findAndHookMethod(
+        XC_MethodHook.Unhook unhook = XposedHelpers2.findAndHookMethod(
                 Application.class.getName(),
                 lpparam.classLoader,
                 "onCreate",
@@ -65,6 +100,20 @@ public class MainHook implements IXposedHookLoadPackage {
                     }
                 }
         );
+        initUnHookList.add(unhook);
+
+//        initHookCallBack = XposedHelpers2.findAndHookMethod(
+//                Activity.class.getName(),
+//                lpparam.classLoader,
+//                "onCreate",
+//                Bundle.class,
+//                new XC_MethodHook() {
+//                    @Override
+//                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+//                        initPlugin(((Activity) param.thisObject).getApplicationContext(), lpparam);
+//                    }
+//                }
+//        );
 //
         //"com.tencent.mm.app.com.Application"的父类
         //"tencent.tinker.loader.app.TinkerApplication"
@@ -82,7 +131,7 @@ public class MainHook implements IXposedHookLoadPackage {
 //                }
 //        );
 //
-        XposedHelpers2.findAndHookMethod(
+        unhook = XposedHelpers2.findAndHookMethod(
                 Instrumentation.class.getName(),
                 lpparam.classLoader,
                 "callApplicationOnCreate",
@@ -94,7 +143,8 @@ public class MainHook implements IXposedHookLoadPackage {
                     }
                 }
         );
-
+        initUnHookList.add(unhook);
+//
 //        XposedHelpers2.findAndHookMethod(
 //                Activity.class.getName(),
 //                lpparam.classLoader,
@@ -127,6 +177,11 @@ public class MainHook implements IXposedHookLoadPackage {
                 WXConfigPlugin.class,
                 WXMaskPlugin.class
         ).handleHooks(context, lpparam);
+        for (XC_MethodHook.Unhook unhook : initUnHookList) {
+            if (unhook != null) {
+                unhook.unhook();
+            }
+        }
         LogUtil.i("init plugin finish");
     }
 

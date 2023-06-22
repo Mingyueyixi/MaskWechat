@@ -30,11 +30,11 @@ class HideSearchListUIPluginPart : IPlugin {
                 override fun afterHookedMethod(param: MethodHookParam) {
                     if (needHideUserName(param, param.result)) {
                         LogUtil.d(param.result)
-                        param.result = try {
+                        param.result = runCatching {
                             //将命中的用户数据抹除掉
                             param.result::class.java.newInstance()
-                        } catch (e: Throwable) {
-                            LogUtil.w("error new Instance")
+                        }.getOrElse {
+                            LogUtil.w("error new Instance, return null")
                             null
                         }
                     }
@@ -56,7 +56,7 @@ class HideSearchListUIPluginPart : IPlugin {
                             //将命中的用户数据抹除掉
                             param.result::class.java.newInstance()
                         } catch (e: Throwable) {
-                            LogUtil.w("error new Instance")
+                            LogUtil.w("error new Instance, return null")
                             null
                         }
                     }
@@ -140,7 +140,7 @@ class HideSearchListUIPluginPart : IPlugin {
         }
         if (chatUser == null) {
             when (AppVersionUtil.getVersionCode()) {
-                Constrant.WX_CODE_8_0_33, Constrant.WX_CODE_8_0_34 -> {
+                in Constrant.WX_CODE_8_0_33..Constrant.WX_CODE_8_0_37 -> {
                     val fieldValue: Any = XposedHelpers2.getObjectField<Any?>(itemData, "p") ?: return false
                     chatUser = XposedHelpers2.getObjectField<String?>(fieldValue, "e")
                 }
@@ -157,7 +157,7 @@ class HideSearchListUIPluginPart : IPlugin {
 
         return (WXMaskPlugin.containChatUser(chatUser)).also {
             if (it) {
-                LogUtil.i("need hide user from search result list after", chatUser)
+                LogUtil.d("need hide user from search result list after", chatUser)
             }
         }
 //        try {

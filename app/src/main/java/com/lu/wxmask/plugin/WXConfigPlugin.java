@@ -191,12 +191,13 @@ public class WXConfigPlugin implements IPlugin {
                 field_conRemark = XposedHelpers2.getObjectField(chatUserInfo, "field_conRemark");
 //                field_username = XposedHelpers2.getObjectField(chatUserInfo, "field_username");
                 field_nickname = XposedHelpers2.getObjectField(chatUserInfo, "field_nickname");
-                LogUtil.d(GsonUtil.toJson(chatUserInfo));
+                LogUtil.d("chatUserInfo", GsonUtil.toJson(chatUserInfo));
             }
+
             if (idIndex < 0) {
                 new AddMaskItemUI(activity, lst)
                         .setChatUserId(chatUser)
-                        .setTagName(field_conRemark.isEmpty() ? field_nickname : field_conRemark)
+                        .setTagName((field_conRemark == null || field_conRemark.isEmpty()) ? field_nickname : field_conRemark)
                         .setFreeButton("退出配置", (dialog, which) -> isOnDoingConfig = false)
                         .show();
             } else {
@@ -214,30 +215,40 @@ public class WXConfigPlugin implements IPlugin {
                 //8.0.32: of3.b
                 //8.0.33: oi3.b
                 //8.0.34: ck3.b
+                //8.0.37: zq3.b
                 Object f = XposedHelpers2.getObjectField(fragmentObj, "f");
                 if (f != null) {
                     //com.tencent.mm.storage.y1
-                    if (AppVersionUtil.getVersionCode() == Constrant.WX_CODE_8_0_32) {
+                    if (AppVersionUtil.getVersionCode() <= Constrant.WX_CODE_8_0_32) {
                         Object v = XposedHelpers2.getObjectField(f, "e");
                         if (ClazzN.from(ClazzN.BaseContact).isAssignableFrom(v.getClass())) {
                             return v;
                         }
-                    } else if (AppVersionUtil.getVersionCode() == Constrant.WX_CODE_8_0_33) {
+                    } else if (AppVersionUtil.getVersionCode() <= Constrant.WX_CODE_8_0_33) {
                         Object v = XposedHelpers2.getObjectField(f, "h");
                         if (ClazzN.from(ClazzN.BaseContact).isAssignableFrom(v.getClass())) {
                             return v;
                         }
-                    } else if (AppVersionUtil.getVersionCode() == Constrant.WX_CODE_8_0_34) {
+                    } else if (AppVersionUtil.getVersionCode() <= Constrant.WX_CODE_8_0_35) {
                         //8.0.34开始，数据库基类改变。包：com.tencent.mm.autogen.table 已经不存在，不再校验
                         Object v = XposedHelpers2.getObjectField(f, "h");
                         return v;
-                    } else {
+                    }
+                    else if (AppVersionUtil.getVersionCode() <= Constrant.WX_CODE_8_0_37) {
+                        Object v = XposedHelpers2.getObjectField(f, "i");
+                        return v;
+                    }
+                    else {
                         //8.0.33与8.0.34共同的父类： com.tencent.mm.contact.d
                         Field[] hitFields = XposedHelpers2.findFieldsByExactPredicate(f.getClass(), field -> ClazzN.from("com.tencent.mm.contact.d").isAssignableFrom(field.getType()));
                         if (hitFields.length > 0) {
-                            Object result = hitFields[0].get(f);
-                            LogUtil.w(AppVersionUtil.getSmartVersionName(), "find user info object", result);
+                            Field field = hitFields[0];
+                            Object result = field.get(f);
+                            LogUtil.w(AppVersionUtil.getSmartVersionName(), "guess user info object, ", "find field: ", field.getName(), "=", result);
                             return result;
+                        }
+                        else {
+                            LogUtil.w(AppVersionUtil.getSmartVersionName(), "guess user info object fail!");
                         }
                     }
                 }

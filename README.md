@@ -63,6 +63,10 @@ v1.13版本开始，默认隐藏App在桌面的图标。隐藏以后，打开模
 8.0.22 (2140) 2022-04-29  
 8.0.32 (2300) 2023-01-06  
 8.0.33 (2320) 2023-02-23  
+8.0.34 (2340) 2023-03-23  
+8.0.35 (2340) 2023-04-20 (PS. 不是作者写错，而是特么下载到了一个和8.0.34版本号一样的8.0.35)   
+8.0.35 (2360) 2023-04-20  
+8.0.37 (2380) 2023-05-25   
 
 **PS.**
 - 仅支持上述版本，所有其他版本号以及32位版本未经测试，预计百分之九十九不可用
@@ -100,11 +104,18 @@ SHA1: 8069F4730CF8839BE68609EF2F4702349E23A86B
 8.0.34（2340）: [https://dldir1.qq.com/weixin/android/weixin8034android2340_arm64_1.apk](https://dldir1.qq.com/weixin/android/weixin8034android2340_arm64_1.apk)  
 SHA1: 30D0D0C25561D367A9E359A1804EA90352BEA7F5  
 
-推荐8.0.32（2300）、8.0.33（2320），因为：
+8.0.35 (2360): [https://dldir1.qq.com/weixin/android/weixin8035android2360_arm64_3.apk](https://dldir1.qq.com/weixin/android/weixin8035android2360_arm64_3.apk)  
+SHA1: 5593FB24667D44ABD2299EF1118CD3498099B719  
+
+8.0.37（2380）：[https://dldir1.qq.com/weixin/android/weixin8037android2380_arm64_1.apk](https://dldir1.qq.com/weixin/android/weixin8037android2380_arm64_1.apk)  
+SHA1: 410E675B0014F6DF768825F647F69D98A110D50D   
+
+
+推荐8.0.32（2300）、8.0.33（2320），8.0.34(2340)，因为：  
 
 - 自2.11版本以来，正在逐步放弃支持8.0.22版本微信
-- 8.0.34虽然适配，但是可能存在未知的bug  
-
+- 8.0.35 刚适配，怕不是有点毛病，有一个版本，它的版本号和8.0.34一样
+- 8.0.37 刚刚适配，不建议。
 
 **问题4：是否支持Google Play版本？**  
 答：不支持。  

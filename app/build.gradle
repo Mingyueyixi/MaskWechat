@@ -61,14 +61,14 @@ this.afterEvaluate {
 
 android {
     namespace 'com.lu.wxmask'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.lu.wxmask"
         minSdk 24
-        targetSdk 33
-        versionCode 17
-        versionName "1.16-bug"
+        targetSdk 34
+        versionCode 18
+        versionName "1.17-bug"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 

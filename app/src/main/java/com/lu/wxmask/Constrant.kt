@@ -33,6 +33,10 @@ class Constrant {
         const val WX_CODE_8_0_32 = 2300
         const val WX_CODE_8_0_33 = 2320
         const val WX_CODE_8_0_34 = 2340
+        //不知道为毛8.0.35找到一个和版本号与8.0.34重复的版本
+        //const val WX_CODE_8_0_35 = 2340
+        const val WX_CODE_8_0_35 = 2360
+        const val WX_CODE_8_0_37 = 2380
     }
 
 }
