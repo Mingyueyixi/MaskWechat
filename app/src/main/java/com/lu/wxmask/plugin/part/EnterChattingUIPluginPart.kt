@@ -12,11 +12,9 @@ import com.lu.lposed.api2.XC_MethodHook2
 import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
 import com.lu.lposed.plugin.PluginProviders
-import com.lu.magic.util.AppUtil
 import com.lu.magic.util.ReflectUtil
 import com.lu.magic.util.ResUtil
 import com.lu.magic.util.log.LogUtil
-import com.lu.wxmask.App
 import com.lu.wxmask.ClazzN
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.bean.MaskItemBean
@@ -26,6 +24,7 @@ import com.lu.wxmask.plugin.WXMaskPlugin
 import com.lu.wxmask.util.AppVersionUtil
 import com.lu.wxmask.util.ConfigUtil
 import com.lu.wxmask.util.QuickCountClickListenerUtil
+import com.lu.wxmask.util.ext.getViewId
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import java.lang.reflect.Method
@@ -157,7 +156,7 @@ class EnterChattingHookAction(
         }.getOrNull()
         if (listView == null) {
             listView = runCatching {
-                val mmListViewId = context.resources.getIdentifier("b5n", "id", context.packageName)
+                val mmListViewId = ResUtil.getViewId("b5n")
                 XposedHelpers2.callMethod(fragmentObj, "findViewById", mmListViewId) as View
             }.getOrNull()
 
@@ -250,7 +249,7 @@ class EnterChattingHookAction(
         //糊界面一脸
         val contentView = ReflectUtil.invokeMethod(fragmentObj, "getView") as? ViewGroup?
         contentView?.let {
-            val pvId = it.resources.getIdentifier("b49", "id", lpparam.packageName)
+            val pvId = ResUtil.getViewId("b49")
             val parent = contentView.findViewById<ViewGroup>(pvId)
             var maskView = it.findViewWithTag<View>(tagConst)
             if (maskView == null) {

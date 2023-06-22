@@ -56,12 +56,14 @@ public class MainHook implements IXposedHookLoadPackage {
         });
         LogUtil.i("start main plugin for wechat");
         XposedHelpers2.Config
+                .setCallMethodWithProxy(true)
                 .setThrowableCallBack(throwable -> LogUtil.w("MaskPlugin error", throwable))
                 .setOnErrorReturnFallback((method, throwable) -> {
                     Class<?> returnType = method.getReturnType();
-                    //没什么鸟用。xposed api就没有byte/short/int/long/这些基本类型的返回值函数
+                    // 函数执行错误时，给定一个默认的返回值值。
+                    // 没什么鸟用。xposed api就没有byte/short/int/long/这些基本类型的返回值函数
                     if (String.class.equals(returnType) || CharSequence.class.isAssignableFrom(returnType)) {
-                        return "123";
+                        return "";
                     }
                     if (Integer.TYPE.equals(returnType) || Integer.class.equals(returnType)) {
                         return 0;
@@ -80,6 +82,9 @@ public class MainHook implements IXposedHookLoadPackage {
                     }
                     if (Short.TYPE.equals(returnType) || Short.class.equals(returnType)) {
                         return (short)0;
+                    }
+                    if (BuildConfig.DEBUG) {
+                        LogUtil.w("setOnErrorReturnFallback", throwable);
                     }
                     return null;
                 });

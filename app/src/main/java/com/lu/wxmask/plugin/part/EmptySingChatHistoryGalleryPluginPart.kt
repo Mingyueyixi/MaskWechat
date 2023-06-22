@@ -141,7 +141,6 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
                 if (AppVersionUtil.getVersionName() == "8.0.35") "P"
                 else "R"
             }
-
             Constrant.WX_CODE_8_0_35 -> "P"
             Constrant.WX_CODE_8_0_37 -> "Q"
             else -> null
@@ -152,21 +151,20 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
             preHookMethod = XposedHelpers2.findMethodExactIfExists(
                 ClazzN.from(Clazz_FTSMultiAllResultFragment),
                 commonHookMethodName,
-                Void.TYPE,
-                ArrayList::class.java
+                java.util.ArrayList::class.java
             )
         }
         if (preHookMethod == null) {
             val methods = XposedHelpers2.findMethodsByExactParameters(
                 ClazzN.from(Clazz_FTSMultiAllResultFragment),
                 Void.TYPE,
-                ArrayList::class.java
+                java.util.ArrayList::class.java
             )
             if (methods.isNotEmpty()) {
                 preHookMethod = methods[0]
                 commonHookMethodName = methods[0].name
             }
-            LogUtil.w(AppVersionUtil.getSmartVersionName(), "guess setEmptyActionBarTabPageUI method:", commonHookMethodName)
+            LogUtil.w(AppVersionUtil.getSmartVersionName(), "guess setEmptyActionBarTabPageUI method:", preHookMethod)
         }
 
         if (preHookMethod == null) {
