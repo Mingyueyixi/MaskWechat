@@ -49,9 +49,8 @@ class HideMainUIListPluginPart : IPlugin {
                     "com.tencent.mm.ui.conversation.p"
                 }
             }
-
             Constrant.WX_CODE_8_0_35 -> "com.tencent.mm.ui.conversation.r"
-            Constrant.WX_CODE_8_0_37 -> "com.tencent.mm.ui.conversation.x"
+            in Constrant.WX_CODE_8_0_35 .. Constrant.WX_CODE_8_0_38 -> "com.tencent.mm.ui.conversation.x"
             else -> null
         }
         var adapterClazz: Class<*>? = null
@@ -147,7 +146,7 @@ class HideMainUIListPluginPart : IPlugin {
                     //带文字的未读红点
                     val tipTvIdTextID = when (AppVersionUtil.getVersionCode()) {
                         in 0..Constrant.WX_CODE_8_0_22 -> "tipcnt_tv"
-                        in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_37 -> "kmv"
+                        in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_38 -> "kmv"
                         else -> "kmv"
                     }
                     val tipTvId = ResUtil.getViewId(tipTvIdTextID)
@@ -155,7 +154,7 @@ class HideMainUIListPluginPart : IPlugin {
 
                     //头像上的小红点
                     val small_red = when (AppVersionUtil.getVersionCode()) {
-                        in 0..Constrant.WX_CODE_8_0_37 -> "a2f"
+                        in 0..Constrant.WX_CODE_8_0_38 -> "a2f"
                         else -> "a2f"
                     }
                     val viewId = ResUtil.getViewId(small_red)
@@ -166,7 +165,7 @@ class HideMainUIListPluginPart : IPlugin {
                 private fun hideMsgViewItemText(itemView: View, param: MethodHookParam) {
                     val msgTvIdName = when (AppVersionUtil.getVersionCode()) {
                         in 0..Constrant.WX_CODE_8_0_22 -> "last_msg_tv"
-                        in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_37 -> "fhs"
+                        in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_38 -> "fhs"
                         else -> "fhs"
                     }
                     val lastMsgViewId = ResUtil.getViewId(msgTvIdName)
@@ -211,7 +210,7 @@ class HideMainUIListPluginPart : IPlugin {
         val adapterClazzName = when (AppVersionUtil.getVersionCode()) {
             Constrant.WX_CODE_8_0_22 -> "com.tencent.mm.ui.g"
             in Constrant.WX_CODE_8_0_32..Constrant.WX_CODE_8_0_34 -> "com.tencent.mm.ui.y"
-            in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_37 -> "com.tencent.mm.ui.z"
+            in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_38 -> "com.tencent.mm.ui.z"
             else -> null
         }
         var getItemMethod = if (adapterClazzName != null && getItemMethodName != null) {
@@ -237,10 +236,10 @@ class HideMainUIListPluginPart : IPlugin {
                     val adapter = param.args[0] ?: return
                     LogUtil.d("List adapter ", adapter)
                     if (adapter::class.java.name.startsWith("com.tencent.mm.ui.conversation")) {
-                        LogUtil.w(AppVersionUtil.getSmartVersionName(), "guess adapter: ", adapter)
                         if (isHookGetItemMethod) {
                             return
                         }
+                        LogUtil.w(AppVersionUtil.getSmartVersionName(), "guess setAdapter: ", adapter)
                         getItemMethod = XposedHelpers2.findMethodExactIfExists(adapter::class.java.superclass, "k", Integer.TYPE)
                         if (getItemMethod == null) {
                             getItemMethod = XposedHelpers2.findMethodExactIfExists(adapter::class.java.superclass, "getItem", Integer.TYPE)
@@ -264,6 +263,7 @@ class HideMainUIListPluginPart : IPlugin {
             object : XC_MethodHook2() {
                 override fun afterHookedMethod(param: MethodHookParam) {
                     val itemData: Any = param.result ?: return
+                    LogUtil.v("item-data", GsonUtil.toJson(itemData))
                     val chatUser: String? = XposedHelpers2.getObjectField(itemData, "field_username")
                     if (WXMaskPlugin.containChatUser(chatUser)) {
                         XposedHelpers2.setObjectField(itemData, "field_content", "")
@@ -272,7 +272,7 @@ class HideMainUIListPluginPart : IPlugin {
                         XposedHelpers2.setObjectField(itemData, "field_UnReadInvite", 0)
                         XposedHelpers2.setObjectField(itemData, "field_unReadMuteCount", 0)
                     }
-                    LogUtil.d("item-data", GsonUtil.toJson(itemData))
+
                 }
 
             }

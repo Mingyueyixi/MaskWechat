@@ -10,7 +10,7 @@ import com.lu.wxmask.Constrant
 class MaskItemBean(
     var maskId: String,
     var tagName: String = "",
-    var tipMode: Int = Constrant.CONFIG_TIP_MODE_ALERT,
+    var tipMode: Int = Constrant.WX_MASK_TIP_MODE_SILENT,
     var tipData: JsonElement? = JsonObject()
 ) {
 
