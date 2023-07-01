@@ -18,52 +18,8 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
  */
 class HideSearchListUIPluginPart : IPlugin {
     override fun handleHook(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
-        //        val wxVersionCode = AppVersionUtil.getVersionCode()
-        // 理论上 hook com.tencent.mm.plugin.fts.ui.z#getItem 也是一样的，但是无效，不清楚原因
-        //全局搜索首页
-        XposedHelpers2.findAndHookMethod(
-            "com.tencent.mm.plugin.fts.ui.z",
-            context.classLoader,
-            "d",
-            Integer.TYPE,
-            object : XC_MethodHook2() {
-                override fun afterHookedMethod(param: MethodHookParam) {
-                    if (needHideUserName(param, param.result)) {
-                        LogUtil.d(param.result)
-                        param.result = runCatching {
-                            //将命中的用户数据抹除掉
-                            param.result::class.java.newInstance()
-                        }.getOrElse {
-                            LogUtil.w("error new Instance, return null")
-                            null
-                        }
-                    }
-
-                }
-            }
-        )
-        //全局搜索详情置空
-        XposedHelpers2.findAndHookMethod(
-            "com.tencent.mm.plugin.fts.ui.y",
-            context.classLoader,
-            "d",
-            Integer.TYPE,
-            object : XC_MethodHook2() {
-                override fun afterHookedMethod(param: MethodHookParam) {
-                    if (needHideUserName(param, param.result)) {
-                        LogUtil.d(param.result)
-                        param.result = try {
-                            //将命中的用户数据抹除掉
-                            param.result::class.java.newInstance()
-                        } catch (e: Throwable) {
-                            LogUtil.w("error new Instance, return null")
-                            null
-                        }
-                    }
-
-                }
-            }
-        )
+        handleGlobalSearch(context, lpparam)
+        handleDetailSearch(context, lpparam)
 
 //        hook adapter getView，因视图复用容易出问题。存在某个item，需要滑动后才消失，原因暂时不明
 //        XposedHelpers2.findAndHookMethod(
@@ -114,6 +70,66 @@ class HideSearchListUIPluginPart : IPlugin {
 
     }
 
+    private fun handleDetailSearch(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
+        var hookClazzName = when (AppVersionUtil.getVersionCode()) {
+            Constrant.WX_CODE_8_0_38 -> "com.tencent.mm.plugin.fts.ui.x"
+            else -> "com.tencent.mm.plugin.fts.ui.y"
+        }
+        //全局搜索详情置空
+        XposedHelpers2.findAndHookMethod(
+            hookClazzName,
+            context.classLoader,
+            "d",
+            Integer.TYPE,
+            object : XC_MethodHook2() {
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    if (needHideUserName(param, param.result)) {
+                        LogUtil.d(param.result)
+                        param.result = try {
+                            //将命中的用户数据抹除掉
+                            param.result::class.java.newInstance()
+                        } catch (e: Throwable) {
+                            LogUtil.w("error new Instance, return null")
+                            null
+                        }
+                    }
+
+                }
+            }
+        )
+    }
+
+    private fun handleGlobalSearch(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
+        //        val wxVersionCode = AppVersionUtil.getVersionCode()
+        // 理论上 hook com.tencent.mm.plugin.fts.ui.z#getItem 也是一样的，但是被覆盖重命名了
+        var hookClazzName = when (AppVersionUtil.getVersionCode()) {
+            Constrant.WX_CODE_8_0_38 -> "com.tencent.mm.plugin.fts.ui.y"
+            else -> "com.tencent.mm.plugin.fts.ui.z"
+        }
+        //全局搜索首页
+        XposedHelpers2.findAndHookMethod(
+            hookClazzName,
+            context.classLoader,
+            "d",
+            Integer.TYPE,
+            object : XC_MethodHook2() {
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    if (needHideUserName(param, param.result)) {
+                        LogUtil.d(param.result)
+                        param.result = runCatching {
+                            //将命中的用户数据抹除掉
+                            param.result::class.java.newInstance()
+                        }.getOrElse {
+                            LogUtil.w("error new Instance, return null")
+                            null
+                        }
+                    }
+
+                }
+            }
+        )
+    }
+
     private fun needHideUserName(param: XC_MethodHook.MethodHookParam, itemData: Any?): Boolean {
         if (itemData == null) {
             return false
@@ -140,7 +156,7 @@ class HideSearchListUIPluginPart : IPlugin {
         }
         if (chatUser == null) {
             when (AppVersionUtil.getVersionCode()) {
-                in Constrant.WX_CODE_8_0_33..Constrant.WX_CODE_8_0_37 -> {
+                in Constrant.WX_CODE_8_0_33..Constrant.WX_CODE_8_0_38 -> {
                     val fieldValue: Any = XposedHelpers2.getObjectField<Any?>(itemData, "p") ?: return false
                     chatUser = XposedHelpers2.getObjectField<String?>(fieldValue, "e")
                 }

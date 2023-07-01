@@ -47,7 +47,14 @@ class AppVersionUtil {
         @JvmStatic
         fun isSupportWechat(): Boolean {
             return when (getVersionCode()) {
-                Constrant.WX_CODE_8_0_22, Constrant.WX_CODE_8_0_32, Constrant.WX_CODE_8_0_33, Constrant.WX_CODE_8_0_34, Constrant.WX_CODE_8_0_35, Constrant.WX_CODE_8_0_37 -> true
+                Constrant.WX_CODE_8_0_22,
+                Constrant.WX_CODE_8_0_32,
+                Constrant.WX_CODE_8_0_33,
+                Constrant.WX_CODE_8_0_34,
+                Constrant.WX_CODE_8_0_35,
+                Constrant.WX_CODE_8_0_37,
+                Constrant.WX_CODE_8_0_38 -> true
+
                 else -> false
             }
         }

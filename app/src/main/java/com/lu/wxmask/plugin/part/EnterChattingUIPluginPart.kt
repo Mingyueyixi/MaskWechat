@@ -69,6 +69,7 @@ class EnterChattingUIPluginPart() : IPlugin {
             }
             Constrant.WX_CODE_8_0_35 -> "J"
             Constrant.WX_CODE_8_0_37 -> "K"
+            Constrant.WX_CODE_8_0_38 -> "M"
             else -> null
         }
         var dispatchMethod: Method? = null
