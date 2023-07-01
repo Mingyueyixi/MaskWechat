@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 # -*- coding: utf-8 -*-
 # @Date:2023/02/13 0:06
 # @Author: Lu

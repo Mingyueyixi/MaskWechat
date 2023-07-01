@@ -110,6 +110,9 @@ SHA1: 5593FB24667D44ABD2299EF1118CD3498099B719
 8.0.37（2380）：[https://dldir1.qq.com/weixin/android/weixin8037android2380_arm64_1.apk](https://dldir1.qq.com/weixin/android/weixin8037android2380_arm64_1.apk)  
 SHA1: 410E675B0014F6DF768825F647F69D98A110D50D   
 
+8.0.38（2400）：[https://dldir1.qq.com/weixin/android/weixin8038android2400_arm64.apk](https://dldir1.qq.com/weixin/android/weixin8038android2400_arm64.apk)  
+SHA1: F62FAD64F70F1181EC62DD3BD796A047028078FA  
+
 
 推荐8.0.32（2300）、8.0.33（2320），8.0.34(2340)，因为：  
 
