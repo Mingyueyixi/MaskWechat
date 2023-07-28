@@ -72,7 +72,7 @@ class HideSearchListUIPluginPart : IPlugin {
 
     private fun handleDetailSearch(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
         var hookClazzName = when (AppVersionUtil.getVersionCode()) {
-            Constrant.WX_CODE_8_0_38 -> "com.tencent.mm.plugin.fts.ui.x"
+            in Constrant.WX_CODE_8_0_38.. Constrant.WX_CODE_8_0_40 -> "com.tencent.mm.plugin.fts.ui.x"
             else -> "com.tencent.mm.plugin.fts.ui.y"
         }
         //全局搜索详情置空
@@ -103,7 +103,7 @@ class HideSearchListUIPluginPart : IPlugin {
         //        val wxVersionCode = AppVersionUtil.getVersionCode()
         // 理论上 hook com.tencent.mm.plugin.fts.ui.z#getItem 也是一样的，但是被覆盖重命名了
         var hookClazzName = when (AppVersionUtil.getVersionCode()) {
-            Constrant.WX_CODE_8_0_38 -> "com.tencent.mm.plugin.fts.ui.y"
+            in Constrant.WX_CODE_8_0_38 .. Constrant.WX_CODE_8_0_40 -> "com.tencent.mm.plugin.fts.ui.y"
             else -> "com.tencent.mm.plugin.fts.ui.z"
         }
         //全局搜索首页
@@ -150,13 +150,19 @@ class HideSearchListUIPluginPart : IPlugin {
 //                "wt1.u" -> XposedHelpers2.getObjectField<String?>(itemData, "q")
 //                else -> null
 //            } ?: return false
-            XposedHelpers2.getObjectField<String?>(itemData, "q")
+
+            val fieldName = when (AppVersionUtil.getVersionCode()) {
+                Constrant.WX_CODE_8_0_40 -> "q1"
+                else -> "q"
+            }
+            XposedHelpers2.getObjectField<String?>(itemData, fieldName)
+
         } catch (e: Throwable) {
             null
         }
         if (chatUser == null) {
             when (AppVersionUtil.getVersionCode()) {
-                in Constrant.WX_CODE_8_0_33..Constrant.WX_CODE_8_0_38 -> {
+                in Constrant.WX_CODE_8_0_33..Constrant.WX_CODE_8_0_40 -> {
                     val fieldValue: Any = XposedHelpers2.getObjectField<Any?>(itemData, "p") ?: return false
                     chatUser = XposedHelpers2.getObjectField<String?>(fieldValue, "e")
                 }

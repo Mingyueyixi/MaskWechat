@@ -68,7 +68,7 @@ public class DebugUtil {
                 }
             }
             try {
-                LogUtil.d(GsonUtil.toJson(data));
+                LogUtil.d("item data class: ", GsonUtil.toJson(data));
             } catch (Exception ex) {
                 LogUtil.e(ex);
             }
@@ -82,7 +82,7 @@ public class DebugUtil {
         for (Field field : fields) {
             try {
                 field.setAccessible(true);
-                String k = field.getName();
+                String k = field.getDeclaringClass() + "_" + field.getName();
                 //String type = field.getType().getSimpleName();
                 Object v = field.get(obj);
                 map.put(k, v);

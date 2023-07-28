@@ -234,7 +234,7 @@ public class WXConfigPlugin implements IPlugin {
                         Object v = XposedHelpers2.getObjectField(f, "h");
                         return v;
                     }
-                    else if (AppVersionUtil.getVersionCode() <= Constrant.WX_CODE_8_0_37) {
+                    else if (AppVersionUtil.getVersionCode() <= Constrant.WX_CODE_8_0_40) {
                         Object v = XposedHelpers2.getObjectField(f, "i");
                         return v;
                     }
