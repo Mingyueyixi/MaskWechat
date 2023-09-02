@@ -68,6 +68,7 @@ v1.13版本开始，默认隐藏App在桌面的图标。隐藏以后，打开模
 8.0.35 (2360) 2023-04-20  
 8.0.37 (2380) 2023-05-25   
 8.0.38 (2400) 2023-06-21
+8.0.40 (2420) 2023-07-20
 
 **PS.**
 - 仅支持上述版本，所有其他版本号以及32位版本未经测试，预计百分之九十九不可用
@@ -114,8 +115,12 @@ SHA1: 410E675B0014F6DF768825F647F69D98A110D50D
 8.0.38（2400）：[https://dldir1.qq.com/weixin/android/weixin8038android2400_arm64.apk](https://dldir1.qq.com/weixin/android/weixin8038android2400_arm64.apk)  
 SHA1: F62FAD64F70F1181EC62DD3BD796A047028078FA  
 
+8.0.40（2420）：[https://dldir1.qq.com/weixin/android/weixin8040android2420_arm64.apk](https://dldir1.qq.com/weixin/android/weixin8040android2420_arm64.apk)  
+SHA1: BCCA3CCACE5F40184A42FEFB06190C7279024985
 
-推荐8.0.37(2340)，8.0.38(2360)
+
+
+推荐适配的最后两个版本，因为其他版本，作者自己不再使用
 
 **问题4：是否支持Google Play版本？**  
 答：不支持。  
