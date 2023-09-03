@@ -49,8 +49,9 @@ class HideMainUIListPluginPart : IPlugin {
                     "com.tencent.mm.ui.conversation.p"
                 }
             }
+
             Constrant.WX_CODE_8_0_35 -> "com.tencent.mm.ui.conversation.r"
-            in Constrant.WX_CODE_8_0_35 .. Constrant.WX_CODE_8_0_38 -> "com.tencent.mm.ui.conversation.x"
+            in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_40 -> "com.tencent.mm.ui.conversation.x"
             else -> null
         }
         var adapterClazz: Class<*>? = null
@@ -207,10 +208,12 @@ class HideMainUIListPluginPart : IPlugin {
         }
         //8.0.32-8.0.34 com.tencent.mm.ui.y
         //8.0.35-8.0.37　　com.tencent.mm.ui.z
+        //搞实际Adapter的父类，是个抽象类
         val adapterClazzName = when (AppVersionUtil.getVersionCode()) {
             Constrant.WX_CODE_8_0_22 -> "com.tencent.mm.ui.g"
             in Constrant.WX_CODE_8_0_32..Constrant.WX_CODE_8_0_34 -> "com.tencent.mm.ui.y"
             in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_38 -> "com.tencent.mm.ui.z"
+//            in Constrant.WX_CODE_8_0_38..Constrant.WX_CODE_8_0_40 -> "com.tencent.mm.ui.b0"
             else -> null
         }
         var getItemMethod = if (adapterClazzName != null && getItemMethodName != null) {
@@ -239,7 +242,7 @@ class HideMainUIListPluginPart : IPlugin {
                         if (isHookGetItemMethod) {
                             return
                         }
-                        LogUtil.w(AppVersionUtil.getSmartVersionName(), "guess setAdapter: ", adapter)
+                        LogUtil.w(AppVersionUtil.getSmartVersionName(), "guess setAdapter: ", adapter, adapter.javaClass.superclass)
                         getItemMethod = XposedHelpers2.findMethodExactIfExists(adapter::class.java.superclass, "k", Integer.TYPE)
                         if (getItemMethod == null) {
                             getItemMethod = XposedHelpers2.findMethodExactIfExists(adapter::class.java.superclass, "getItem", Integer.TYPE)
