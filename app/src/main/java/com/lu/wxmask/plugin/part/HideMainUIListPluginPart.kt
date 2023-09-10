@@ -29,7 +29,6 @@ import java.lang.reflect.Method
 class HideMainUIListPluginPart : IPlugin {
 
     override fun handleHook(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
-        handleMainUIChattingListView(context, lpparam)
         runCatching {
             handleMainUIChattingListView2(context, lpparam)
         }.onFailure {
@@ -51,7 +50,7 @@ class HideMainUIListPluginPart : IPlugin {
             }
 
             Constrant.WX_CODE_8_0_35 -> "com.tencent.mm.ui.conversation.r"
-            in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_40 -> "com.tencent.mm.ui.conversation.x"
+            in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_41 -> "com.tencent.mm.ui.conversation.x"
             else -> null
         }
         var adapterClazz: Class<*>? = null
@@ -69,7 +68,8 @@ class HideMainUIListPluginPart : IPlugin {
                 "setAdapter",
                 ListAdapter::class.java
             )
-            if (setAdapterMethod != null) {
+            if (setAdapterMethod == null) {
+                LogUtil.w( "setAdapterMethod is null")
                 return
             }
             XposedHelpers2.hookMethod(
@@ -77,7 +77,7 @@ class HideMainUIListPluginPart : IPlugin {
                 object : XC_MethodHook2() {
                     override fun afterHookedMethod(param: MethodHookParam) {
                         val adapter = param.args[0] ?: return
-                        LogUtil.d("List adapter ", adapter)
+                        LogUtil.i("hook List adapter ", adapter)
                         if (adapter::class.java.name.startsWith("com.tencent.mm.ui.conversation")) {
                             LogUtil.w(AppVersionUtil.getSmartVersionName(), "guess adapter: ", adapter)
                             hookListViewAdapter(adapter.javaClass)
@@ -147,7 +147,7 @@ class HideMainUIListPluginPart : IPlugin {
                     //带文字的未读红点
                     val tipTvIdTextID = when (AppVersionUtil.getVersionCode()) {
                         in 0..Constrant.WX_CODE_8_0_22 -> "tipcnt_tv"
-                        in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_38 -> "kmv"
+                        in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_41 -> "kmv"
                         else -> "kmv"
                     }
                     val tipTvId = ResUtil.getViewId(tipTvIdTextID)
@@ -155,8 +155,9 @@ class HideMainUIListPluginPart : IPlugin {
 
                     //头像上的小红点
                     val small_red = when (AppVersionUtil.getVersionCode()) {
-                        in 0..Constrant.WX_CODE_8_0_38 -> "a2f"
-                        else -> "a2f"
+                        in 0..Constrant.WX_CODE_8_0_40 -> "a2f"
+                        Constrant.WX_CODE_8_0_41 -> "o_u"
+                        else -> "o_u"
                     }
                     val viewId = ResUtil.getViewId(small_red)
                     itemView.findViewById<View>(viewId)?.visibility = View.INVISIBLE
@@ -166,8 +167,9 @@ class HideMainUIListPluginPart : IPlugin {
                 private fun hideMsgViewItemText(itemView: View, param: MethodHookParam) {
                     val msgTvIdName = when (AppVersionUtil.getVersionCode()) {
                         in 0..Constrant.WX_CODE_8_0_22 -> "last_msg_tv"
-                        in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_38 -> "fhs"
-                        else -> "fhs"
+                        in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_40 -> "fhs"
+                        Constrant.WX_CODE_8_0_41 -> "ht5"
+                        else -> "ht5"
                     }
                     val lastMsgViewId = ResUtil.getViewId(msgTvIdName)
                     LogUtil.d("mask last msg textView", lastMsgViewId)
@@ -213,7 +215,7 @@ class HideMainUIListPluginPart : IPlugin {
             Constrant.WX_CODE_8_0_22 -> "com.tencent.mm.ui.g"
             in Constrant.WX_CODE_8_0_32..Constrant.WX_CODE_8_0_34 -> "com.tencent.mm.ui.y"
             in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_38 -> "com.tencent.mm.ui.z"
-//            in Constrant.WX_CODE_8_0_38..Constrant.WX_CODE_8_0_40 -> "com.tencent.mm.ui.b0"
+            in Constrant.WX_CODE_8_0_40..Constrant.WX_CODE_8_0_41 -> "com.tencent.mm.ui.b0"
             else -> null
         }
         var getItemMethod = if (adapterClazzName != null && getItemMethodName != null) {

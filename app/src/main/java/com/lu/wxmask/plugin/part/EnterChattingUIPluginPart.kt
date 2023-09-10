@@ -67,10 +67,11 @@ class EnterChattingUIPluginPart() : IPlugin {
                 if (AppVersionUtil.getVersionName() == "8.0.35") "J"
                 else "M"
             }
+
             Constrant.WX_CODE_8_0_35 -> "J"
             Constrant.WX_CODE_8_0_37 -> "K"
             Constrant.WX_CODE_8_0_38 -> "M"
-            Constrant.WX_CODE_8_0_40 -> "K"
+            in Constrant.WX_CODE_8_0_40..Constrant.WX_CODE_8_0_41 -> "K"
             else -> null
         }
         var dispatchMethod: Method? = null

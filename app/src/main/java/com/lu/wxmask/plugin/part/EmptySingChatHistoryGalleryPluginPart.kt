@@ -34,7 +34,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
     private fun setEmptyDetailHistoryUIForMedia(context: Context, lpparam: XC_LoadPackage.LoadPackageParam?) {
         var mediaMethodName = when (AppVersionUtil.getVersionCode()) {
             in Constrant.WX_CODE_8_0_32..Constrant.WX_CODE_8_0_35 -> "k"
-            in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_40 -> "l"
+            in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_41 -> "l"
             else -> "l"
         }
         val MediaHistoryListUI = "com.tencent.mm.ui.chatting.gallery.MediaHistoryListUI"
@@ -82,7 +82,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
         val MediaHistoryGalleryUI = "com.tencent.mm.ui.chatting.gallery.MediaHistoryGalleryUI"
         val methodName = when (AppVersionUtil.getVersionCode()) {
             in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_35 -> "k"
-            in Constrant.WX_CODE_8_0_35 .. Constrant.WX_CODE_8_0_40 -> "l"
+            in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_41 -> "l"
             else -> null
         }
         var galleryMethod: Method? = null
@@ -141,10 +141,11 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
                 if (AppVersionUtil.getVersionName() == "8.0.35") "P"
                 else "R"
             }
+
             Constrant.WX_CODE_8_0_35 -> "P"
             Constrant.WX_CODE_8_0_37 -> "Q"
             Constrant.WX_CODE_8_0_38 -> "R"
-            Constrant.WX_CODE_8_0_40 -> "Q"
+            in Constrant.WX_CODE_8_0_40..Constrant.WX_CODE_8_0_41 -> "Q"
             else -> null
         }
         LogUtil.d("setEmptyActionBarTabPageUI method is :", commonHookMethodName)
