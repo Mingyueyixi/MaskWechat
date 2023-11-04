@@ -90,6 +90,7 @@ android {
     }
     buildTypes {
         debug {
+            debuggable true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.alpha
@@ -97,6 +98,7 @@ android {
             buildConfigField "String", "buildInfoJson64", "\"${buildInfoJson.bytes.encodeBase64()}\""
         }
         release {
+            debuggable false
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
