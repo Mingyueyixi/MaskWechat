@@ -76,7 +76,7 @@ public class WXConfigPlugin implements IPlugin {
         boolean isFromMaskPlugin = intent.getBooleanExtra(Constrant.KEY_INTENT_FROM_MASK, false);
         pluginMode = intent.getIntExtra(Constrant.KEY_INTENT_PLUGIN_MODE, -1);
         if (!isFromMaskPlugin) {
-            LogUtil.i("ignore not from mask");
+            LogUtil.d("ignore not from mask");
             return;
         }
         if (!AppVersionUtil.isSupportWechat()) {
