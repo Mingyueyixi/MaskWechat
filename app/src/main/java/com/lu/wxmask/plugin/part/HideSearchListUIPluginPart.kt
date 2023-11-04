@@ -94,7 +94,7 @@ class HideSearchListUIPluginPart : IPlugin {
                             //将命中的用户数据抹除掉
                             param.result::class.java.newInstance()
                         } catch (e: Throwable) {
-                            LogUtil.w("error new Instance, return null")
+                            LogUtil.d("error new Instance, return null")
                             null
                         }
                     }
@@ -239,7 +239,7 @@ class HideSearchListUIPluginPart : IPlugin {
                 field.isAccessible = true
                 try {
                     if (checkNeedHide(itemData, field)) {
-                        LogUtil.i("field: ", field.type.name, field.name, field.get(itemData))
+                        LogUtil.d("field: ", field.type.name, field.name, field.get(itemData))
                         return true
                     }
                 } catch (e: Exception) {
