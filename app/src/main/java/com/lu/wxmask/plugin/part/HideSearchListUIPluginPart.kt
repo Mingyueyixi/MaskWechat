@@ -1,13 +1,13 @@
 package com.lu.wxmask.plugin.part
 
 import android.content.Context
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
+import android.util.LruCache
 import com.lu.lposed.api2.XC_MethodHook2
 import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
 import com.lu.lposed.plugin.PluginProviders
 import com.lu.magic.util.GsonUtil
+import com.lu.magic.util.ReflectUtil
 import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.BuildConfig
 import com.lu.wxmask.Constrant
@@ -17,11 +17,15 @@ import com.lu.wxmask.util.dev.DebugUtil
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import java.lang.reflect.Field
+import java.sql.Ref
 
 /**
  * 隐藏搜索列表
  */
 class HideSearchListUIPluginPart : IPlugin {
+    private val hideFieldInfoCache = HashMap<String, HashSet<Field>>()
+    private val jsonResultLruCache = LruCache<String, CharSequence>(16)
+
     override fun handleHook(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
         handleGlobalSearch(context, lpparam)
         handleDetailSearch(context, lpparam)
@@ -109,7 +113,7 @@ class HideSearchListUIPluginPart : IPlugin {
         //        val wxVersionCode = AppVersionUtil.getVersionCode()
         // 理论上 hook com.tencent.mm.plugin.fts.ui.z#getItem 也是一样的，但是被覆盖重命名了
         var hookClazzName = when (AppVersionUtil.getVersionCode()) {
-            in Constrant.WX_CODE_8_0_38..Constrant.WX_CODE_8_0_42 -> "com.tencent.mm.plugin.fts.ui.y"
+            in Constrant.WX_CODE_8_0_38..Constrant.WX_CODE_8_0_43 -> "com.tencent.mm.plugin.fts.ui.y"
             else -> "com.tencent.mm.plugin.fts.ui.z"
         }
         //全局搜索首页
@@ -228,18 +232,27 @@ class HideSearchListUIPluginPart : IPlugin {
 
     }
 
+
     private fun needHideUserName2(param: XC_MethodHook.MethodHookParam, itemData: Any?): Boolean {
         if (itemData == null) {
             return false
         }
-        var clazz: Class<*>? = itemData.javaClass
-
+        var clazz: Class<*>? = itemData.javaClass ?: return false
+        if (hideFieldInfoCache[clazz!!.name] != null) {
+            for (field in hideFieldInfoCache[clazz.name]!!) {
+                if (checkFieldNeedHide(itemData, field)) {
+                    LogUtil.d("hide field from cache: ", field.type.name, field.name, field.get(itemData))
+                    return true
+                }
+            }
+            return false
+        }
         while (clazz != null) {
             for (field in clazz.declaredFields) {
                 field.isAccessible = true
                 try {
-                    if (checkNeedHide(itemData, field)) {
-                        LogUtil.d("field: ", field.type.name, field.name, field.get(itemData))
+                    if (checkFieldNeedHide(itemData, field)) {
+                        LogUtil.d("hide field: ", field.type.name, field.name, field.get(itemData))
                         return true
                     }
                 } catch (e: Exception) {
@@ -255,8 +268,8 @@ class HideSearchListUIPluginPart : IPlugin {
         return false
     }
 
-    private fun checkNeedHide(obj: Any, field: Field): Boolean {
-        var fieldValue = field.get(obj)
+    private fun checkFieldNeedHide(itemData: Any, field: Field): Boolean {
+        var fieldValue: Any? = field.get(itemData) ?: return false
         var clazzName = field.type.name
         if (field.type.isAssignableFrom(Number::class.java)
             || field.type.isAssignableFrom(Byte::class.java)
@@ -265,21 +278,43 @@ class HideSearchListUIPluginPart : IPlugin {
             return false
         }
 
+        var jsonKey = fieldValue.toString().hashCode().toString()
+
         var compareText = if (fieldValue is CharSequence) {
             fieldValue
         } else {
-            GsonUtil.toJson(fieldValue)
+            if (jsonResultLruCache[jsonKey] == null){
+                GsonUtil.toJson(fieldValue)
+            }else{
+                jsonResultLruCache[jsonKey]
+            }
         }
+        if (compareText.isBlank()) {
+            return false
+        }
+        jsonResultLruCache.put(jsonKey, compareText)
 
         for (wxid in PluginProviders.from(WXMaskPlugin::class.java).maskIdList) {
             if (wxid == null) {
                 continue
             }
             if (compareText.contains(wxid)) {
-                LogUtil.d("compareText: ", compareText)
+                putField2Cache(itemData::class.java.name, field)
+                LogUtil.d("hit wxid compareText: ", compareText)
                 return true
             }
         }
         return false
+
+    }
+
+    private fun putField2Cache(itemClassName: String, field: Field) {
+        var pool = hideFieldInfoCache[itemClassName]
+        if (pool == null) {
+            pool = hashSetOf(field)
+            hideFieldInfoCache[itemClassName] = pool
+        } else {
+            pool.add(field)
+        }
     }
 }

@@ -82,7 +82,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
         val MediaHistoryGalleryUI = "com.tencent.mm.ui.chatting.gallery.MediaHistoryGalleryUI"
         val methodName = when (AppVersionUtil.getVersionCode()) {
             in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_35 -> "k"
-            in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_42 -> "l"
+            in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_43 -> "l"
             else -> null
         }
         var galleryMethod: Method? = null
@@ -145,7 +145,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
             Constrant.WX_CODE_8_0_35 -> "P"
             Constrant.WX_CODE_8_0_37 -> "Q"
             Constrant.WX_CODE_8_0_38 -> "R"
-            in Constrant.WX_CODE_8_0_40..Constrant.WX_CODE_8_0_41 -> "Q"
+            in Constrant.WX_CODE_8_0_40..Constrant.WX_CODE_8_0_41, Constrant.WX_CODE_8_0_43-> "Q"
             in Constrant.WX_CODE_8_0_41 .. Constrant.WX_CODE_8_0_42 -> "R"
             else -> null
         }
