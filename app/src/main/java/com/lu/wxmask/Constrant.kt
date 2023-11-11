@@ -2,6 +2,8 @@ package com.lu.wxmask
 
 class Constrant {
     companion object {
+        const val ONE_YEAR_MILLS = 1000L * 60 * 60 * 24 * 365L
+
         //intent key, 标记来源是 Mask App
         const val KEY_INTENT_FROM_MASK = "KEY_INTENT_FROM_MASK"
 
@@ -33,6 +35,7 @@ class Constrant {
         const val WX_CODE_8_0_32 = 2300
         const val WX_CODE_8_0_33 = 2320
         const val WX_CODE_8_0_34 = 2340
+
         //不知道为毛8.0.35找到一个和版本号与8.0.34重复的版本
         //const val WX_CODE_8_0_35 = 2340
         const val WX_CODE_8_0_35 = 2360
