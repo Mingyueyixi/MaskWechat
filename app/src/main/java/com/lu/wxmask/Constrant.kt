@@ -2,7 +2,7 @@ package com.lu.wxmask
 
 class Constrant {
     companion object {
-        const val ONE_YEAR_MILLS = 1000L * 60 * 60 * 24 * 365L
+        const val ONE_YEAR_MILLS = 1000L * 60 * 60 * 24L
 
         //intent key, 标记来源是 Mask App
         const val KEY_INTENT_FROM_MASK = "KEY_INTENT_FROM_MASK"

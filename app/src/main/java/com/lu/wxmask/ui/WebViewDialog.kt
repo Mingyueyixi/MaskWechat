@@ -1,12 +1,12 @@
 package com.lu.wxmask.ui
 
+import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.WindowManager
 import android.webkit.WebView
 import android.widget.FrameLayout
-import androidx.appcompat.app.AppCompatDialog
 import com.lu.magic.util.AppUtil
 import com.lu.wxmask.ui.wrapper.WebViewComponent
 import com.lu.wxmask.ui.wrapper.WebViewComponentCallBack
@@ -17,7 +17,7 @@ class WebViewDialog @JvmOverloads constructor(
     var webUrl: String,
     var dialogTitle: String? = null,
     var forceHtml: Boolean = false
-) : AppCompatDialog(context) {
+) : Dialog(context) {
     val webViewComponent = WebViewComponent(context).also {
         it.forceHtml = forceHtml
     }

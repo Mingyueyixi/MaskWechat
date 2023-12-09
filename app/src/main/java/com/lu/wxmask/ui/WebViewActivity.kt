@@ -3,8 +3,8 @@ package com.lu.wxmask.ui
 import android.os.Bundle
 import android.webkit.WebView
 import android.widget.FrameLayout
-import com.lu.magic.ui.BaseActivity
 import com.lu.magic.util.log.LogUtil
+import com.lu.wxmask.base.BaseActivity
 import com.lu.wxmask.ui.wrapper.WebViewComponentCallBack
 import com.lu.wxmask.ui.wrapper.WebViewComponent
 

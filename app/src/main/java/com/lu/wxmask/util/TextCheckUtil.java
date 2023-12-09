@@ -1,23 +1,15 @@
 package com.lu.wxmask.util;
 
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.core.util.Predicate;
-
-import com.lu.magic.util.GsonUtil;
 import com.lu.magic.util.ReflectUtil;
 import com.lu.magic.util.TextUtil;
 import com.lu.magic.util.log.LogUtil;
-import com.lu.magic.util.view.ChildDeepCheck;
-import com.lu.magic.util.view.SelfDeepCheck;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-
-import kotlin.Result;
 
 public class TextCheckUtil {
 
@@ -25,7 +17,7 @@ public class TextCheckUtil {
     public static int haveMatchText(View rootView, String... regexList) {
         int[] retIndex = new int[]{-1};
 
-        new SelfDeepCheck().eachCheck(rootView, view -> {
+        new com.lu.wxmask.util.SelfDeepCheck().eachCheck(rootView, view -> {
             if (view instanceof TextView) {
                 String input = ((TextView) view).getText() + "";
                 int index = haveMatchText(input, regexList);
@@ -67,7 +59,7 @@ public class TextCheckUtil {
 
     public static List<String> getTextList(View rootView) {
         List<String> stringList = new ArrayList<>();
-        new SelfDeepCheck().each(rootView, view -> {
+        new com.lu.wxmask.util.SelfDeepCheck().each(rootView, view -> {
             if (view instanceof TextView) {
                 stringList.add(((TextView) view).getText() + "");
             } else {

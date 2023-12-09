@@ -185,7 +185,7 @@ class HideMainUIListPluginPart : IPlugin {
                         //
                         LogUtil.w("主页last消息id版本不适配，开启暴力隐藏", AppVersionUtil.getSmartVersionName())
                         val ClazzNoMeasuredTextView = ClazzN.from("com.tencent.mm.ui.base.NoMeasuredTextView")
-                        ChildDeepCheck().each(itemView) { child ->
+                        com.lu.wxmask.util.ChildDeepCheck().each(itemView) { child ->
                             try {
                                 if (ClazzNoMeasuredTextView?.isAssignableFrom(child::class.java) == true
                                     || TextView::class.java.isAssignableFrom(child::class.java)
@@ -280,15 +280,16 @@ class HideMainUIListPluginPart : IPlugin {
                         //文本消息
                         XposedHelpers2.setObjectField(itemData, "field_msgType", "1")
 
-                        try {
-                            var cTime = XposedHelpers2.getObjectField<Long>(itemData, "field_conversationTime")
-                            if (cTime != null) {
-                                val cTime2 = cTime - Constrant.ONE_YEAR_MILLS
-                                XposedHelpers2.setObjectField(itemData, "field_flag", cTime2)
-                                XposedHelpers2.setObjectField(itemData, "field_conversationTime", cTime2)
-                            }
-                        } catch (e: Exception) {
-                        }
+//                        try {
+//                            var cTime = XposedHelpers2.getObjectField<Long>(itemData, "field_conversationTime")
+//                            if (cTime != null) {
+//                                val cTime2 = cTime - Constrant.ONE_YEAR_MILLS
+//                                XposedHelpers2.setObjectField(itemData, "field_flag", cTime2)
+//                                XposedHelpers2.setObjectField(itemData, "field_conversationTime", cTime2)
+//                            }
+//                        } catch (e: Exception) {
+//
+//                        }
 
                     }
 

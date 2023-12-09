@@ -4,12 +4,9 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import androidx.core.net.toUri
-import androidx.lifecycle.ViewModelProvider
 import com.lu.magic.util.AppUtil
 import com.lu.magic.util.log.LogUtil
 import com.lu.mask.donate.DonatePresenter
-import com.lu.wxmask.App
 import com.lu.wxmask.config.AppConfigUtil
 import com.lu.wxmask.ui.MainActivity
 import com.lu.wxmask.ui.WebViewActivity
@@ -27,7 +24,7 @@ class MaskAppRouter {
     companion object {
         val vailScheme = "maskwechat"
         val vailHost = "com.lu.wxmask"
-        private val appUpdateViewModel = ViewModelProvider(App.instance)[AppUpdateViewModel::class.java]
+        private val appUpdateViewModel = AppUpdateViewModel()
         private val donatePresenter by lazy { DonatePresenter.create() }
         fun routeCheckAppUpdateFeat(activity: Activity) {
             route(activity, "maskwechat://com.lu.wxmask/feat/checkAppUpdate")

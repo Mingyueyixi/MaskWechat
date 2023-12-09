@@ -7,8 +7,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.lu.magic.ui.BaseFragment
-import com.lu.magic.ui.LifecycleAutoViewBinding
 import com.lu.magic.util.SizeUtil
 import com.lu.magic.util.ToastUtil
 import com.lu.magic.util.kxt.toElseString
@@ -24,6 +22,7 @@ import com.lu.wxmask.R
 import com.lu.wxmask.SelfHook
 import com.lu.wxmask.adapter.AbsListAdapter
 import com.lu.wxmask.adapter.CommonListAdapter
+import com.lu.wxmask.base.BaseFragment
 import com.lu.wxmask.config.AppConfigUtil
 import com.lu.wxmask.databinding.FragmentMainBinding
 import com.lu.wxmask.databinding.ItemIconTextBinding
@@ -31,8 +30,8 @@ import com.lu.wxmask.route.MaskAppRouter
 
 
 class MainFragment : BaseFragment() {
-    private var itemBinding: ItemIconTextBinding by LifecycleAutoViewBinding<MainFragment, ItemIconTextBinding>()
-    private var mainBinding: FragmentMainBinding by LifecycleAutoViewBinding<MainFragment, FragmentMainBinding>()
+    private lateinit var itemBinding: ItemIconTextBinding
+    private lateinit var mainBinding: FragmentMainBinding
     private val buildInfo = MaskAppBuildInfo.of()
 
     private val donateCardId = 10086
@@ -58,7 +57,7 @@ class MainFragment : BaseFragment() {
 
 
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemBindingViewHolder {
-                itemBinding = ItemIconTextBinding.inflate(layoutInflater, parent, false)
+                itemBinding = ItemIconTextBinding.inflate(layoutInflaterCompat, parent, false)
 
                 return object : ItemBindingViewHolder(itemBinding) {
                     init {
@@ -226,5 +225,6 @@ class MainFragment : BaseFragment() {
             LogUtil.e(e)
         }
     }
+
 
 }

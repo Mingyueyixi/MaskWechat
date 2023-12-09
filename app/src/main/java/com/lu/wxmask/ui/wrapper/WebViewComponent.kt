@@ -16,9 +16,9 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.core.view.contains
 import com.lu.magic.util.kxt.toElseEmptyString
 import com.lu.magic.util.log.LogUtil
+import com.lu.magic.util.view.ViewUtil
 import com.lu.wxmask.BuildConfig
 import com.lu.wxmask.route.MaskAppRouter
 import java.net.URL
@@ -153,7 +153,7 @@ class WebViewComponent(context: Context) {
     }
 
     fun attachView(root: ViewGroup): WebViewComponent {
-        if (root.contains(webView)) {
+        if (ViewUtil.haveChild(root, webView)) {
             return this
         }
         root.addView(webView, MarginLayoutParams.MATCH_PARENT, MarginLayoutParams.MATCH_PARENT)

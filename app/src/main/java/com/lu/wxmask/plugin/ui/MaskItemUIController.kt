@@ -10,7 +10,6 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
-import androidx.core.view.setPadding
 import com.google.gson.JsonObject
 import com.lu.magic.util.SizeUtil
 import com.lu.magic.util.kxt.toElseString
@@ -20,6 +19,7 @@ import com.lu.wxmask.adapter.CommonListAdapter
 import com.lu.wxmask.bean.MaskItemBean
 import com.lu.wxmask.bean.QuickTemporaryBean
 import com.lu.wxmask.util.ConfigUtil
+import com.lu.wxmask.util.ext.setPadding
 
 internal class MaskItemUIController(private val context: Context, private val mask: MaskItemBean) {
     private val viewId: MutableMap<String, View> = mutableMapOf()

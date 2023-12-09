@@ -2,9 +2,7 @@ package com.lu.wxmask.ui
 
 import android.content.Intent
 import android.os.Bundle
-import com.lu.magic.ui.BaseActivity
-import com.lu.magic.util.log.LogUtil
-import com.lu.wxmask.route.MaskAppRouter
+import com.lu.wxmask.base.BaseActivity
 
 class DeepLinkActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

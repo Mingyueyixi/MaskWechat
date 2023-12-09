@@ -1,11 +1,9 @@
 package com.lu.wxmask
 
 import android.app.Application
-import androidx.lifecycle.ViewModelStore
-import androidx.lifecycle.ViewModelStoreOwner
 import com.lu.wxmask.ui.JsonMenuManager
 
-class App : Application(), ViewModelStoreOwner {
+class App : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
@@ -15,7 +13,4 @@ class App : Application(), ViewModelStoreOwner {
         lateinit var instance: App
     }
 
-    override fun getViewModelStore(): ViewModelStore {
-        return ViewModelStore()
-    }
 }

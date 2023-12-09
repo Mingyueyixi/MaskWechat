@@ -15,7 +15,6 @@ import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.PopupWindow
 import android.widget.TextView
-import androidx.core.view.setPadding
 import com.lu.magic.util.ResUtil
 import com.lu.magic.util.SizeUtil
 import com.lu.magic.util.ripple.RectangleRippleBuilder
@@ -24,6 +23,7 @@ import com.lu.wxmask.adapter.AbsListAdapter
 import com.lu.wxmask.adapter.CommonListAdapter
 import com.lu.wxmask.bean.MaskItemBean
 import com.lu.wxmask.util.ConfigUtil
+import com.lu.wxmask.util.ext.setPadding
 
 interface IConfigManagerUI {
     fun onCreateView(): View
@@ -181,7 +181,7 @@ private class ConfigManagerUIController(private val context: Context) {
             selector = ColorDrawable(Color.TRANSPARENT)
         }
 
-        listAdapter = object : CommonListAdapter<MaskItemBean,AbsListAdapter.ViewHolder>() {
+        listAdapter = object : CommonListAdapter<MaskItemBean, AbsListAdapter.ViewHolder>() {
             init {
                 //去重
                 val dataListTemp = ConfigUtil.getMaskList().let {

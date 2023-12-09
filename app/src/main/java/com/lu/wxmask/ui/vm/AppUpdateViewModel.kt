@@ -2,13 +2,12 @@ package com.lu.wxmask.ui.vm
 
 import android.app.AlertDialog
 import android.content.Context
-import androidx.lifecycle.ViewModel
 import com.lu.magic.util.ToastUtil
 import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.route.MaskAppRouter
 import com.lu.wxmask.util.AppUpdateCheckUtil
 
-class AppUpdateViewModel : ViewModel() {
+class AppUpdateViewModel {
     private var hasOnCheckAction = false
     fun checkOnEnter(context: Context) {
         if (hasOnCheckAction) {
