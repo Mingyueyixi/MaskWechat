@@ -19,11 +19,17 @@ public class FragmentNavigation {
 
     public void navigate(Fragment fragment) {
         String tag = fragment.getClass().getName();
-        activity.getFragmentManager().beginTransaction()
-                .add(containerId, fragment, tag)
-                .addToBackStack(tag)
-                .commitNowAllowingStateLoss();
-
+        Fragment frag = activity.getFragmentManager().findFragmentByTag(tag);
+        if (frag != null) {
+            //&& frag == fragment ???
+            activity.getFragmentManager().beginTransaction()
+                    .show(fragment)
+                    .commitNowAllowingStateLoss();
+        } else {
+            activity.getFragmentManager().beginTransaction()
+                    .add(containerId, fragment, tag)
+                    .commitNowAllowingStateLoss();
+        }
     }
 
     public boolean navigateBack() {
