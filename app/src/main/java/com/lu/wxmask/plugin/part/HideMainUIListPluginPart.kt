@@ -207,7 +207,8 @@ class HideMainUIListPluginPart : IPlugin {
         //listAdapter getItem方法被重命名了
         var getItemMethodName = when (AppVersionUtil.getVersionCode()) {
             Constrant.WX_CODE_8_0_22 -> "aCW"
-            else -> "k"
+            in Constrant.WX_CODE_8_0_22 .. Constrant.WX_CODE_8_0_43 -> "k"
+            else -> "m"
         }
         //8.0.32-8.0.34 com.tencent.mm.ui.y
         //8.0.35-8.0.37　　com.tencent.mm.ui.z
@@ -217,6 +218,7 @@ class HideMainUIListPluginPart : IPlugin {
             in Constrant.WX_CODE_8_0_32..Constrant.WX_CODE_8_0_34 -> "com.tencent.mm.ui.y"
             in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_38 -> "com.tencent.mm.ui.z"
             in Constrant.WX_CODE_8_0_40..Constrant.WX_CODE_8_0_43 -> "com.tencent.mm.ui.b0"
+            in Constrant.WX_CODE_8_0_43 .. Constrant.WX_CODE_8_0_44 -> "com.tencent.mm.ui.h3"
             else -> null
         }
         var getItemMethod = if (adapterClazzName != null && getItemMethodName != null) {
@@ -264,6 +266,8 @@ class HideMainUIListPluginPart : IPlugin {
     }
 
     private fun hookListViewGetItem(getItemMethod: Method) {
+        LogUtil.d(">>>>>>>>>>.", getItemMethod)
+
         XposedHelpers2.hookMethod(
             getItemMethod,
             object : XC_MethodHook2() {

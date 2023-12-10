@@ -4,8 +4,13 @@ import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.core.view.isVisible
+import androidx.core.view.postDelayed
 import com.lu.lposed.api2.XC_MethodHook2
+import com.lu.lposed.api2.XC_MethodReplacement2
 import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
 import com.lu.magic.util.log.LogUtil
@@ -21,6 +26,7 @@ import java.lang.reflect.Method
  * 置空单聊页面菜单的“查找聊天记录”搜索结果
  */
 class EmptySingChatHistoryGalleryPluginPart : IPlugin {
+    val MediaHistoryGalleryUI = "com.tencent.mm.ui.chatting.gallery.MediaHistoryGalleryUI"
     override fun handleHook(context: Context, lpparam: XC_LoadPackage.LoadPackageParam?) {
         setEmptyDetailHistoryUI(context, lpparam)
         setEmptyActionBarTabPageUI(context, lpparam)
@@ -28,13 +34,14 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
 
     private fun setEmptyDetailHistoryUI(context: Context, lpparam: XC_LoadPackage.LoadPackageParam?) {
         setEmptyDetailHistoryUIForMedia(context, lpparam)
-        setEmptyDetailHistoryUIForGallery(context, lpparam)
+        setEmptyDetailHistoryUIForGalleryCompat(context, lpparam)
     }
 
     private fun setEmptyDetailHistoryUIForMedia(context: Context, lpparam: XC_LoadPackage.LoadPackageParam?) {
         var mediaMethodName = when (AppVersionUtil.getVersionCode()) {
             in Constrant.WX_CODE_8_0_32..Constrant.WX_CODE_8_0_35 -> "k"
-            in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_41 -> "l"
+            in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_43 -> "l"
+            in Constrant.WX_CODE_8_0_43..Constrant.WX_CODE_8_0_44 -> "z"
             else -> "l"
         }
         val MediaHistoryListUI = "com.tencent.mm.ui.chatting.gallery.MediaHistoryListUI"
@@ -78,8 +85,20 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
         })
     }
 
+
+    /**
+     * 置空图片/视频搜索结果
+     */
+    private fun setEmptyDetailHistoryUIForGalleryCompat(context: Context, lpparam: XC_LoadPackage.LoadPackageParam?) {
+        if (AppVersionUtil.getVersionCode() > Constrant.WX_CODE_8_0_43) {
+            setEmptyDetailHistoryUIForGallery8044(context, lpparam)
+            return
+        } else {
+            setEmptyDetailHistoryUIForGallery(context, lpparam)
+        }
+    }
+
     private fun setEmptyDetailHistoryUIForGallery(context: Context, lpparam: XC_LoadPackage.LoadPackageParam?) {
-        val MediaHistoryGalleryUI = "com.tencent.mm.ui.chatting.gallery.MediaHistoryGalleryUI"
         val methodName = when (AppVersionUtil.getVersionCode()) {
             in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_35 -> "k"
             in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_43 -> "l"
@@ -107,7 +126,6 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
             }
             LogUtil.w(AppVersionUtil.getSmartVersionName(), "guess MediaHistoryGalleryUI empty method is ", galleryMethod)
         }
-
         XposedHelpers2.hookMethod(
             galleryMethod,
             object : XC_MethodHook2() {
@@ -125,6 +143,60 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
                     }
                 }
             })
+    }
+
+    private fun setEmptyDetailHistoryUIForGallery8044(context: Context, lpparam: XC_LoadPackage.LoadPackageParam?) {
+        //k1 run a1 -> a1 run z0 加载图片完成
+        var methods = XposedHelpers2.findMethodsByExactParameters(
+            ClazzN.from("com.tencent.mm.ui.chatting.presenter.k1"),
+            Void.TYPE,
+            java.lang.Boolean.TYPE,
+            Integer.TYPE,
+        )
+        if (methods.isNotEmpty()) {
+            XposedHelpers2.hookMethod(methods[0],
+                object : XC_MethodHook2() {
+                    override fun beforeHookedMethod(param: MethodHookParam) {
+                        super.beforeHookedMethod(param)
+//                        val activity: Activity = param.thisObject as Activity
+
+//
+
+                        var fields = XposedHelpers2.findFieldsByExactPredicate(param.thisObject::class.java) {
+                            var v = it.get(param.thisObject)
+
+                            if (v.javaClass.name.equals(MediaHistoryGalleryUI)) {
+                                return@findFieldsByExactPredicate true
+                            }
+                            return@findFieldsByExactPredicate false
+                        }
+                        var activity: Activity? = null
+                        if (!fields.isEmpty()) {
+                            activity = fields[0].get(param.thisObject) as Activity
+                        }
+                        if (activity == null) {
+                            LogUtil.w("can not find DetailHistoryUIForGallery8044")
+                            return
+                        }
+                        val intent = activity.intent
+                        val userName = intent.getStringExtra("kintent_talker")
+                        if (userName.isNullOrBlank()) {
+                            LogUtil.w("MediaHistoryListUI‘s user is empty", userName)
+                            return
+                        }
+                        if (WXMaskPlugin.containChatUser(userName)) {
+                            param.args[1] = 0
+                            LogUtil.i("empty MediaHistoryGalleryUI data")
+                        }
+                        param.args[0] = false
+//                        XposedHelpers2.findFirstFieldByExactType(this::class.java)
+                    }
+                }
+            )
+        } else {
+            LogUtil.w("can not find presenter for setEmptyDetailHistoryUIForGallery8044")
+
+        }
 
     }
 
@@ -145,8 +217,9 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
             Constrant.WX_CODE_8_0_35 -> "P"
             Constrant.WX_CODE_8_0_37 -> "Q"
             Constrant.WX_CODE_8_0_38 -> "R"
-            in Constrant.WX_CODE_8_0_40..Constrant.WX_CODE_8_0_41, Constrant.WX_CODE_8_0_43-> "Q"
-            in Constrant.WX_CODE_8_0_41 .. Constrant.WX_CODE_8_0_42 -> "R"
+            Constrant.WX_CODE_8_0_44 -> "D"
+            in Constrant.WX_CODE_8_0_40..Constrant.WX_CODE_8_0_41, Constrant.WX_CODE_8_0_43 -> "Q"
+            in Constrant.WX_CODE_8_0_41..Constrant.WX_CODE_8_0_42 -> "R"
             else -> null
         }
         LogUtil.d("setEmptyActionBarTabPageUI method is :", commonHookMethodName)
@@ -222,7 +295,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
             Bundle::class.java,
             object : XC_MethodHook2() {
 
-                override fun beforeHookedMethod(param: MethodHookParam) {
+                override fun afterHookedMethod(param: MethodHookParam) {
                     debugLog(param)
                     if (isHitMaskId(param.thisObject)) {
                         val inflater = param.args[0] as LayoutInflater
