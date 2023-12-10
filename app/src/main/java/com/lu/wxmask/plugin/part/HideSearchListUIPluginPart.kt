@@ -2,10 +2,12 @@ package com.lu.wxmask.plugin.part
 
 import android.content.Context
 import android.util.LruCache
+import android.util.SparseArray
 import com.lu.lposed.api2.XC_MethodHook2
 import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
 import com.lu.lposed.plugin.PluginProviders
+import com.lu.magic.util.AppUtil
 import com.lu.magic.util.GsonUtil
 import com.lu.magic.util.ReflectUtil
 import com.lu.magic.util.log.LogUtil
@@ -27,8 +29,31 @@ class HideSearchListUIPluginPart : IPlugin {
     private val jsonResultLruCache = LruCache<String, CharSequence>(16)
 
     override fun handleHook(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
-        handleGlobalSearch(context, lpparam)
-        handleDetailSearch(context, lpparam)
+//        handleGlobalSearch(context, lpparam)
+//        handleDetailSearch(context, lpparam)
+
+        //hook getItem --> rename to h
+        XposedHelpers2.findAndHookMethod(" com.tencent.mm.plugin.fts.ui.a0",
+            context.classLoader,
+            "h",
+            java.lang.Integer.TYPE,
+            object : XC_MethodHook2(){
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    super.afterHookedMethod(param)
+                    if (needHideUserName2(param, param.result)) {
+                        LogUtil.d(param.result)
+//                        param.result = try {
+//                            //将命中的用户数据抹除掉
+//                            param.result::class.java.newInstance()
+//                        } catch (e: Throwable) {
+//                            LogUtil.d("error new Instance, return null")
+//                            null
+//                        }
+                        var f: SparseArray<*> = XposedHelpers2.getObjectField(param.thisObject, "f")
+                        param.result = f.get(0)
+                    }
+                }
+            });
 
 //        hook adapter getView，因视图复用容易出问题。存在某个item，需要滑动后才消失，原因暂时不明
 //        XposedHelpers2.findAndHookMethod(

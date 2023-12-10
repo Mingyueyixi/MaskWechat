@@ -3,6 +3,7 @@ package com.lu.wxmask
 class Constrant {
     companion object {
         const val ONE_YEAR_MILLS = 1000L * 60 * 60 * 24 * 365L
+        const val ONE_DAY_MILLS = 1000L * 60 * 60 * 24L
 
         //intent key, 标记来源是 Mask App
         const val KEY_INTENT_FROM_MASK = "KEY_INTENT_FROM_MASK"
@@ -45,6 +46,7 @@ class Constrant {
         const val WX_CODE_8_0_41 = 2441
         const val WX_CODE_8_0_42 = 2460
         const val WX_CODE_8_0_43 = 2480
+        const val WX_CODE_8_0_44 = 2502
     }
 
 }
