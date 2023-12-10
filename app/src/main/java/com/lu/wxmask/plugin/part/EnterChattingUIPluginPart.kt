@@ -45,7 +45,7 @@ class EnterChattingUIPluginPart() : IPlugin {
             "onEnterBegin"
         )
         if (onEnterBeginMethod == null) {
-            LogUtil.i("onEnterBegin function == null, maybe change")
+            LogUtil.d("onEnterBegin function == null, maybe change")
         } else {
             //8.0.22
             LogUtil.d("hook onEnterBegin")
@@ -69,9 +69,10 @@ class EnterChattingUIPluginPart() : IPlugin {
             }
 
             Constrant.WX_CODE_8_0_35 -> "J"
-            Constrant.WX_CODE_8_0_37 -> "K"
+            Constrant.WX_CODE_8_0_37, Constrant.WX_CODE_8_0_43 -> "K"
             Constrant.WX_CODE_8_0_38 -> "M"
             in Constrant.WX_CODE_8_0_40..Constrant.WX_CODE_8_0_41 -> "K"
+            in Constrant.WX_CODE_8_0_41..Constrant.WX_CODE_8_0_42 -> "M"
             else -> null
         }
         var dispatchMethod: Method? = null
@@ -159,7 +160,12 @@ class EnterChattingHookAction(
         }.getOrNull()
         if (listView == null) {
             listView = runCatching {
-                val mmListViewId = ResUtil.getViewId("b5n")
+                val mmListViewId =
+                    if (AppVersionUtil.getVersionCode() in Constrant.WX_CODE_8_0_42..Constrant.WX_CODE_8_0_43) {
+                        ResUtil.getViewId("bm6")
+                    } else {
+                        ResUtil.getViewId("b5n")
+                    }
                 XposedHelpers2.callMethod(fragmentObj, "findViewById", mmListViewId) as View
             }.getOrNull()
 

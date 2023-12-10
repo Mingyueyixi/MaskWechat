@@ -35,6 +35,7 @@ class HideMainUIListPluginPart : IPlugin {
             LogUtil.w("hide mainUI listview fail, try to old function.")
             handleMainUIChattingListView(context, lpparam)
         }
+
     }
 
     //隐藏指定用户的主页的消息
@@ -215,7 +216,7 @@ class HideMainUIListPluginPart : IPlugin {
             Constrant.WX_CODE_8_0_22 -> "com.tencent.mm.ui.g"
             in Constrant.WX_CODE_8_0_32..Constrant.WX_CODE_8_0_34 -> "com.tencent.mm.ui.y"
             in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_38 -> "com.tencent.mm.ui.z"
-            in Constrant.WX_CODE_8_0_40..Constrant.WX_CODE_8_0_41 -> "com.tencent.mm.ui.b0"
+            in Constrant.WX_CODE_8_0_40..Constrant.WX_CODE_8_0_43 -> "com.tencent.mm.ui.b0"
             else -> null
         }
         var getItemMethod = if (adapterClazzName != null && getItemMethodName != null) {
@@ -276,6 +277,19 @@ class HideMainUIListPluginPart : IPlugin {
                         XposedHelpers2.setObjectField(itemData, "field_unReadCount", 0)
                         XposedHelpers2.setObjectField(itemData, "field_UnReadInvite", 0)
                         XposedHelpers2.setObjectField(itemData, "field_unReadMuteCount", 0)
+                        //文本消息
+                        XposedHelpers2.setObjectField(itemData, "field_msgType", "1")
+
+//                        try {
+//                            var cTime = XposedHelpers2.getObjectField<Long>(itemData, "field_conversationTime")
+//                            if (cTime != null) {
+//                                val cTime2 = cTime - Constrant.ONE_YEAR_MILLS
+//                                XposedHelpers2.setObjectField(itemData, "field_flag", cTime2)
+//                                XposedHelpers2.setObjectField(itemData, "field_conversationTime", cTime2)
+//                            }
+//                        } catch (e: Exception) {
+//                        }
+
                     }
 
                 }
@@ -283,5 +297,6 @@ class HideMainUIListPluginPart : IPlugin {
             }
         )
     }
+
 
 }
