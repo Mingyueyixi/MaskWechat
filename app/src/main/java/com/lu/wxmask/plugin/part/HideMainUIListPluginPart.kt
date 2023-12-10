@@ -280,15 +280,15 @@ class HideMainUIListPluginPart : IPlugin {
                         //文本消息
                         XposedHelpers2.setObjectField(itemData, "field_msgType", "1")
 
-                        try {
-                            var cTime = XposedHelpers2.getObjectField<Long>(itemData, "field_conversationTime")
-                            if (cTime != null) {
-                                val cTime2 = cTime - Constrant.ONE_YEAR_MILLS
-                                XposedHelpers2.setObjectField(itemData, "field_flag", cTime2)
-                                XposedHelpers2.setObjectField(itemData, "field_conversationTime", cTime2)
-                            }
-                        } catch (e: Exception) {
-                        }
+//                        try {
+//                            var cTime = XposedHelpers2.getObjectField<Long>(itemData, "field_conversationTime")
+//                            if (cTime != null) {
+//                                val cTime2 = cTime - Constrant.ONE_YEAR_MILLS
+//                                XposedHelpers2.setObjectField(itemData, "field_flag", cTime2)
+//                                XposedHelpers2.setObjectField(itemData, "field_conversationTime", cTime2)
+//                            }
+//                        } catch (e: Exception) {
+//                        }
 
                     }
 
