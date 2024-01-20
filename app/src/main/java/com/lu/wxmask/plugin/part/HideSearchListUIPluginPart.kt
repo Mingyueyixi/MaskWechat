@@ -29,15 +29,22 @@ class HideSearchListUIPluginPart : IPlugin {
     private val jsonResultLruCache = LruCache<String, CharSequence>(16)
 
     override fun handleHook(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
-//        handleGlobalSearch(context, lpparam)
-//        handleDetailSearch(context, lpparam)
+        if (AppVersionUtil.getVersionCode() < Constrant.WX_CODE_8_0_44) {
+            handleGlobalSearch(context, lpparam)
+            handleDetailSearch(context, lpparam)
+            return
+        }
 
+        var getItemMethod = when (AppVersionUtil.getVersionCode()) {
+            Constrant.WX_CODE_8_0_44 -> "h"
+            else -> "i"
+        }
         //hook getItem --> rename to h
-        XposedHelpers2.findAndHookMethod(" com.tencent.mm.plugin.fts.ui.a0",
+        XposedHelpers2.findAndHookMethod("com.tencent.mm.plugin.fts.ui.a0",
             context.classLoader,
-            "h",
+            getItemMethod ,
             java.lang.Integer.TYPE,
-            object : XC_MethodHook2(){
+            object : XC_MethodHook2() {
                 override fun afterHookedMethod(param: MethodHookParam) {
                     super.afterHookedMethod(param)
                     if (needHideUserName2(param, param.result)) {
@@ -308,9 +315,9 @@ class HideSearchListUIPluginPart : IPlugin {
         var compareText = if (fieldValue is CharSequence) {
             fieldValue
         } else {
-            if (jsonResultLruCache[jsonKey] == null){
+            if (jsonResultLruCache[jsonKey] == null) {
                 GsonUtil.toJson(fieldValue)
-            }else{
+            } else {
                 jsonResultLruCache[jsonKey]
             }
         }

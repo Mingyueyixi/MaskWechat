@@ -47,6 +47,7 @@ class Constrant {
         const val WX_CODE_8_0_42 = 2460
         const val WX_CODE_8_0_43 = 2480
         const val WX_CODE_8_0_44 = 2502
+        const val WX_CODE_8_0_45 = 2521
     }
 
 }

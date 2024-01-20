@@ -219,9 +219,10 @@ class HideMainUIListPluginPart : IPlugin {
             in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_38 -> "com.tencent.mm.ui.z"
             in Constrant.WX_CODE_8_0_40..Constrant.WX_CODE_8_0_43 -> "com.tencent.mm.ui.b0"
             in Constrant.WX_CODE_8_0_43 .. Constrant.WX_CODE_8_0_44 -> "com.tencent.mm.ui.h3"
+            in Constrant.WX_CODE_8_0_43 .. Constrant.WX_CODE_8_0_45 -> "com.tencent.mm.ui.i3"
             else -> null
         }
-        var getItemMethod = if (adapterClazzName != null && getItemMethodName != null) {
+        var getItemMethod = if (adapterClazzName != null) {
             XposedHelpers2.findMethodExactIfExists(adapterClazzName, AppUtil.getClassLoader(), getItemMethodName, Integer.TYPE)
         } else {
             null
