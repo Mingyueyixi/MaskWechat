@@ -42,7 +42,7 @@ class HideSearchListUIPluginPart : IPlugin {
         //hook getItem --> rename to h
         XposedHelpers2.findAndHookMethod("com.tencent.mm.plugin.fts.ui.a0",
             context.classLoader,
-            getItemMethod ,
+            getItemMethod,
             java.lang.Integer.TYPE,
             object : XC_MethodHook2() {
                 override fun afterHookedMethod(param: MethodHookParam) {
@@ -265,7 +265,7 @@ class HideSearchListUIPluginPart : IPlugin {
     }
 
 
-    private fun needHideUserName2(param: XC_MethodHook.MethodHookParam, itemData: Any?): Boolean {
+    fun needHideUserName2(param: XC_MethodHook.MethodHookParam, itemData: Any?): Boolean {
         if (itemData == null) {
             return false
         }

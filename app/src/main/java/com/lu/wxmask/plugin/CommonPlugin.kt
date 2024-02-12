@@ -1,20 +1,8 @@
 package com.lu.wxmask.plugin
 
 import android.content.Context
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ListAdapter
-import android.widget.ListView
-import com.lu.lposed.api2.XC_MethodHook2
-import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
-import com.lu.magic.util.log.LogUtil
-import com.lu.magic.util.view.ChildDeepCheck
-import com.lu.magic.util.view.SelfDeepCheck
-import com.lu.magic.util.view.ViewUtil
-import com.lu.wxmask.BuildConfig
-import com.lu.wxmask.util.AppVersionUtil
+import com.lu.wxmask.util.HookPointManager
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 
 class CommonPlugin : IPlugin {
@@ -42,5 +30,7 @@ class CommonPlugin : IPlugin {
 //                }
 //            }
 //        )
+
+        HookPointManager.INSTANCE.init(context, lpparam)
     }
 }
