@@ -15,7 +15,7 @@ import java.util.concurrent.CopyOnWriteArraySet
 
 class WXMaskPlugin : IPlugin, ConfigSetObserver {
     lateinit var maskIdList: Array<String?>
-    private val hideSearchListPluginPart = HideSearchListUIPluginPart()
+    val hideSearchListPluginPart = HideSearchListUIPluginPart()
     private val enterChattingUIPluginPart = EnterChattingUIPluginPart()
     private val hideMainUIListPluginPart = HideMainUIListPluginPart()
     private val emptySingChatHistoryGalleryPluginPart = EmptySingChatHistoryGalleryPluginPart()
@@ -55,7 +55,7 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
         maskIdList = loadMaskIdList()
         hideMainUIListPluginPart.handleHook(context, lpparam)
         enterChattingUIPluginPart.handleHook(context, lpparam)
-        hideSearchListPluginPart.handleHook(context, lpparam)
+//        hideSearchListPluginPart.handleHook(context, lpparam)
         emptySingChatHistoryGalleryPluginPart.handleHook(context, lpparam)
     }
 
