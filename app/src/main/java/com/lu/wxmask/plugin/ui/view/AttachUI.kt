@@ -10,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.ViewCompat
-import com.lu.wxmask.util.BarUtils
 import com.lu.wxmask.util.KeyBoxUtil
 import com.lu.wxmask.util.ext.dp
 
@@ -19,6 +18,10 @@ open class AttachUI @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0, defStyleRes: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes), ViewCompat.OnUnhandledKeyEventListenerCompat {
     protected var isViewCreated = false
+    var onShowListener: ((v: AttachUI) -> Unit)? = null
+    var onDismissListener: ((v: AttachUI) -> Unit)? = null
+
+
     open fun onCreateView(container: ViewGroup): View {
         return View(context)
     }
@@ -30,6 +33,8 @@ open class AttachUI @JvmOverloads constructor(
         KeyBoxUtil.hideSoftInput(this)
         val container = parent as ViewGroup?
         container?.removeView(this)
+
+        onDismissListener?.invoke(this)
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
@@ -68,7 +73,7 @@ open class AttachUI @JvmOverloads constructor(
         if (isShowing()) {
             return
         }
-        KeyBoxUtil.hideSoftInput(this)
+//        KeyBoxUtil.hideSoftInput(this)
 
         getRootContainer()?.removeView(this)
         var lp = layoutParams
@@ -78,8 +83,9 @@ open class AttachUI @JvmOverloads constructor(
             lp.width = MarginLayoutParams.MATCH_PARENT
             lp.height = MarginLayoutParams.MATCH_PARENT
         }
-        BarUtils.setStatusBarLightMode(getActivity()!!, true)
         getRootContainer()?.addView(this, lp)
+        onShowListener?.invoke(this)
+        z = 99f
     }
 
     open fun isShowing(): Boolean {
@@ -123,7 +129,7 @@ open class AttachUI @JvmOverloads constructor(
 
     protected fun getRootContainer(): ViewGroup? {
         return (getActivity()?.window?.decorView) as ViewGroup?
-
+//        return getActivity()?.findViewById(android.R.id.content)
     }
 
 

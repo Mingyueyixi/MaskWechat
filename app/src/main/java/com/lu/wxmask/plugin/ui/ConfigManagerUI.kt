@@ -23,6 +23,7 @@ import com.lu.wxmask.adapter.AbsListAdapter
 import com.lu.wxmask.adapter.CommonListAdapter
 import com.lu.wxmask.bean.MaskItemBean
 import com.lu.wxmask.plugin.ui.view.BottomPopUI
+import com.lu.wxmask.util.BarUtils
 import com.lu.wxmask.util.ConfigUtil
 import com.lu.wxmask.util.ext.dp
 
@@ -40,7 +41,10 @@ internal class ConfigManagerUI(private val context: Activity) : IConfigManagerUI
 //    private val mContentLayout = FrameLayout(context)
 
     init {
-        popwindow = BottomPopUI(onCreateView(), topDragBoundHeight = 44.dp)
+        popwindow = BottomPopUI(onCreateView(), topDragBoundHeight = 48.dp)
+        popwindow.onShowListener = {
+            BarUtils.setStatusBarLightMode(context, true)
+        }
     }
 
 
