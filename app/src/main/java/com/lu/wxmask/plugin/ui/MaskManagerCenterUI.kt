@@ -17,12 +17,14 @@ import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
 import com.google.gson.JsonObject
+import com.lu.magic.util.ResUtil
 import com.lu.magic.util.ToastUtil
 import com.lu.magic.util.kxt.toElseString
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.bean.QuickTemporaryBean
 import com.lu.wxmask.plugin.ui.view.AttachUI
 import com.lu.wxmask.ui.adapter.SpinnerListAdapter
+import com.lu.wxmask.util.ActivityUtils
 import com.lu.wxmask.util.ConfigUtil
 import com.lu.wxmask.util.ext.dp
 import com.lu.wxmask.util.ext.toIntElse
@@ -77,7 +79,12 @@ class MaskManagerCenterUI @JvmOverloads constructor(
         }
     }
 
-    override fun dismiss() {
+    private fun dismissWithCheck(check: Boolean = true) {
+        if (!check) {
+            super.dismiss()
+            return
+        }
+
         if (mQuickClickCountEdit?.text.isNullOrBlank() || mQuickClickDurationEdit?.text.isNullOrBlank()) {
             ToastUtil.show("不能为空")
             return
@@ -103,7 +110,10 @@ class MaskManagerCenterUI @JvmOverloads constructor(
         } else {
             super.dismiss()
         }
+    }
 
+    override fun dismiss() {
+        dismissWithCheck(true)
     }
 
     private fun getContent(): View {
@@ -114,24 +124,12 @@ class MaskManagerCenterUI @JvmOverloads constructor(
                 orientation = LinearLayout.VERTICAL
             }
             setPadding(24.dp, 12.dp, 24.dp, 12.dp)
-            addView(FrameLayout(context).apply {
-                layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
-                addView(
-                    ItemTitle("小黑屋名单管理")
-                )
-                addView(TextView(context).apply {
-                    layoutParams = FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
-                        gravity = Gravity.END or Gravity.CENTER_VERTICAL
+            addView(
+                ItemLayoutArrowRight("黑名单管理").apply {
+                    setOnClickListener {
+                        ConfigManagerUI(getActivity()!!).show()
                     }
-                    text = ">"
-                    textSize = 18f
-                    scaleX = 0.6f
-                    setTextColor(Color.GRAY)
                 })
-                setOnClickListener {
-                    ConfigManagerUI(getActivity()!!).show()
-                }
-            })
             addView(Divider())
             addView(ItemTitle("临时解除", onClick = {
 
@@ -170,14 +168,47 @@ class MaskManagerCenterUI @JvmOverloads constructor(
                     inputType = InputType.TYPE_CLASS_NUMBER
                 })
             })
+
+            addView(Divider())
+            addView(ItemLayoutArrowRight("清空配置数据").apply {
+                setOnClickListener {
+                    AlertDialog.Builder(context)
+                        .setTitle("警告")
+                        .setMessage("该操作会清空所有配置数据")
+                        .setPositiveButton("取消", null)
+                        .setNegativeButton("确定") { _, _ ->
+                            ConfigUtil.clearData()
+                            ToastUtil.show("配置已清空，请杀掉${context.resources.getString(context.applicationInfo.labelRes)}并重启")
+                            getActivity()?.finish()
+                        }
+                        .show()
+                }
+            })
         }
     }
 
     private fun Divider() = View(context).apply {
         layoutParams = MarginLayoutParams(MATCH_PARENT, 1.dp).apply {
-
+            topMargin = 4.dp
+            bottomMargin = 4.dp
         }
         setBackgroundColor(Theme.Color.divider)
+    }
+
+    private fun ItemLayoutArrowRight(text: String) = FrameLayout(context).apply {
+        layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
+        addView(
+            ItemTitle(text)
+        )
+        addView(TextView(context).apply {
+            layoutParams = FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+                gravity = Gravity.END or Gravity.CENTER_VERTICAL
+            }
+            this.text = ">"
+            textSize = 18f
+            scaleX = 0.6f
+            setTextColor(Color.GRAY)
+        })
     }
 
     private fun ItemSubEdit(text: String) = EditText(context).apply {

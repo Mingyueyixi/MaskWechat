@@ -74,6 +74,19 @@ class ConfigUtil {
             }
         }
 
+
+        fun clearData() {
+            try {
+                var result = sp.edit().clear().commit()
+                if (!result) {
+                    LogUtil.w("clear sp data fail$result")
+                }
+                notifyConfigSetObserverChanged()
+            } catch (e: Exception) {
+                LogUtil.w("clear sp data fail", e)
+            }
+        }
+
         fun registerConfigSetObserver(observer: ConfigSetObserver) {
             dataSetObserverList.add(observer)
         }
@@ -91,6 +104,8 @@ class ConfigUtil {
                 it.onConfigChange()
             }
         }
+
+
     }
 
     fun interface ConfigSetObserver {

@@ -17,16 +17,24 @@ import com.lu.magic.util.view.ChildDeepCheck
 import com.lu.wxmask.ClazzN
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.MainHook
+import com.lu.wxmask.bean.PointBean
 import com.lu.wxmask.plugin.WXMaskPlugin
 import com.lu.wxmask.util.AppVersionUtil
+import com.lu.wxmask.util.HookPointManager
 import com.lu.wxmask.util.ext.getViewId
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import java.lang.reflect.Method
+import java.lang.reflect.Modifier
 
 /**
  * 主页UI（即微信底部“微信”Tab选中时所在页面）处理，消息、小红点相关逻辑
  */
 class HideMainUIListPluginPart : IPlugin {
+    val GetItemMethodName = when (AppVersionUtil.getVersionCode()) {
+        Constrant.WX_CODE_8_0_22 -> "aCW"
+        in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_43 -> "k"
+        else -> "m"
+    }
 
     override fun handleHook(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
         runCatching {
@@ -52,6 +60,7 @@ class HideMainUIListPluginPart : IPlugin {
 
             Constrant.WX_CODE_8_0_35 -> "com.tencent.mm.ui.conversation.r"
             in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_41 -> "com.tencent.mm.ui.conversation.x"
+            Constrant.WX_CODE_8_0_47 -> "com.tencent.mm.ui.conversation.p3"
             else -> null
         }
         var adapterClazz: Class<*>? = null
@@ -70,7 +79,7 @@ class HideMainUIListPluginPart : IPlugin {
                 ListAdapter::class.java
             )
             if (setAdapterMethod == null) {
-                LogUtil.w( "setAdapterMethod is null")
+                LogUtil.w("setAdapterMethod is null")
                 return
             }
             XposedHelpers2.hookMethod(
@@ -203,13 +212,47 @@ class HideMainUIListPluginPart : IPlugin {
         MainHook.uniqueMetaStore.add(getViewMethodIDText)
     }
 
+
+    private fun findGetItemMethod(adapterClazz: Class<*>?): Method? {
+        if (adapterClazz == null) {
+            return null
+        }
+        var method: Method? = XposedHelpers2.findMethodExactIfExists(adapterClazz, GetItemMethodName, Integer.TYPE)
+        if (method != null) {
+            return method
+        }
+        var methods = XposedHelpers2.findMethodsByExactPredicate(adapterClazz) { m ->
+            val ret = !arrayOf(
+                Object::class.java,
+                String::class.java,
+                Byte::class.java,
+                Short::class.java,
+                Long::class.java,
+                Float::class.java,
+                Double::class.java,
+                String::class.java,
+                java.lang.Byte.TYPE,
+                java.lang.Short.TYPE,
+                java.lang.Integer.TYPE,
+                java.lang.Long.TYPE,
+                java.lang.Float.TYPE,
+                java.lang.Double.TYPE,
+            ).contains(m.returnType)
+            val paramVail = m.parameterTypes.size == 1 && m.parameterTypes[0] == Integer.TYPE
+            return@findMethodsByExactPredicate paramVail && ret && Modifier.isPublic(m.modifiers) && !Modifier.isAbstract(m.modifiers)
+        }
+        if (methods.size > 0) {
+            method = methods[0]
+            if (methods.size > 1) {
+                LogUtil.d("find getItem methods: []--> " + methods.joinToString("\n"))
+            }
+            LogUtil.d("guess getItem method $method")
+        }
+        return method
+    }
+
     private fun handleMainUIChattingListView2(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
         //listAdapter getItem方法被重命名了
-        var getItemMethodName = when (AppVersionUtil.getVersionCode()) {
-            Constrant.WX_CODE_8_0_22 -> "aCW"
-            in Constrant.WX_CODE_8_0_22 .. Constrant.WX_CODE_8_0_43 -> "k"
-            else -> "m"
-        }
         //8.0.32-8.0.34 com.tencent.mm.ui.y
         //8.0.35-8.0.37　　com.tencent.mm.ui.z
         //搞实际Adapter的父类，是个抽象类
@@ -218,12 +261,12 @@ class HideMainUIListPluginPart : IPlugin {
             in Constrant.WX_CODE_8_0_32..Constrant.WX_CODE_8_0_34 -> "com.tencent.mm.ui.y"
             in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_38 -> "com.tencent.mm.ui.z"
             in Constrant.WX_CODE_8_0_40..Constrant.WX_CODE_8_0_43 -> "com.tencent.mm.ui.b0"
-            in Constrant.WX_CODE_8_0_43 .. Constrant.WX_CODE_8_0_44 -> "com.tencent.mm.ui.h3"
-            in Constrant.WX_CODE_8_0_43 .. Constrant.WX_CODE_8_0_45 -> "com.tencent.mm.ui.i3"
+            in Constrant.WX_CODE_8_0_43..Constrant.WX_CODE_8_0_44 -> "com.tencent.mm.ui.h3"
+            in Constrant.WX_CODE_8_0_43..Constrant.WX_CODE_8_0_47 -> "com.tencent.mm.ui.i3"
             else -> null
         }
         var getItemMethod = if (adapterClazzName != null) {
-            XposedHelpers2.findMethodExactIfExists(adapterClazzName, AppUtil.getClassLoader(), getItemMethodName, Integer.TYPE)
+            findGetItemMethod(ClazzN.from(adapterClazzName))
         } else {
             null
         }
@@ -249,7 +292,8 @@ class HideMainUIListPluginPart : IPlugin {
                             return
                         }
                         LogUtil.w(AppVersionUtil.getSmartVersionName(), "guess setAdapter: ", adapter, adapter.javaClass.superclass)
-                        getItemMethod = XposedHelpers2.findMethodExactIfExists(adapter::class.java.superclass, "k", Integer.TYPE)
+                        var getItemMethod = findGetItemMethod(adapter::class.java.superclass)
+//                        getItemMethod = XposedHelpers2.findMethodExactIfExists(adapter::class.java.superclass, GetItemMethodName, Integer.TYPE)
                         if (getItemMethod == null) {
                             getItemMethod = XposedHelpers2.findMethodExactIfExists(adapter::class.java.superclass, "getItem", Integer.TYPE)
                         }

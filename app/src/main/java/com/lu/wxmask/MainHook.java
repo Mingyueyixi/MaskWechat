@@ -48,6 +48,7 @@ public class MainHook implements IXposedHookLoadPackage, IXposedHookZygoteInit, 
 //            return;
 //        }
 
+
         HashSet<String> allowList = new HashSet<>();
         allowList.add(BuildConfig.APPLICATION_ID);
         allowList.add(TARGET_PACKAGE);
