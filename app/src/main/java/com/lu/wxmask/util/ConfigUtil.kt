@@ -77,7 +77,7 @@ class ConfigUtil {
 
         fun clearData() {
             try {
-                var result = sp.edit().clear().commit()
+                val result = sp.edit().clear().commit()
                 if (!result) {
                     LogUtil.w("clear sp data fail$result")
                 }

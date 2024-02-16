@@ -42,9 +42,6 @@ internal class ConfigManagerUI(private val context: Activity) : IConfigManagerUI
 
     init {
         popwindow = BottomPopUI(onCreateView(), topDragBoundHeight = 48.dp)
-        popwindow.onShowListener = {
-            BarUtils.setStatusBarLightMode(context, true)
-        }
     }
 
 
@@ -66,11 +63,7 @@ internal class ConfigManagerUI(private val context: Activity) : IConfigManagerUI
             // isForceDarkAllowed = true
             background = GradientDrawable().apply {
                 shape = GradientDrawable.RECTANGLE
-                if (ResUtil.isAppNightMode(context)) {
-                    setColor(Theme.Color.bgColorDark)
-                } else {
-                    setColor(Theme.Color.bgColor)
-                }
+                setColor(Theme.Color.bgPrimary(context))
                 cornerRadii = floatArrayOf(16f.dp, 16f.dp, 16f.dp, 16f.dp, 0f, 0f, 0f, 0f)
             }
 

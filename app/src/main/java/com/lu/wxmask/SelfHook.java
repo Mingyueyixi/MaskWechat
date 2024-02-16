@@ -50,6 +50,13 @@ public class SelfHook implements IPlugin {
                 }
         );
 
+        if (BuildConfig.DEBUG) {
+            handleDebugHook(context, lpparam);
+        }
+
+    }
+
+    private void handleDebugHook(Context context, XC_LoadPackage.LoadPackageParam lpparam) {
         XposedHelpers.findAndHookMethod(
                 ClazzN.from("android.app.Activity"),
                 "onResume",
@@ -60,6 +67,5 @@ public class SelfHook implements IPlugin {
                         act.findViewById(ResUtilXKt.getViewId(ResUtil.INSTANCE, "action_bar")).setOnClickListener(v -> new MaskManagerCenterUI(act).show());
                     }
                 });
-
     }
 }

@@ -1,14 +1,15 @@
 package com.lu.wxmask.util.ext
 
-import android.view.TextureView
-import android.view.View
-import androidx.core.util.Consumer
+import android.graphics.Color
+import android.widget.TextView
 import com.google.gson.JsonObject
 import com.lu.magic.util.AppUtil
+import com.lu.magic.util.ColorUtil
 import com.lu.magic.util.GsonUtil
+import com.lu.magic.util.ResUtil
 import com.lu.magic.util.SizeUtil
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
+import com.lu.wxmask.util.ColorUtilX
+
 
 val sizeIntCache = HashMap<String, Int>()
 val sizeFloatCache = HashMap<String, Float>()
@@ -52,3 +53,12 @@ fun CharSequence?.toIntElse(fallback: Int): Int = try {
 } catch (e: Exception) {
     fallback
 }
+
+fun TextView.setTextColorTheme(color: Int) {
+    if (ResUtil.isAppNightMode(this.context)) {
+        setTextColor(ColorUtilX.invertColor(color))
+    } else {
+        setTextColor(color)
+    }
+}
+

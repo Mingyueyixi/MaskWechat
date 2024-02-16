@@ -3,6 +3,7 @@ package com.lu.wxmask.plugin.ui
 import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Color
+import android.os.Build
 import android.text.InputType
 import android.util.AttributeSet
 import android.util.TypedValue
@@ -25,8 +26,10 @@ import com.lu.wxmask.bean.QuickTemporaryBean
 import com.lu.wxmask.plugin.ui.view.AttachUI
 import com.lu.wxmask.ui.adapter.SpinnerListAdapter
 import com.lu.wxmask.util.ActivityUtils
+import com.lu.wxmask.util.BarUtils
 import com.lu.wxmask.util.ConfigUtil
 import com.lu.wxmask.util.ext.dp
+import com.lu.wxmask.util.ext.setTextColorTheme
 import com.lu.wxmask.util.ext.toIntElse
 import com.lu.wxmask.util.ext.toJson
 
@@ -38,8 +41,17 @@ class MaskManagerCenterUI @JvmOverloads constructor(
     var mQuickClickCountEdit: EditText? = null
     var mQuickClickDurationEdit: EditText? = null
 
+    init {
+        this.onShowListener = {
+            BarUtils.setStatusBarLightMode(getActivity()!!, true)
+        }
+    }
+
     override fun onCreateView(container: ViewGroup): View {
-        container.setBackgroundColor(Theme.Color.bgColor)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            isForceDarkAllowed = true
+        }
+        container.setBackgroundColor(Theme.Color.bgPrimary(context))
         return LinearLayout(context).apply {
             layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
                 orientation = LinearLayout.VERTICAL
@@ -60,7 +72,7 @@ class MaskManagerCenterUI @JvmOverloads constructor(
                     marginStart = 24.dp
                     marginEnd = 24.dp
                 }
-                setTextColor(Color.BLACK)
+                setTextColorTheme(Color.BLACK)
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 24f)
                 text = "×"
 
@@ -72,7 +84,7 @@ class MaskManagerCenterUI @JvmOverloads constructor(
                 layoutParams = FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
                     gravity = Gravity.CENTER
                 }
-                setTextColor(Color.BLACK)
+                setTextColorTheme(Color.BLACK)
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
                 text = "老年人配置中心"
             })
@@ -175,8 +187,8 @@ class MaskManagerCenterUI @JvmOverloads constructor(
                     AlertDialog.Builder(context)
                         .setTitle("警告")
                         .setMessage("该操作会清空所有配置数据")
-                        .setPositiveButton("取消", null)
-                        .setNegativeButton("确定") { _, _ ->
+                        .setNegativeButton("取消", null)
+                        .setPositiveButton("确定") { _, _ ->
                             ConfigUtil.clearData()
                             ToastUtil.show("配置已清空，请杀掉${context.resources.getString(context.applicationInfo.labelRes)}并重启")
                             getActivity()?.finish()
@@ -189,8 +201,8 @@ class MaskManagerCenterUI @JvmOverloads constructor(
 
     private fun Divider() = View(context).apply {
         layoutParams = MarginLayoutParams(MATCH_PARENT, 1.dp).apply {
-            topMargin = 4.dp
-            bottomMargin = 4.dp
+            topMargin = 8.dp
+            bottomMargin = 8.dp
         }
         setBackgroundColor(Theme.Color.divider)
     }
@@ -207,7 +219,7 @@ class MaskManagerCenterUI @JvmOverloads constructor(
             this.text = ">"
             textSize = 18f
             scaleX = 0.6f
-            setTextColor(Color.GRAY)
+            setTextColorTheme(Color.GRAY)
         })
     }
 

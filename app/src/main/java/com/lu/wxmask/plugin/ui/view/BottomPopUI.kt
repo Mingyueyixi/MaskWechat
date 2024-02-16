@@ -30,7 +30,7 @@ class BottomPopUI(
     }
 
     override fun onCreateView(container: ViewGroup): View {
-        container.setBackgroundColor(0x8888888)
+        container.setBackgroundColor(0x33000000.toInt())
         container.setOnClickListener {
             dismiss()
         }
