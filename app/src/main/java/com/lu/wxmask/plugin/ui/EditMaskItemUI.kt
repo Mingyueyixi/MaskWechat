@@ -97,10 +97,6 @@ class EditMaskItemUI(
                             maskItemBean.tipData = it
                         }
 
-                        val clickCount = ui.etClickCount.text.toElseString("5").toInt()
-                        val duration = ui.etDuration.text.toElseString("150").toInt()
-                        ConfigUtil.setTemporary(QuickTemporaryBean(duration, clickCount))
-
                         ConfigUtil.setMaskList(lst)
                         ToastUtil.show("已更新！")
                         onConfigChangeListener?.invoke(dialog, maskItemBean, MODE_CONFIG_UPDATE)

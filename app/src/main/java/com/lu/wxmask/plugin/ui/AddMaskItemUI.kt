@@ -81,12 +81,9 @@ class AddMaskItemUI(
                     val tipMode = ui.tipSpinnerSelectedItem.first
                     val tipData = GsonUtil.toJsonTree(MaskItemBean.TipData(tipMess)).asJsonObject
 
-                    val clickCount = ui.etClickCount.text.toElseString("5").toInt()
-                    val duration = ui.etDuration.text.toElseString("150").toInt()
 
                     MaskItemBean(maskId, maskName, tipMode, tipData).let {
                         ConfigUtil.addMaskList(it)
-                        ConfigUtil.setTemporary(QuickTemporaryBean(duration, clickCount))
                         configListener?.invoke(dialog, it)
                     }
                     dialog.dismiss()

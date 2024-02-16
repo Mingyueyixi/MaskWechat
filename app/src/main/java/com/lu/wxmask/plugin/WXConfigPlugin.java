@@ -114,7 +114,7 @@ public class WXConfigPlugin implements IPlugin {
     }
 
     private void showManagerConfigUI(Activity activity, Intent intent) {
-        new ConfigManagerUI(activity).initUI().show();
+        new ConfigManagerUI(activity).show();
     }
 
     private void showAddTipDialog(Activity activity) {
