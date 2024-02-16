@@ -21,6 +21,15 @@ open class AttachUI @JvmOverloads constructor(
     var onShowListener: ((v: AttachUI) -> Unit)? = null
     var onDismissListener: ((v: AttachUI) -> Unit)? = null
 
+    var _rootContainer: ViewGroup? = null
+    var rootContainer: ViewGroup? = _rootContainer
+        get() {
+            if (_rootContainer == null) {
+                _rootContainer = (getActivity()?.window?.decorView) as ViewGroup?
+            }
+            return _rootContainer
+        }
+
 
     open fun onCreateView(container: ViewGroup): View {
         return View(context)
@@ -73,9 +82,6 @@ open class AttachUI @JvmOverloads constructor(
         if (isShowing()) {
             return
         }
-//        KeyBoxUtil.hideSoftInput(this)
-
-        getRootContainer()?.removeView(this)
         var lp = layoutParams
         if (lp == null) {
             lp = MarginLayoutParams(MarginLayoutParams.MATCH_PARENT, MarginLayoutParams.MATCH_PARENT)
@@ -83,7 +89,9 @@ open class AttachUI @JvmOverloads constructor(
             lp.width = MarginLayoutParams.MATCH_PARENT
             lp.height = MarginLayoutParams.MATCH_PARENT
         }
-        getRootContainer()?.addView(this, lp)
+        if (parent == null) {
+            rootContainer?.addView(this, lp)
+        }
         onShowListener?.invoke(this)
         z = 99f
     }
@@ -124,12 +132,6 @@ open class AttachUI @JvmOverloads constructor(
             }
         }
         return null
-    }
-
-
-    protected fun getRootContainer(): ViewGroup? {
-        return (getActivity()?.window?.decorView) as ViewGroup?
-//        return getActivity()?.findViewById(android.R.id.content)
     }
 
 

@@ -85,7 +85,9 @@ class BottomPopUI(
                     })
             }.start()
         }
-        mTransferView.visibility = View.INVISIBLE
+        if (!isShowing()) {
+            mTransferView.visibility = View.INVISIBLE
+        }
         super.show()
     }
 
