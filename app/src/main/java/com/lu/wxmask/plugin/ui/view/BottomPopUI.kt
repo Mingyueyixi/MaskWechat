@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.FrameLayout
 import androidx.core.animation.addListener
+import com.lu.wxmask.plugin.ui.Theme
 
 class BottomPopUI(
     val contentView: View,
@@ -30,7 +31,7 @@ class BottomPopUI(
     }
 
     override fun onCreateView(container: ViewGroup): View {
-        container.setBackgroundColor(0x33000000.toInt())
+        container.setBackgroundColor(Theme.Color.bgColorDialogTranslucence)
         container.setOnClickListener {
             dismiss()
         }

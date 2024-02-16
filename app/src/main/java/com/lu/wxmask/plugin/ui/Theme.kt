@@ -14,10 +14,11 @@ interface Theme {
     }
 
     class Colors {
+        val bgRippleColor: Int = 0xFF33AAAAAA.toInt()
         val bgColor = 0xFFF9F6F6.toInt()
-        val bgColorDialogDark = 0xFF303030.toInt()
+        val bgColorDialogTranslucence = 0x33000000.toInt()
         val bgColorDark = 0xFF0B0B0B.toInt()
-        val divider = 0XFFCCCCCC.toInt()
+        val divider = 0XFFDDDDDD.toInt()
 
         val bgPrimary = fun(context: Context): Int {
             if (ResUtil.isSystemNightMode(context)) {

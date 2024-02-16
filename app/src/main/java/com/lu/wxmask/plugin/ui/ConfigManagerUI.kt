@@ -94,7 +94,7 @@ internal class ConfigManagerUI(private val context: Activity) : IConfigManagerUI
                 setOnClickListener {
                     showAddMaskItemDialog()
                 }
-                RippleApplyUtil.apply(this, RectangleRippleBuilder(Color.TRANSPARENT, 0x33333333, 4))
+                RippleApplyUtil.apply(this, RectangleRippleBuilder(Color.TRANSPARENT, Theme.Color.bgRippleColor, 4))
                 val size = (textSize * 1.5).toInt()
                 layoutParams = FrameLayout.LayoutParams(size, size).apply {
                     gravity = Gravity.END
@@ -139,7 +139,7 @@ internal class ConfigManagerUI(private val context: Activity) : IConfigManagerUI
                         MarginLayoutParams.WRAP_CONTENT
                     )
                     it.setPadding(6.dp)
-                    RippleApplyUtil.apply(it, RectangleRippleBuilder(Color.TRANSPARENT, 0x33333333))
+                    RippleApplyUtil.apply(it, RectangleRippleBuilder(Color.TRANSPARENT, Theme.Color.bgRippleColor))
                 }
 
                 return object : ViewHolder(itemView) {

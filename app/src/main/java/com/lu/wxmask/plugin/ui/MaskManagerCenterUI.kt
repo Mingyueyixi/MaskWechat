@@ -17,10 +17,13 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
+import androidx.core.view.marginTop
 import com.google.gson.JsonObject
 import com.lu.magic.util.ResUtil
 import com.lu.magic.util.ToastUtil
 import com.lu.magic.util.kxt.toElseString
+import com.lu.magic.util.ripple.RectangleRippleBuilder
+import com.lu.magic.util.ripple.RippleApplyUtil
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.bean.QuickTemporaryBean
 import com.lu.wxmask.plugin.ui.view.AttachUI
@@ -161,6 +164,7 @@ class MaskManagerCenterUI @JvmOverloads constructor(
             addView(LinearLayout(context).apply {
                 layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
                     orientation = LinearLayout.HORIZONTAL
+                    topMargin = 8.dp
                 }
                 addView(ItemSubTitle("间隔时长/毫秒："))
                 addView(ItemSubEdit(quickTemp.duration.toElseString("150")).apply {
@@ -201,17 +205,22 @@ class MaskManagerCenterUI @JvmOverloads constructor(
 
     private fun Divider() = View(context).apply {
         layoutParams = MarginLayoutParams(MATCH_PARENT, 1.dp).apply {
-            topMargin = 8.dp
-            bottomMargin = 8.dp
+            topMargin = 24.dp
+            bottomMargin = 24.dp
         }
         setBackgroundColor(Theme.Color.divider)
     }
 
     private fun ItemLayoutArrowRight(text: String) = FrameLayout(context).apply {
-        layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
-        addView(
-            ItemTitle(text)
-        )
+        layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, 48.dp).apply {
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        RippleApplyUtil.apply(this, RectangleRippleBuilder(Color.TRANSPARENT, Theme.Color.bgRippleColor))
+        addView(ItemTitle(text).apply {
+            layoutParams = FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+                gravity = Gravity.START or Gravity.CENTER_VERTICAL
+            }
+        })
         addView(TextView(context).apply {
             layoutParams = FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
                 gravity = Gravity.END or Gravity.CENTER_VERTICAL
@@ -244,8 +253,7 @@ class MaskManagerCenterUI @JvmOverloads constructor(
 
     private fun ItemTitle(text: String, onClick: View.OnClickListener? = null) = TextView(context).apply {
         layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
-            topMargin = 12.dp
-            bottomMargin = 12.dp
+            gravity = Gravity.CENTER_VERTICAL
         }
         gravity = Gravity.CENTER_VERTICAL
         Theme.Style.itemTitleStyle(this)
