@@ -2,8 +2,8 @@
     <!-- Base application theme. -->
     <style name="Theme.MaskWechat" parent="Theme.AppCompat.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="android:statusBarColor">@color/purple_500</item>
+        <item name="colorPrimary">@color/app_primary</item>
+        <item name="android:statusBarColor">@color/app_primary</item>
         <!--        <item name="colorPrimaryVariant">@color/purple_500</item>-->
         <!--        <item name="colorOnPrimary">@color/white</item>-->
         <!--        &lt;!&ndash; Secondary brand color. &ndash;&gt;-->
