@@ -3,6 +3,7 @@ package com.lu.wxmask.plugin.ui
 import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Build
 import android.text.InputType
 import android.util.AttributeSet
@@ -40,6 +41,8 @@ import com.lu.wxmask.util.ext.toJson
 class MaskManagerCenterUI @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0, defStyleRes: Int = 0
 ) : AttachUI(context, attrs, defStyleAttr, defStyleRes) {
+
+    private val ITEM_HEIGHT: Int = 48.dp
 
     var mQuickClickCountEdit: EditText? = null
     var mQuickClickDurationEdit: EditText? = null
@@ -88,6 +91,7 @@ class MaskManagerCenterUI @JvmOverloads constructor(
                     gravity = Gravity.CENTER
                 }
                 setTextColorTheme(Color.BLACK)
+                setTypeface(Typeface.DEFAULT_BOLD)
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
                 text = "老年人配置中心"
             })
@@ -212,10 +216,9 @@ class MaskManagerCenterUI @JvmOverloads constructor(
     }
 
     private fun ItemLayoutArrowRight(text: String) = FrameLayout(context).apply {
-        layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, 48.dp).apply {
+        layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, ITEM_HEIGHT).apply {
             gravity = Gravity.CENTER_VERTICAL
         }
-        RippleApplyUtil.apply(this, RectangleRippleBuilder(Color.TRANSPARENT, Theme.Color.bgRippleColor))
         addView(ItemTitle(text).apply {
             layoutParams = FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
                 gravity = Gravity.START or Gravity.CENTER_VERTICAL
@@ -230,6 +233,8 @@ class MaskManagerCenterUI @JvmOverloads constructor(
             scaleX = 0.6f
             setTextColorTheme(Color.GRAY)
         })
+
+        RippleApplyUtil.apply(this, RectangleRippleBuilder(Color.TRANSPARENT, Theme.Color.bgRippleColor))
     }
 
     private fun ItemSubEdit(text: String) = EditText(context).apply {
@@ -240,6 +245,7 @@ class MaskManagerCenterUI @JvmOverloads constructor(
         Theme.Style.itemSubTitleStyle(this)
         setText(text)
     }
+//    伪造id，跳转到指定的账号
 
     private fun ItemSubTitle(text: String, onClick: View.OnClickListener? = null) = TextView(context).apply {
         layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
@@ -252,7 +258,7 @@ class MaskManagerCenterUI @JvmOverloads constructor(
     }
 
     private fun ItemTitle(text: String, onClick: View.OnClickListener? = null) = TextView(context).apply {
-        layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+        layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, ITEM_HEIGHT).apply {
             gravity = Gravity.CENTER_VERTICAL
         }
         gravity = Gravity.CENTER_VERTICAL
