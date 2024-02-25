@@ -15,6 +15,7 @@ import com.lu.wxmask.BuildConfig
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.plugin.WXMaskPlugin
 import com.lu.wxmask.util.AppVersionUtil
+import com.lu.wxmask.util.ConfigUtil
 import com.lu.wxmask.util.dev.DebugUtil
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.callbacks.XC_LoadPackage
@@ -47,6 +48,9 @@ class HideSearchListUIPluginPart : IPlugin {
             object : XC_MethodHook2() {
                 override fun afterHookedMethod(param: MethodHookParam) {
                     super.afterHookedMethod(param)
+                    if (!ConfigUtil.getOptionData().hideMainSearch) {
+                        return
+                    }
                     if (needHideUserName2(param, param.result)) {
                         LogUtil.d(param.result)
 //                        param.result = try {
@@ -176,6 +180,9 @@ class HideSearchListUIPluginPart : IPlugin {
         if (itemData == null) {
             return false
         }
+        if (!ConfigUtil.getOptionData().hideMainSearch) {
+            return false
+        }
 
 // 方法一，列举class。当前使用
 // 方法二，遍历要隐藏的ID，在itemData的field.value中发现，即屏蔽
@@ -267,6 +274,9 @@ class HideSearchListUIPluginPart : IPlugin {
 
     fun needHideUserName2(param: XC_MethodHook.MethodHookParam, itemData: Any?): Boolean {
         if (itemData == null) {
+            return false
+        }
+        if (!ConfigUtil.getOptionData().hideMainSearch) {
             return false
         }
         var clazz: Class<*>? = itemData.javaClass ?: return false

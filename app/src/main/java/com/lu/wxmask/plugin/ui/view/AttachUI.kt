@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.ViewCompat
+import androidx.core.view.get
 import com.lu.wxmask.util.KeyBoxUtil
 import com.lu.wxmask.util.ext.dp
 
@@ -81,6 +82,9 @@ open class AttachUI @JvmOverloads constructor(
     open fun show() {
         if (isShowing()) {
             return
+        }
+        getActivity()?.let {
+            KeyBoxUtil.hideSoftInput(it)
         }
         var lp = layoutParams
         if (lp == null) {

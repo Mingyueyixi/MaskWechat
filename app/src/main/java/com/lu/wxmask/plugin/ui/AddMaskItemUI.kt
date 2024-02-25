@@ -81,8 +81,10 @@ class AddMaskItemUI(
                     val tipMode = ui.tipSpinnerSelectedItem.first
                     val tipData = GsonUtil.toJsonTree(MaskItemBean.TipData(tipMess)).asJsonObject
 
-
                     MaskItemBean(maskId, maskName, tipMode, tipData).let {
+                        ui.etMapId.text?.apply {
+                            it.mapId = this.toString()
+                        }
                         ConfigUtil.addMaskList(it)
                         configListener?.invoke(dialog, it)
                     }

@@ -9,7 +9,6 @@ import android.widget.TextView
 import com.lu.lposed.api2.XC_MethodHook2
 import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
-import com.lu.magic.util.AppUtil
 import com.lu.magic.util.GsonUtil
 import com.lu.magic.util.ResUtil
 import com.lu.magic.util.log.LogUtil
@@ -17,10 +16,11 @@ import com.lu.magic.util.view.ChildDeepCheck
 import com.lu.wxmask.ClazzN
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.MainHook
-import com.lu.wxmask.bean.PointBean
+import com.lu.wxmask.plugin.WXConfigPlugin
 import com.lu.wxmask.plugin.WXMaskPlugin
+import com.lu.wxmask.plugin.ui.MaskUtil
 import com.lu.wxmask.util.AppVersionUtil
-import com.lu.wxmask.util.HookPointManager
+import com.lu.wxmask.util.ConfigUtil
 import com.lu.wxmask.util.ext.getViewId
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import java.lang.reflect.Method
@@ -320,7 +320,17 @@ class HideMainUIListPluginPart : IPlugin {
                     val itemData: Any = param.result ?: return
                     LogUtil.v("item-data", GsonUtil.toJson(itemData))
                     val chatUser: String? = XposedHelpers2.getObjectField(itemData, "field_username")
+                    if (chatUser == null) {
+                        LogUtil.w("chat user is null")
+                        return
+                    }
                     if (WXMaskPlugin.containChatUser(chatUser)) {
+                        if (ConfigUtil.getOptionData().enableMapConversation) {
+                            var maskBean = WXMaskPlugin.getMaskBeamById(chatUser)?.let {
+                                XposedHelpers2.setObjectField(itemData, "field_username", it.mapId)
+                            }
+
+                        }
                         XposedHelpers2.setObjectField(itemData, "field_content", "")
                         XposedHelpers2.setObjectField(itemData, "field_digest", "")
                         XposedHelpers2.setObjectField(itemData, "field_unReadCount", 0)
@@ -340,6 +350,7 @@ class HideMainUIListPluginPart : IPlugin {
 //                        }
 
                     }
+
 
                 }
 

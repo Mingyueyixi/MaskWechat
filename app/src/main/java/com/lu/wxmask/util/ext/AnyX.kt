@@ -62,3 +62,15 @@ fun TextView.setTextColorTheme(color: Int) {
     }
 }
 
+fun Class<*>?.createEmptyOrNullObject(): Any? {
+    if (this == null) {
+        return null
+    }
+    return runCatching {
+        this::class.java.newInstance()
+    }.getOrElse {
+        runCatching {
+            return GsonUtil.fromJson("{}", this::class.java)
+        }.getOrDefault(null)
+    }
+}

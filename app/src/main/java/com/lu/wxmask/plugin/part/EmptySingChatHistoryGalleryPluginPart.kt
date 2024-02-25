@@ -18,6 +18,7 @@ import com.lu.wxmask.ClazzN
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.plugin.WXMaskPlugin
 import com.lu.wxmask.util.AppVersionUtil
+import com.lu.wxmask.util.ConfigUtil
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import java.lang.reflect.Method
@@ -72,6 +73,9 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
         }
         XposedHelpers2.hookMethod(mediaMethod, object : XC_MethodHook2() {
             override fun beforeHookedMethod(param: MethodHookParam) {
+                if (!ConfigUtil.getOptionData().hideSingleSearch) {
+                    return
+                }
                 val activity: Activity = param.thisObject as Activity
                 val intent = activity.intent
                 val userName = intent.getStringExtra("kintent_talker")
@@ -132,6 +136,9 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
             galleryMethod,
             object : XC_MethodHook2() {
                 override fun beforeHookedMethod(param: MethodHookParam) {
+                    if (!ConfigUtil.getOptionData().hideSingleSearch) {
+                        return
+                    }
                     val activity: Activity = param.thisObject as Activity
                     val intent = activity.intent
                     val userName = intent.getStringExtra("kintent_talker")
@@ -160,6 +167,9 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
                 object : XC_MethodHook2() {
                     override fun beforeHookedMethod(param: MethodHookParam) {
                         super.beforeHookedMethod(param)
+                        if (!ConfigUtil.getOptionData().hideSingleSearch) {
+                            return
+                        }
 //                        val activity: Activity = param.thisObject as Activity
 
 //
@@ -257,6 +267,9 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
             object : XC_MethodHook2() {
 
                 override fun beforeHookedMethod(param: MethodHookParam) {
+                    if (!ConfigUtil.getOptionData().hideSingleSearch) {
+                        return
+                    }
                     debugLog(param)
                     if (isHitMaskId(param.thisObject)) {
                         val arrayList: java.util.ArrayList<*> = param.args[0] as java.util.ArrayList<*>
@@ -278,6 +291,9 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
             object : XC_MethodHook2() {
 
                 override fun beforeHookedMethod(param: MethodHookParam) {
+                    if (!ConfigUtil.getOptionData().hideSingleSearch) {
+                        return
+                    }
                     debugLog(param)
                     if (isHitMaskId(param.thisObject)) {
                         val arrayList: java.util.ArrayList<*> = param.args[0] as java.util.ArrayList<*>
@@ -298,6 +314,9 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
             object : XC_MethodHook2() {
 
                 override fun afterHookedMethod(param: MethodHookParam) {
+                    if (!ConfigUtil.getOptionData().hideSingleSearch) {
+                        return
+                    }
                     debugLog(param)
                     if (isHitMaskId(param.thisObject)) {
                         val inflater = param.args[0] as LayoutInflater

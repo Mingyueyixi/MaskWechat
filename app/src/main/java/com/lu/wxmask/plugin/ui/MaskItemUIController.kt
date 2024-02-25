@@ -1,24 +1,18 @@
 package com.lu.wxmask.plugin.ui
 
 import android.content.Context
-import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams.MATCH_PARENT
+import android.view.ViewGroup.MarginLayoutParams.WRAP_CONTENT
 import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Spinner
-import android.widget.TextView
 import androidx.core.view.setPadding
-import com.google.gson.JsonObject
 import com.lu.magic.util.SizeUtil
 import com.lu.wxmask.Constrant
-import com.lu.wxmask.adapter.AbsListAdapter
-import com.lu.wxmask.adapter.CommonListAdapter
 import com.lu.wxmask.bean.MaskItemBean
-import com.lu.wxmask.bean.QuickTemporaryBean
 import com.lu.wxmask.ui.adapter.SpinnerListAdapter
-import com.lu.wxmask.util.ConfigUtil
 import com.lu.wxmask.util.ext.dp
 
 internal class MaskItemUIController(private val context: Context, private val mask: MaskItemBean) {
@@ -27,8 +21,8 @@ internal class MaskItemUIController(private val context: Context, private val ma
     val dp24 = SizeUtil.dp2px(context.resources, 24f).toInt()
     var root: LinearLayout = LinearLayout(context).apply {
         layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
+            MATCH_PARENT,
+            WRAP_CONTENT
         ).also {
             orientation = LinearLayout.VERTICAL
         }
@@ -54,13 +48,18 @@ internal class MaskItemUIController(private val context: Context, private val ma
             else -> it.setText(Constrant.WX_MASK_TIP_ALERT_MESS_DEFAULT)
         }
     }
+    var etMapId = EditText(context).apply {
+        hint = "变脸者，默认${MaskItemBean.fromJson("{}").mapId}"
+        setText(mask.mapId)
+    }
+
     val spinnerTipDataList = arrayListOf(
-        Constrant.CONFIG_TIP_MODE_ALERT to "提示模式",
-        Constrant.WX_MASK_TIP_MODE_SILENT to "静默模式"
+        Constrant.WX_MASK_TIP_MODE_SILENT to "静默模式",
+        Constrant.CONFIG_TIP_MODE_ALERT to "提示模式"
     )
     var tipSpinner: Spinner = Spinner(context).also {
         it.layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+            MATCH_PARENT, WRAP_CONTENT
         )
         it.adapter = SpinnerListAdapter(spinnerTipDataList)
         it.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -89,16 +88,16 @@ internal class MaskItemUIController(private val context: Context, private val ma
 
     init {
         LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
+            MATCH_PARENT,
+            WRAP_CONTENT
         ).apply {
             topMargin = 4.dp
         }
-        root.addView(etMaskId, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-        root.addView(etTagName, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-        root.addView(tipSpinner, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-        root.addView(etTipMess, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-
+        root.addView(etMaskId, MATCH_PARENT, WRAP_CONTENT)
+        root.addView(etTagName, MATCH_PARENT, WRAP_CONTENT)
+        root.addView(tipSpinner, MATCH_PARENT, WRAP_CONTENT)
+        root.addView(etTipMess, MATCH_PARENT, WRAP_CONTENT)
+        root.addView(etMapId, MATCH_PARENT, WRAP_CONTENT)
     }
 
 

@@ -1,6 +1,7 @@
 package com.lu.wxmask.plugin.point;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.lu.lposed.api2.XC_MethodHook2;
 import com.lu.lposed.api2.XposedHelpers2;
@@ -11,6 +12,7 @@ import com.lu.wxmask.ClazzN;
 import com.lu.wxmask.bean.PointBean;
 import com.lu.wxmask.plugin.WXMaskPlugin;
 import com.lu.wxmask.plugin.part.HideSearchListUIPluginPart;
+import com.lu.wxmask.util.ConfigUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -37,6 +39,10 @@ public class HideSearchListPoint implements IPlugin {
         XposedHelpers2.hookMethod(method, new XC_MethodHook2() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                if (!ConfigUtil.Companion.getOptionData().getHideMainSearch()) {
+                    LogUtil.i("off hideMainSearch");
+                    return;
+                }
                 WXMaskPlugin wxMaskPlugin = PluginProviders.from(WXMaskPlugin.class);
                 HideSearchListUIPluginPart pluginPart = wxMaskPlugin.getHideSearchListPluginPart();
 

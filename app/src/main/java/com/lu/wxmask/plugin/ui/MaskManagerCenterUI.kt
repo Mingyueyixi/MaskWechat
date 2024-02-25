@@ -16,11 +16,11 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.Spinner
+import android.widget.Switch
 import android.widget.TextView
-import androidx.core.view.marginTop
 import com.google.gson.JsonObject
-import com.lu.magic.util.ResUtil
 import com.lu.magic.util.ToastUtil
 import com.lu.magic.util.kxt.toElseString
 import com.lu.magic.util.ripple.RectangleRippleBuilder
@@ -29,7 +29,6 @@ import com.lu.wxmask.Constrant
 import com.lu.wxmask.bean.QuickTemporaryBean
 import com.lu.wxmask.plugin.ui.view.AttachUI
 import com.lu.wxmask.ui.adapter.SpinnerListAdapter
-import com.lu.wxmask.util.ActivityUtils
 import com.lu.wxmask.util.BarUtils
 import com.lu.wxmask.util.ConfigUtil
 import com.lu.wxmask.util.ext.dp
@@ -46,6 +45,8 @@ class MaskManagerCenterUI @JvmOverloads constructor(
 
     var mQuickClickCountEdit: EditText? = null
     var mQuickClickDurationEdit: EditText? = null
+    val mOptionData = ConfigUtil.getOptionData()
+
 
     init {
         this.onShowListener = {
@@ -63,7 +64,11 @@ class MaskManagerCenterUI @JvmOverloads constructor(
                 orientation = LinearLayout.VERTICAL
             }
             addView(getTitleBar())
-            addView(getContent())
+            addView(ScrollView(context).apply {
+                layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
+
+                addView(getContent())
+            })
         }
     }
 
@@ -110,20 +115,25 @@ class MaskManagerCenterUI @JvmOverloads constructor(
         }
 
         val quickTempLocal = QuickTemporaryBean(ConfigUtil.getTemporaryJson() ?: JsonObject())
+        val optionDataLocal = ConfigUtil.getOptionData()
+
         val uiQuickTemp = QuickTemporaryBean().apply {
             duration = mQuickClickDurationEdit?.text.toIntElse(duration)
             clickCount = mQuickClickCountEdit?.text.toIntElse(clickCount)
         }
 
-        if (quickTempLocal.toJson() != (uiQuickTemp.toJson())) {
+        if (quickTempLocal.toJson() != (uiQuickTemp.toJson()) || mOptionData.toJson() != optionDataLocal.toJson()) {
             //数据发生了变更
             AlertDialog.Builder(context)
                 .setTitle("提示")
                 .setIcon(context.applicationInfo.icon)
                 .setMessage("是否保存修改？")
-                .setNegativeButton("取消", null)
+                .setNegativeButton("取消") { _, _ ->
+                    super.dismiss()
+                }
                 .setPositiveButton("确定") { _, _ ->
                     ConfigUtil.setTemporary(uiQuickTemp)
+                    ConfigUtil.setOptionData(mOptionData)
                     super.dismiss()
                 }.show()
         } else {
@@ -159,7 +169,6 @@ class MaskManagerCenterUI @JvmOverloads constructor(
                     Constrant.CONFIG_TEMPORARY_MODE_QUICK_CLICK to "快速点击",
                     Constrant.CONFIG_TEMPORARY_MODE_LONG_PRESS to "长按解除",
                     Constrant.CONFIG_TEMPORARY_MODE_CIPHER to "长按解除"
-
                 )
                 adapter = SpinnerListAdapter(dataList)
                 visibility = View.GONE
@@ -189,6 +198,54 @@ class MaskManagerCenterUI @JvmOverloads constructor(
                 })
             })
 
+            addView(Divider())
+            addView(ItemTitle("实验室"))
+            addView(FrameLayout(context).apply {
+                layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, ITEM_HEIGHT).apply {
+                    gravity = Gravity.CENTER_VERTICAL
+                    topMargin = 8.dp
+                }
+                addView(ItemSubTitle("主页会话变脸伪装"))
+                addView(Switch(context).apply {
+                    layoutParams = FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+                        gravity = Gravity.CENTER_VERTICAL or Gravity.RIGHT
+                    }
+                    isChecked = mOptionData.enableMapConversation
+                    setOnCheckedChangeListener { buttonView, isChecked ->
+                        mOptionData.enableMapConversation = isChecked
+                    }
+                })
+            })
+            addView(FrameLayout(context).apply {
+                layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, ITEM_HEIGHT).apply {
+                    gravity = Gravity.CENTER_VERTICAL
+                }
+                addView(ItemSubTitle("主页搜索隐藏"))
+                addView(Switch(context).apply {
+                    layoutParams = FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+                        gravity = Gravity.CENTER_VERTICAL or Gravity.RIGHT
+                    }
+                    isChecked = mOptionData.hideMainSearch
+                    setOnCheckedChangeListener { buttonView, isChecked ->
+                        mOptionData.hideMainSearch = isChecked
+                    }
+                })
+            })
+            addView(FrameLayout(context).apply {
+                layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, ITEM_HEIGHT).apply {
+                    gravity = Gravity.CENTER_VERTICAL
+                }
+                addView(ItemSubTitle("单聊搜索隐藏"))
+                addView(Switch(context).apply {
+                    layoutParams = FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+                        gravity = Gravity.CENTER_VERTICAL or Gravity.RIGHT
+                    }
+                    isChecked = mOptionData.hideSingleSearch
+                    setOnCheckedChangeListener { buttonView, isChecked ->
+                        mOptionData.hideSingleSearch = isChecked
+                    }
+                })
+            })
             addView(Divider())
             addView(ItemLayoutArrowRight("清空配置数据").apply {
                 setOnClickListener {

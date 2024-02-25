@@ -15,7 +15,6 @@ import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
 import androidx.core.view.setPadding
-import com.lu.magic.util.ResUtil
 import com.lu.magic.util.SizeUtil
 import com.lu.magic.util.ripple.RectangleRippleBuilder
 import com.lu.magic.util.ripple.RippleApplyUtil
@@ -23,7 +22,6 @@ import com.lu.wxmask.adapter.AbsListAdapter
 import com.lu.wxmask.adapter.CommonListAdapter
 import com.lu.wxmask.bean.MaskItemBean
 import com.lu.wxmask.plugin.ui.view.BottomPopUI
-import com.lu.wxmask.util.BarUtils
 import com.lu.wxmask.util.ConfigUtil
 import com.lu.wxmask.util.ext.dp
 
@@ -38,10 +36,11 @@ interface IConfigManagerUI {
 internal class ConfigManagerUI(private val context: Activity) : IConfigManagerUI {
     private lateinit var listAdapter: CommonListAdapter<MaskItemBean, AbsListAdapter.ViewHolder>
     private val popwindow: BottomPopUI
-//    private val mContentLayout = FrameLayout(context)
+    private lateinit var listView: ListView
 
     init {
-        popwindow = BottomPopUI(onCreateView(), topDragBoundHeight = 48.dp)
+        popwindow = BottomPopUI(onCreateView())
+        popwindow.needScrollChild = listView
     }
 
 
@@ -107,6 +106,8 @@ internal class ConfigManagerUI(private val context: Activity) : IConfigManagerUI
     private fun initMaskListView(): ListView {
         initListAdapter()
         return ListView(context).apply {
+            listView = this
+            isVerticalScrollBarEnabled = false
             layoutParams = LinearLayout.LayoutParams(MarginLayoutParams.MATCH_PARENT, MarginLayoutParams.WRAP_CONTENT).apply {
                 topMargin = 16.dp
             }

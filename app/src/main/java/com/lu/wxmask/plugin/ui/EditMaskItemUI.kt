@@ -89,7 +89,9 @@ class EditMaskItemUI(
                         maskItemBean.maskId = maskId
                         maskItemBean.tipMode = ui.tipSpinnerSelectedItem.first
                         maskItemBean.tagName = tagName
-
+                        ui.etMapId.text?.let {
+                            maskItemBean.mapId = it.toString()
+                        }
                         when (maskItemBean.tipMode) {
                             Constrant.CONFIG_TIP_MODE_ALERT -> GsonUtil.toJsonTree(MaskItemBean.TipData(tipMess)).asJsonObject
                             else -> null
