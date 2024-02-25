@@ -18,7 +18,7 @@ class OptionData(
             }
             return OptionData(
                 hideMainSearch = json.optBoolean("hideMainSearch", true),
-                enableMapConversation = json.optBoolean("hideConversationItem", false),
+                enableMapConversation = json.optBoolean("enableMapConversation", false),
                 hideSingleSearch = json.optBoolean("hideSingleSearch", true)
             )
         }
