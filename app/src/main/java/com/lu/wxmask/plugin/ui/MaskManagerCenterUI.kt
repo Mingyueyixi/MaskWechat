@@ -235,6 +235,21 @@ class MaskManagerCenterUI @JvmOverloads constructor(
                 layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, ITEM_HEIGHT).apply {
                     gravity = Gravity.CENTER_VERTICAL
                 }
+                addView(ItemSubTitle("主页搜索隐藏-强力模式（可能会引发崩溃）"))
+                addView(Switch(context).apply {
+                    layoutParams = FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+                        gravity = Gravity.CENTER_VERTICAL or Gravity.RIGHT
+                    }
+                    isChecked = mOptionData.hideMainSearchStrong
+                    setOnCheckedChangeListener { buttonView, isChecked ->
+                        mOptionData.hideMainSearchStrong = isChecked
+                    }
+                })
+            })
+            addView(FrameLayout(context).apply {
+                layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, ITEM_HEIGHT).apply {
+                    gravity = Gravity.CENTER_VERTICAL
+                }
                 addView(ItemSubTitle("单聊搜索隐藏"))
                 addView(Switch(context).apply {
                     layoutParams = FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {

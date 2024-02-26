@@ -237,6 +237,7 @@ class HideMainUIListPluginPart : IPlugin {
                 java.lang.Long.TYPE,
                 java.lang.Float.TYPE,
                 java.lang.Double.TYPE,
+                java.lang.Void.TYPE
             ).contains(m.returnType)
             val paramVail = m.parameterTypes.size == 1 && m.parameterTypes[0] == Integer.TYPE
             return@findMethodsByExactPredicate paramVail && ret && Modifier.isPublic(m.modifiers) && !Modifier.isAbstract(m.modifiers)

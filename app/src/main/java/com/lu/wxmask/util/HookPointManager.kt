@@ -34,10 +34,13 @@ class HookPointManager {
             hookList.addAll(getHookPointByScanner(context))
             ConfigUtil.sp.edit().putString(keyLocal, hookList.toJson()).apply()
         }
+        val hideMainSearchStrong = ConfigUtil.getOptionData().hideMainSearchStrong
         hookList.forEach {
             when (it.featId) {
                 KEY_SEARCH_ADAPTER -> {
-                    HideSearchListPoint(it).handleHook(context, lpparam)
+                    if (hideMainSearchStrong) {
+                        HideSearchListPoint(it).handleHook(context, lpparam)
+                    }
                 }
             }
         }
@@ -86,6 +89,7 @@ class HookPointManager {
                                 java.lang.Long.TYPE,
                                 java.lang.Float.TYPE,
                                 java.lang.Double.TYPE,
+                                java.lang.Void.TYPE
                             ).contains(m.returnType)
                             if (ret && Modifier.isPublic(m.modifiers) && !Modifier.isAbstract(m.modifiers)) {
                                 result.add(PointBean(KEY_SEARCH_ADAPTER, clazz.name, m.name))

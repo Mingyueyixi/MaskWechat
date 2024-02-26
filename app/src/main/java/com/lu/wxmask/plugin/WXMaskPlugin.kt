@@ -62,7 +62,9 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
         loadConfigData()
         hideMainUIListPluginPart.handleHook(context, lpparam)
         enterChattingUIPluginPart.handleHook(context, lpparam)
-//        hideSearchListPluginPart.handleHook(context, lpparam)
+        if (!ConfigUtil.getOptionData().hideMainSearchStrong) {
+            hideSearchListPluginPart.handleHook(context, lpparam)
+        }
         emptySingChatHistoryGalleryPluginPart.handleHook(context, lpparam)
         maskUIManagerPluginPart.handleHook(context, lpparam)
     }
