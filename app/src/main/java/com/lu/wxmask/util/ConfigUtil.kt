@@ -1,5 +1,6 @@
 package com.lu.wxmask.util
 
+import android.text.TextUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.lu.magic.util.GsonUtil
@@ -36,9 +37,16 @@ class ConfigUtil {
             try {
                 val jsonText = sp.getString(KEY_MASK_LIST, "[]")
                 val jsonArr = JSONArray(jsonText)
-                for (i in 0..jsonArr.length()) {
+                for (i in 0 until jsonArr.length()) {
                     val json = jsonArr.optString(i)
-                    result.add(MaskItemBean.fromJson(json))
+                    if (json.isNullOrBlank()) {
+                        continue
+                    }
+                    var bean = MaskItemBean.fromJson(json)
+                    if (TextUtils.isEmpty(bean.maskId)) {
+                        continue
+                    }
+                    result.add(bean)
                 }
             } catch (e: Exception) {
                 LogUtil.w("getMaskList fail", e)
