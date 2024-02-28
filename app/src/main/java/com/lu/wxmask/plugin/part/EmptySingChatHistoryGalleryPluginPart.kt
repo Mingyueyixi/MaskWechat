@@ -199,8 +199,8 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
                         if (WXMaskPlugin.containChatUser(userName)) {
                             param.args[1] = 0
                             LogUtil.i("empty MediaHistoryGalleryUI data")
+                            param.args[0] = false
                         }
-                        param.args[0] = false
 //                        XposedHelpers2.findFirstFieldByExactType(this::class.java)
                     }
                 }
