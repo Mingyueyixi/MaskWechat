@@ -4,21 +4,25 @@ import android.content.Context
 import com.lu.lposed.plugin.IPlugin
 import com.lu.lposed.plugin.PluginProviders
 import com.lu.magic.util.log.LogUtil
+import com.lu.wxmask.bean.MaskItemBean
 import com.lu.wxmask.plugin.part.EmptySingChatHistoryGalleryPluginPart
 import com.lu.wxmask.plugin.part.EnterChattingUIPluginPart
 import com.lu.wxmask.plugin.part.HideMainUIListPluginPart
 import com.lu.wxmask.plugin.part.HideSearchListUIPluginPart
+import com.lu.wxmask.plugin.part.MaskUIManagerPluginPart
 import com.lu.wxmask.util.ConfigUtil
 import com.lu.wxmask.util.ConfigUtil.ConfigSetObserver
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam
-import java.util.concurrent.CopyOnWriteArraySet
 
 class WXMaskPlugin : IPlugin, ConfigSetObserver {
-    lateinit var maskIdList: Array<String?>
+    var maskIdList = ArrayList<String?>()
+    val maskListMap: LinkedHashMap<String?, MaskItemBean> = LinkedHashMap()
+
     val hideSearchListPluginPart = HideSearchListUIPluginPart()
     private val enterChattingUIPluginPart = EnterChattingUIPluginPart()
     private val hideMainUIListPluginPart = HideMainUIListPluginPart()
     private val emptySingChatHistoryGalleryPluginPart = EmptySingChatHistoryGalleryPluginPart()
+    private val maskUIManagerPluginPart = MaskUIManagerPluginPart()
 
     companion object {
         fun containChatUser(chatUser: String?): Boolean {
@@ -29,34 +33,40 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
             }
             return self.maskIdList.contains(chatUser)
         }
+
+        fun getMaskBeamById(id: String): MaskItemBean? {
+            val self = PluginProviders.from(WXMaskPlugin::class.java)
+            return self.maskListMap[id]
+        }
     }
 
-    private fun loadMaskIdList(): Array<String?> {
-        val maskList = ConfigUtil.getMaskList()
-        val ret = arrayOfNulls<String>(maskList.size)
-        for (i in maskList.indices) {
-            ret[i] = maskList[i].maskId
+    private fun loadConfigData() {
+        ConfigUtil.getMaskList().forEach {
+            maskListMap[it.maskId] = it
+            maskIdList.add(it.maskId)
         }
-        return ret
     }
+
 
     override fun onCreate() {
         ConfigUtil.registerConfigSetObserver(this)
     }
 
     override fun onConfigChange() {
-        //实时更新id的值
-        maskIdList = loadMaskIdList()
+        loadConfigData()
     }
 
     override fun handleHook(context: Context, lpparam: LoadPackageParam) {
 //        handleViewClick(context, lpparam)
 //        LogUtil.w(" context state:::::::::::", context is Application, context.applicationContext)
-        maskIdList = loadMaskIdList()
+        loadConfigData()
         hideMainUIListPluginPart.handleHook(context, lpparam)
         enterChattingUIPluginPart.handleHook(context, lpparam)
-//        hideSearchListPluginPart.handleHook(context, lpparam)
+        if (!ConfigUtil.getOptionData().hideMainSearchStrong) {
+            hideSearchListPluginPart.handleHook(context, lpparam)
+        }
         emptySingChatHistoryGalleryPluginPart.handleHook(context, lpparam)
+        maskUIManagerPluginPart.handleHook(context, lpparam)
     }
 
 

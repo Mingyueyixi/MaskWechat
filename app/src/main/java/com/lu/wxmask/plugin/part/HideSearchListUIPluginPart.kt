@@ -1,6 +1,7 @@
 package com.lu.wxmask.plugin.part
 
 import android.content.Context
+import android.text.TextUtils
 import android.util.LruCache
 import android.util.SparseArray
 import com.lu.lposed.api2.XC_MethodHook2
@@ -10,11 +11,13 @@ import com.lu.lposed.plugin.PluginProviders
 import com.lu.magic.util.AppUtil
 import com.lu.magic.util.GsonUtil
 import com.lu.magic.util.ReflectUtil
+import com.lu.magic.util.TextUtil
 import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.BuildConfig
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.plugin.WXMaskPlugin
 import com.lu.wxmask.util.AppVersionUtil
+import com.lu.wxmask.util.ConfigUtil
 import com.lu.wxmask.util.dev.DebugUtil
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.callbacks.XC_LoadPackage
@@ -35,10 +38,11 @@ class HideSearchListUIPluginPart : IPlugin {
             return
         }
 
-        var getItemMethod = when (AppVersionUtil.getVersionCode()) {
+        val getItemMethod = when (AppVersionUtil.getVersionCode()) {
             Constrant.WX_CODE_8_0_44 -> "h"
             else -> "i"
         }
+//        LogUtil.d("getItem name:", getItemMethod)
         //hook getItem --> rename to h
         XposedHelpers2.findAndHookMethod("com.tencent.mm.plugin.fts.ui.a0",
             context.classLoader,
@@ -47,8 +51,9 @@ class HideSearchListUIPluginPart : IPlugin {
             object : XC_MethodHook2() {
                 override fun afterHookedMethod(param: MethodHookParam) {
                     super.afterHookedMethod(param)
+//                    LogUtil.d("search hide afterMethod")
                     if (needHideUserName2(param, param.result)) {
-                        LogUtil.d(param.result)
+                        LogUtil.d("search hide", param.result)
 //                        param.result = try {
 //                            //将命中的用户数据抹除掉
 //                            param.result::class.java.newInstance()
@@ -176,6 +181,9 @@ class HideSearchListUIPluginPart : IPlugin {
         if (itemData == null) {
             return false
         }
+        if (!ConfigUtil.getOptionData().hideMainSearch) {
+            return false
+        }
 
 // 方法一，列举class。当前使用
 // 方法二，遍历要隐藏的ID，在itemData的field.value中发现，即屏蔽
@@ -269,6 +277,9 @@ class HideSearchListUIPluginPart : IPlugin {
         if (itemData == null) {
             return false
         }
+        if (!ConfigUtil.getOptionData().hideMainSearch) {
+            return false
+        }
         var clazz: Class<*>? = itemData.javaClass ?: return false
         if (hideFieldInfoCache[clazz!!.name] != null) {
             for (field in hideFieldInfoCache[clazz.name]!!) {
@@ -327,10 +338,10 @@ class HideSearchListUIPluginPart : IPlugin {
         jsonResultLruCache.put(jsonKey, compareText)
 
         for (wxid in PluginProviders.from(WXMaskPlugin::class.java).maskIdList) {
-            if (wxid == null) {
+            if (TextUtils.isEmpty(wxid) || TextUtils.isEmpty(wxid?.trim())) {
                 continue
             }
-            if (compareText.contains(wxid)) {
+            if (compareText.contains(wxid!!)) {
                 putField2Cache(itemData::class.java.name, field)
                 LogUtil.d("hit wxid compareText: ", compareText)
                 return true

@@ -19,6 +19,12 @@
 4.  模块会抓取糊脸Id（微信用户的唯一id），并弹出对话框。
 5.  确认后，点击对话框确定按钮。再次进入聊天页即隐藏与此用户的聊天记录
 
+### 2.0版本变更
+
+1. 全局配置移动不再个人弹窗中出现，而是移动到了配置中心
+2. 配置中心打开路径为：“微信设置->关怀模式->开启按钮（长按）”
+
+
 ### 临时解除隐藏（Since v1.6）
 
 v1.6版本：  
@@ -75,7 +81,8 @@ v1.13版本开始，默认隐藏App在桌面的图标。隐藏以后，打开模
 8.0.43 (2480) 2023-11-06
 8.0.44 (2502) 2023-12-04
 8.0.45 (2521) 2024-01-02
-
+8.0.46 (2540) 2024-01-23
+8.0.47 (2560) 2024-02-01
 
 **PS.**
 - 仅支持上述版本，所有其他版本号以及32位版本未经测试，预计百分之九十九不可用
@@ -139,8 +146,12 @@ SHA1: 38525994D6D69106CDB3D6F9F62B045CFF9CC4D5
 
 8.0.45（2521）：[https://dldir1.qq.com/weixin/android/weixin8045android2521_0x28002d34_arm64_1.apk](https://dldir1.qq.com/weixin/android/weixin8045android2521_0x28002d34_arm64_1.apk)    
 SHA1: F44F35663E2A2C3BF9EA671270D65902AB5727DA    
- 
 
+8.0.46（2540）: [https://dldir1.qq.com/weixin/android/weixin/android/weixin8046android2540_0x28002e34_arm64.apk](https://dldir1.qq.com/weixin/android/weixin/android/weixin8046android2540_0x28002e34_arm64.apk)    
+SHA1: 173D8632093949D7AB1DA6D8B8CB5C1252876BEB    
+
+8.0.47（2560）: [https://dldir1.qq.com/weixin/android/weixin8047android2560_0x28002f36_arm64.apk](https://dldir1.qq.com/weixin/android/weixin8047android2560_0x28002f36_arm64.apk)    
+SHA1: 79F1341563A9CCCAF3090D27A5E9D529008EEC42    
 
 
 推荐适配的最后两个版本，因为其他版本，作者自己不再使用

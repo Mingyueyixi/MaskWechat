@@ -89,17 +89,15 @@ class EditMaskItemUI(
                         maskItemBean.maskId = maskId
                         maskItemBean.tipMode = ui.tipSpinnerSelectedItem.first
                         maskItemBean.tagName = tagName
-
+                        ui.etMapId.text?.let {
+                            maskItemBean.mapId = it.toString()
+                        }
                         when (maskItemBean.tipMode) {
                             Constrant.CONFIG_TIP_MODE_ALERT -> GsonUtil.toJsonTree(MaskItemBean.TipData(tipMess)).asJsonObject
                             else -> null
                         }?.let {
                             maskItemBean.tipData = it
                         }
-
-                        val clickCount = ui.etClickCount.text.toElseString("5").toInt()
-                        val duration = ui.etDuration.text.toElseString("150").toInt()
-                        ConfigUtil.setTemporary(QuickTemporaryBean(duration, clickCount))
 
                         ConfigUtil.setMaskList(lst)
                         ToastUtil.show("已更新！")

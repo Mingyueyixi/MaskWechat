@@ -144,7 +144,7 @@ class MainFragment : BaseFragment() {
 
             private fun applyModuleStateRipple(v: View, enable: Boolean) {
                 val contentColor = if (enable) {
-                    view.context.getColor(R.color.purple_200)
+                    view.context.getColor(R.color.app_primary)
                 } else {
                     0xFFFF6027.toInt()
                 }
