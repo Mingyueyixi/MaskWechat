@@ -8,7 +8,8 @@ class OptionData private constructor(
     var hideMainSearch: Boolean,
     var enableMapConversation: Boolean,
     var hideSingleSearch: Boolean,
-    var hideMainSearchStrong: Boolean
+    var hideMainSearchStrong: Boolean,
+    var viewWxDbPw: Boolean
 ) {
 
     companion object {
@@ -22,7 +23,8 @@ class OptionData private constructor(
                 hideMainSearch = json.optBoolean("hideMainSearch", true),
                 enableMapConversation = json.optBoolean("enableMapConversation", false),
                 hideSingleSearch = json.optBoolean("hideSingleSearch", true),
-                hideMainSearchStrong = json.optBoolean("hideMainSearchStrong", false)
+                hideMainSearchStrong = json.optBoolean("hideMainSearchStrong", false),
+                viewWxDbPw = json.optBoolean("viewWxDbPw", false),
             )
         }
 

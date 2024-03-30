@@ -46,7 +46,7 @@ v1.7版本新增功能（预计**Only For 8.0.32**）当Wechat主页发起的搜
 通过`配置管理`清除即可
 
 
-**PS.**  
+**PS.**
 - 模块仅仅是隐藏了视图，不对用户数据进行修改
 - 模块目前仅隐藏聊天记录，防止被偷窥，而不会”伪装“或修改好友/群组信息，此类功能暂时不会添加
 - 模块正常只隐藏主页相关消息，不包括通知栏等渠道的消息，有较强隐私需求用户，建议关闭微信的`通知显示消息详情`
@@ -54,15 +54,15 @@ v1.7版本新增功能（预计**Only For 8.0.32**）当Wechat主页发起的搜
 
 ### 隐藏App图标（Since V1.13）
 
-v1.13版本开始，默认隐藏App在桌面的图标。隐藏以后，打开模块App可以通过以下途径：    
+v1.13版本开始，默认隐藏App在桌面的图标。隐藏以后，打开模块App可以通过以下途径：
 1. 从 lsp 模块管理器打开App
 2. 从网页链接（deeplink）打开App
 
-**PS.**   
-- App主页跳转链接：[maskwechat://com.lu.wxmask](maskwechat://com.lu.wxmask)  
-- 小米系统可通过系统的”扫一扫“扫描上述链接对应的二维马直接打开（请自行去生成一个吧），其他app如浏览器需可点击短链打开：[https://sourl.cn/sPfEeY](https://sourl.cn/sPfEeY)，可以保存为书签  
-- 微信/QQ不支持通过此类链接跳转  
-- 自行配置 html 如：`<a href="maskwechat://com.lu.wxmask">maskwechat://com.lu.wxmask</a>`  
+**PS.**
+- App主页跳转链接：[maskwechat://com.lu.wxmask](maskwechat://com.lu.wxmask)
+- 小米系统可通过系统的”扫一扫“扫描上述链接对应的二维马直接打开（请自行去生成一个吧），其他app如浏览器需可点击短链打开：[https://sourl.cn/sPfEeY](https://sourl.cn/sPfEeY)，可以保存为书签
+- 微信/QQ不支持通过此类链接跳转
+- 自行配置 html 如：`<a href="maskwechat://com.lu.wxmask">maskwechat://com.lu.wxmask</a>`
 
 ## 适配版本
 
@@ -70,18 +70,18 @@ v1.13版本开始，默认隐藏App在桌面的图标。隐藏以后，打开模
 8.0.32 (2300) 2023-01-06  
 8.0.33 (2320) 2023-02-23  
 8.0.34 (2340) 2023-03-23  
-8.0.35 (2340) 2023-04-20 (PS. 不是作者写错，而是特么下载到了一个和8.0.34版本号一样的8.0.35)   
+8.0.35 (2340) 2023-04-20 (PS. 不是作者写错，而是特么下载到了一个和8.0.34版本号一样的8.0.35)  
 8.0.35 (2360) 2023-04-20  
-8.0.37 (2380) 2023-05-25   
-8.0.38 (2400) 2023-06-21
-8.0.40 (2420) 2023-07-20
-8.0.40 (2420) 2023-07-20    
-8.0.41 (2441) 2023-09-06
-8.0.42 (2460) 2023-09-22
-8.0.43 (2480) 2023-11-06
-8.0.44 (2502) 2023-12-04
-8.0.45 (2521) 2024-01-02
-8.0.46 (2540) 2024-01-23
+8.0.37 (2380) 2023-05-25  
+8.0.38 (2400) 2023-06-21  
+8.0.40 (2420) 2023-07-20  
+8.0.40 (2420) 2023-07-20  
+8.0.41 (2441) 2023-09-06  
+8.0.42 (2460) 2023-09-22  
+8.0.43 (2480) 2023-11-06  
+8.0.44 (2502) 2023-12-04  
+8.0.45 (2521) 2024-01-02  
+8.0.46 (2540) 2024-01-23  
 8.0.47 (2560) 2024-02-01
 
 **PS.**
@@ -100,7 +100,7 @@ v1.13版本开始，默认隐藏App在桌面的图标。隐藏以后，打开模
 （5）[https://dldir1.qq.com/weixin/android/weixin8032android2300.apk](https://dldir1.qq.com/weixin/android/weixin8032android2300.apk)  
 （6）[https://dldir1.qq.com/weixin/android/weixin8032android2300_1.apk](https://dldir1.qq.com/weixin/android/weixin8032android2300_1.apk)  
 （7）[https://dldir1.qq.com/weixin/android/weixin8032android2300_2.apk](https://dldir1.qq.com/weixin/android/weixin8032android2300_2.apk)  
-（8）[https://dldir1.qq.com/weixin/android/weixin8032android2300_3.apk](https://dldir1.qq.com/weixin/android/weixin8032android2300_3.apk)  
+（8）[https://dldir1.qq.com/weixin/android/weixin8032android2300_3.apk](https://dldir1.qq.com/weixin/android/weixin8032android2300_3.apk)
 
 **问题2：为什么我的微信版本是8.0.32，仍然弹出不支持的版本对话框？**  
 答：原因类似问题1，只不过你的微信版本号不是2300，仅仅是版本名称叫8.0.32，而这、导致模块不支持。由此可见，8.0.32的安装包也远不止问题1所列。假如你能正常使用，但是弹窗，请反馈版本号以便去除弹窗。
@@ -109,49 +109,49 @@ v1.13版本开始，默认隐藏App在桌面的图标。隐藏以后，打开模
 **问题3：上面列举了那么多个下载链接，到底下载那个？**  
 答：以下链接来自官网：  
 8.0.22（2140）：[https://dldir1.qq.com/weixin/android/weixin8022android2140_arm64.apk](https://dldir1.qq.com/weixin/android/weixin8022android2140_arm64.apk)  
-SHA1: 2FAB9BF8E160F38494FE7D6D4D7A56DF63B6EB58  
+SHA1: 2FAB9BF8E160F38494FE7D6D4D7A56DF63B6EB58
 
 8.0.32（2300）：[https://dldir1.qq.com/weixin/android/weixin8032android2300_arm64_3.apk](https://dldir1.qq.com/weixin/android/weixin8032android2300_arm64_3.apk)  
-SHA1: 45A408C5222C1A03D3B7C84F06DA97AD2F5B4ADC  
+SHA1: 45A408C5222C1A03D3B7C84F06DA97AD2F5B4ADC
 
 8.0.33（2320）：[https://dldir1.qq.com/weixin/android/weixin8033android2320_arm64.apk](https://dldir1.qq.com/weixin/android/weixin8033android2320_arm64.apk)  
-SHA1: 8069F4730CF8839BE68609EF2F4702349E23A86B  
+SHA1: 8069F4730CF8839BE68609EF2F4702349E23A86B
 
 8.0.34（2340）: [https://dldir1.qq.com/weixin/android/weixin8034android2340_arm64_1.apk](https://dldir1.qq.com/weixin/android/weixin8034android2340_arm64_1.apk)  
-SHA1: 30D0D0C25561D367A9E359A1804EA90352BEA7F5  
+SHA1: 30D0D0C25561D367A9E359A1804EA90352BEA7F5
 
 8.0.35 (2360): [https://dldir1.qq.com/weixin/android/weixin8035android2360_arm64_3.apk](https://dldir1.qq.com/weixin/android/weixin8035android2360_arm64_3.apk)  
-SHA1: 5593FB24667D44ABD2299EF1118CD3498099B719  
+SHA1: 5593FB24667D44ABD2299EF1118CD3498099B719
 
 8.0.37（2380）：[https://dldir1.qq.com/weixin/android/weixin8037android2380_arm64_1.apk](https://dldir1.qq.com/weixin/android/weixin8037android2380_arm64_1.apk)  
-SHA1: 410E675B0014F6DF768825F647F69D98A110D50D   
+SHA1: 410E675B0014F6DF768825F647F69D98A110D50D
 
 8.0.38（2400）：[https://dldir1.qq.com/weixin/android/weixin8038android2400_arm64.apk](https://dldir1.qq.com/weixin/android/weixin8038android2400_arm64.apk)  
-SHA1: F62FAD64F70F1181EC62DD3BD796A047028078FA  
+SHA1: F62FAD64F70F1181EC62DD3BD796A047028078FA
 
 8.0.40（2420）：[https://dldir1.qq.com/weixin/android/weixin8040android2420_arm64.apk](https://dldir1.qq.com/weixin/android/weixin8040android2420_arm64.apk)  
-SHA1: BCCA3CCACE5F40184A42FEFB06190C7279024985  
+SHA1: BCCA3CCACE5F40184A42FEFB06190C7279024985
 
 8.0.41（2441）：[https://dldir1.qq.com/weixin/android/weixin8041android2441_arm64_1.apk](https://dldir1.qq.com/weixin/android/weixin8041android2441_arm64_1.apk)    
-SHA1: 51D3E1C9594723FE8A69B68780C4B561964C7718  
+SHA1: 51D3E1C9594723FE8A69B68780C4B561964C7718
 
 8.0.42（2460）：[https://dldir1.qq.com/weixin/android/weixin8042android2460_arm64.apk](https://dldir1.qq.com/weixin/android/weixin8042android2460_arm64.apk)    
-SHA1: 227E395C67A2C0B0BCC750E1A3C52F642B433441    
+SHA1: 227E395C67A2C0B0BCC750E1A3C52F642B433441
 
 8.0.43（2480）：[https://dldir1.qq.com/weixin/android/weixin8043android2480_0x28002b35_arm64.apk](https://dldir1.qq.com/weixin/android/weixin8043android2480_0x28002b35_arm64.apk)    
 SHA1: C46C85AF05130EDABCDBA8D487A5373ECE4AE6D0
 
 8.0.44（2502）：[https://dldir1.qq.com/weixin/android/weixin8044android2502_0x28002c36_arm64.apk](https://dldir1.qq.com/weixin/android/weixin8044android2502_0x28002c36_arm64.apk)    
-SHA1: 38525994D6D69106CDB3D6F9F62B045CFF9CC4D5     
+SHA1: 38525994D6D69106CDB3D6F9F62B045CFF9CC4D5
 
 8.0.45（2521）：[https://dldir1.qq.com/weixin/android/weixin8045android2521_0x28002d34_arm64_1.apk](https://dldir1.qq.com/weixin/android/weixin8045android2521_0x28002d34_arm64_1.apk)    
-SHA1: F44F35663E2A2C3BF9EA671270D65902AB5727DA    
+SHA1: F44F35663E2A2C3BF9EA671270D65902AB5727DA
 
 8.0.46（2540）: [https://dldir1.qq.com/weixin/android/weixin/android/weixin8046android2540_0x28002e34_arm64.apk](https://dldir1.qq.com/weixin/android/weixin/android/weixin8046android2540_0x28002e34_arm64.apk)    
-SHA1: 173D8632093949D7AB1DA6D8B8CB5C1252876BEB    
+SHA1: 173D8632093949D7AB1DA6D8B8CB5C1252876BEB
 
 8.0.47（2560）: [https://dldir1.qq.com/weixin/android/weixin8047android2560_0x28002f36_arm64.apk](https://dldir1.qq.com/weixin/android/weixin8047android2560_0x28002f36_arm64.apk)    
-SHA1: 79F1341563A9CCCAF3090D27A5E9D529008EEC42    
+SHA1: 79F1341563A9CCCAF3090D27A5E9D529008EEC42
 
 
 推荐适配的最后两个版本，因为其他版本，作者自己不再使用
@@ -159,7 +159,7 @@ SHA1: 79F1341563A9CCCAF3090D27A5E9D529008EEC42
 **问题4：是否支持Google Play版本？**  
 答：不支持。  
 （1）如前所述，微信的版本是如此之多，作者没有充足的时间和精力，只能随便摇骰子选一个来适配，而Google Play版没摇中  
-（2）Google Play版并非主流使用版本，故未来也没有计划支持Google Play版  
+（2）Google Play版并非主流使用版本，故未来也没有计划支持Google Play版
 
 
 ## 交流
@@ -170,8 +170,8 @@ telegram普通群：点击添加 [https://t.me/MaskWechatX](https://t.me/MaskWec
 
 ## 声明
 
-1. 项目旨在个人测试与学习开发，请勿用于商业用途，请勿用于非法用途  
-2. 项目所发布的所有App版本，虽名为release，实际均为开发包，均使用同一个测试签名，因此它将不会在应用市场发布  
-3. 项目只保证自身不会包含任何恶意代码，不会主动收集任何个人信息，但不能保证第三方库安全  
-4. 您应当知道并理解使用`模块`的风险，使用此模块如造成问题与作者无关  
+1. 项目旨在个人测试与学习开发，请勿用于商业用途，请勿用于非法用途
+2. 项目所发布的所有App版本，虽名为release，实际均为开发包，均使用同一个测试签名，因此它将不会在应用市场发布
+3. 项目只保证自身不会包含任何恶意代码，不会主动收集任何个人信息，但不能保证第三方库安全
+4. 您应当知道并理解使用`模块`的风险，使用此模块如造成问题与作者无关
 5. 您只有在清楚并同意本声明的情况下，才可使用本项目的App  

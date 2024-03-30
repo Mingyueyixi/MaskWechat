@@ -43,6 +43,7 @@ class MaskManagerCenterUI @JvmOverloads constructor(
 
     private val ITEM_HEIGHT: Int = 48.dp
 
+    private var mViewWxDbPwSwitch: Switch? = null
     var mQuickClickCountEdit: EditText? = null
     var mQuickClickDurationEdit: EditText? = null
     val mOptionData = ConfigUtil.getOptionData()
@@ -261,6 +262,33 @@ class MaskManagerCenterUI @JvmOverloads constructor(
                     }
                 })
             })
+            addView(FrameLayout(context).apply {
+                layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, ITEM_HEIGHT).apply {
+                    gravity = Gravity.CENTER_VERTICAL
+                }
+                addView(ItemSubTitle("查看微信数据库密码").apply {
+                    setOnClickListener {
+                        handlerWxDbItemClick()
+                    }
+                })
+                addView(Switch(context).apply {
+                    mViewWxDbPwSwitch = this
+                    isChecked = mOptionData.viewWxDbPw
+                    layoutParams = FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+                        gravity = Gravity.CENTER_VERTICAL or Gravity.RIGHT
+                    }
+                    isChecked = mOptionData.hideMainSearchStrong
+                    setOnCheckedChangeListener { buttonView, isChecked ->
+                        mOptionData.viewWxDbPw = isChecked
+                        ConfigUtil.setOptionData(mOptionData)
+                        ToastUtil.show("配置已更新，这是个开发者功能，变更开关需要重启后生效")
+                    }
+                })
+                setOnClickListener{
+                    handlerWxDbItemClick()
+                }
+            })
+
             addView(Divider())
             addView(ItemLayoutArrowRight("清空配置数据").apply {
                 setOnClickListener {
@@ -276,6 +304,22 @@ class MaskManagerCenterUI @JvmOverloads constructor(
                         .show()
                 }
             })
+        }
+    }
+
+    private fun handlerWxDbItemClick() {
+        if (mOptionData.viewWxDbPw) {
+            DBInfoListUI(context).show()
+        } else {
+            AlertDialog.Builder(context).setTitle("提示")
+                .setMessage("这是个开发者功能，普通用户没用，不建议开启。是否打开？")
+                .setNegativeButton("取消", null)
+                .setPositiveButton("确定") { _, _ ->
+                    mOptionData.viewWxDbPw = true
+                    mViewWxDbPwSwitch?.isChecked = true
+                    ConfigUtil.setOptionData(mOptionData)
+                    ToastUtil.show("配置已保存，请重启${context.resources.getString(context.applicationInfo.labelRes)}")
+                }.show()
         }
     }
 

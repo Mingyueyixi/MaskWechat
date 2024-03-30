@@ -160,6 +160,8 @@ dependencies {
     implementation(deps['androidx.appcompat:appcompat'])
     implementation(project(":lib-donate"))
     compileOnly(deps['de.robv.android.xposed:api'])
+    compileOnly('com.tencent.wcdb:wcdb-android:1.1-19')
+    // https://mvnrepository.com/artifact/com.tencent.wcdb/wcdb-android
 
     // https://mvnrepository.com/artifact/org.json/json
     // testImplementation 'org.json:json:20220924'
