@@ -41,7 +41,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
     private fun setEmptyDetailHistoryUIForMedia(context: Context, lpparam: XC_LoadPackage.LoadPackageParam?) {
         var mediaMethodName = when (AppVersionUtil.getVersionCode()) {
             in Constrant.WX_CODE_8_0_32..Constrant.WX_CODE_8_0_35 -> "k"
-            in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_43 -> "l"
+            in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_43 -> "l" // WX_CODE_PLAY_8_0_42 matches
             in Constrant.WX_CODE_8_0_43..Constrant.WX_CODE_8_0_44 -> "z"
             in Constrant.WX_CODE_8_0_44..Constrant.WX_CODE_8_0_45 -> "A"
             Constrant.WX_CODE_8_0_47 -> "B"
@@ -107,7 +107,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
     private fun setEmptyDetailHistoryUIForGallery(context: Context, lpparam: XC_LoadPackage.LoadPackageParam?) {
         val methodName = when (AppVersionUtil.getVersionCode()) {
             in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_35 -> "k"
-            in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_43 -> "l"
+            in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_43 -> "l" // WX_CODE_PLAY_8_0_42 matches
             else -> null
         }
         var galleryMethod: Method? = null
@@ -226,7 +226,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
                 else "R"
             }
 
-            Constrant.WX_CODE_8_0_35 -> "P"
+            Constrant.WX_CODE_8_0_35, Constrant.WX_CODE_PLAY_8_0_42 -> "P"
             Constrant.WX_CODE_8_0_37 -> "Q"
             Constrant.WX_CODE_8_0_38 -> "R"
             in Constrant.WX_CODE_8_0_40..Constrant.WX_CODE_8_0_41, Constrant.WX_CODE_8_0_43 -> "Q"
