@@ -147,17 +147,28 @@ android {
 
 }
 
+configurations.all {
+    resolutionStrategy {
+        force 'androidx.core:core:1.13.1'
+//        force 'androidx.arch.core:core-runtime:2.2.0'
+    }
+}
+
+
+
 dependencies {
     implementation(fileTree(dir: "libs", include: ["*.jar", "*.aar"]))
     implementation(deps['com.github.Mingyueyixi.frame-base-utils:core'])
-    implementation(deps['com.github.Mingyueyixi.frame-ui:ui-appcompat'])
-//    implementation('com.github.Mingyueyixi.frame-ui:ui-appcompat:1.0')
-
+    implementation(deps['com.github.Mingyueyixi.frame-ui:ui-appcompat']){
+//        exclude(group:'androidx.core', module:'core')
+    }
     implementation(deps['com.github.Mingyueyixi.lposed:xposed-api2'])
     implementation(deps['com.github.Mingyueyixi.lposed:plugin'])
 
     implementation(deps['com.google.code.gson:gson'])
     implementation(deps['androidx.appcompat:appcompat'])
+//    implementation 'androidx.core:core:1.3.1'
+
     implementation(project(":lib-donate"))
     compileOnly(deps['de.robv.android.xposed:api'])
     compileOnly('com.tencent.wcdb:wcdb-android:1.1-19')

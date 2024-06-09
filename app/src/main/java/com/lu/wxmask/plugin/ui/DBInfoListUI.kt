@@ -26,6 +26,7 @@ import com.lu.wxmask.util.ConfigUtil
 import com.lu.wxmask.util.WxSQLiteManager
 import com.lu.wxmask.util.ext.dp
 import com.lu.wxmask.util.ext.toJson
+import java.io.File
 
 class DBInfoListUI(val context: Context) : IConfigManagerUI {
     private lateinit var listView: ListView
@@ -112,11 +113,18 @@ class DBInfoListUI(val context: Context) : IConfigManagerUI {
         override fun onBindViewHolder(vh: Holder, position: Int, parent: ViewGroup) {
             val item = dataList[position]
             vh.textLeft.text = item.name
-            vh.textRight.text = item.password.toElseEmptyString()
+
+            val dbFile = File(item.name)
+            val rightText = item.password.toElseEmptyString() + if (dbFile.exists()) {
+                "\n${dbFile.length() / 1024L}KB"
+            } else {
+                ""
+            }
+            vh.textRight.text = rightText
             vh.itemView.setOnClickListener {
                 val text = "数据库：${item.name}\n密码：${item.password}"
                 if (ClipboardUtil.copy(text)) {
-//                    ToastUtil.show("数据库路径和密码已复制")
+                    ToastUtil.show("数据库路径和密码已复制")
                     ToastUtil.show(WxSQLiteManager.getAllTables(item.name, item.password).toJson())
 
                 }
@@ -131,6 +139,7 @@ class DBInfoListUI(val context: Context) : IConfigManagerUI {
 
         init {
             itemView.addView(LinearLayout(itemView.context).apply {
+                orientation = LinearLayout.HORIZONTAL
                 addView(TextView(context).apply {
                     textLeft = this
                     textSize = 16f
