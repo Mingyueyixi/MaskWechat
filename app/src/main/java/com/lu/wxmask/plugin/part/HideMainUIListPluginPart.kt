@@ -32,7 +32,7 @@ import java.lang.reflect.Modifier
 class HideMainUIListPluginPart : IPlugin {
     val GetItemMethodName = when (AppVersionUtil.getVersionCode()) {
         Constrant.WX_CODE_8_0_22 -> "aCW"
-        in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_43 -> "k"
+        in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_43 -> "k" // WX_CODE_PLAY_8_0_42 matches
         else -> "m"
     }
 
@@ -59,7 +59,7 @@ class HideMainUIListPluginPart : IPlugin {
             }
 
             Constrant.WX_CODE_8_0_35 -> "com.tencent.mm.ui.conversation.r"
-            in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_41 -> "com.tencent.mm.ui.conversation.x"
+            in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_41 -> "com.tencent.mm.ui.conversation.x" // WX_CODE_PLAY_8_0_42 matches
             Constrant.WX_CODE_8_0_47 -> "com.tencent.mm.ui.conversation.p3"
             else -> null
         }
@@ -155,8 +155,10 @@ class HideMainUIListPluginPart : IPlugin {
                 //隐藏未读消息红点
                 private fun hideUnReadTipView(itemView: View, param: MethodHookParam) {
                     //带文字的未读红点
+                    // Res TextView under com.tencent.mm.ui.conversation.ConversationFolderItemView
                     val tipTvIdTextID = when (AppVersionUtil.getVersionCode()) {
                         in 0..Constrant.WX_CODE_8_0_22 -> "tipcnt_tv"
+                        Constrant.WX_CODE_PLAY_8_0_42 -> "oqu"
                         in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_41 -> "kmv"
                         else -> "kmv"
                     }
@@ -166,6 +168,7 @@ class HideMainUIListPluginPart : IPlugin {
                     //头像上的小红点
                     val small_red = when (AppVersionUtil.getVersionCode()) {
                         in 0..Constrant.WX_CODE_8_0_40 -> "a2f"
+                        Constrant.WX_CODE_PLAY_8_0_42 -> "a_w"
                         Constrant.WX_CODE_8_0_41 -> "o_u"
                         else -> "o_u"
                     }
@@ -175,9 +178,11 @@ class HideMainUIListPluginPart : IPlugin {
 
                 //隐藏最后一条消息等
                 private fun hideMsgViewItemText(itemView: View, param: MethodHookParam) {
+                    // Res com.tencent.mm.ui.base.NoMeasuredTextView (tag last_msg_tv) under com.tencent.mm.ui.conversation.ConversationFolderItemView
                     val msgTvIdName = when (AppVersionUtil.getVersionCode()) {
                         in 0..Constrant.WX_CODE_8_0_22 -> "last_msg_tv"
                         in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_40 -> "fhs"
+                        Constrant.WX_CODE_PLAY_8_0_42 -> "i2_"
                         Constrant.WX_CODE_8_0_41 -> "ht5"
                         else -> "ht5"
                     }
@@ -261,7 +266,7 @@ class HideMainUIListPluginPart : IPlugin {
             Constrant.WX_CODE_8_0_22 -> "com.tencent.mm.ui.g"
             in Constrant.WX_CODE_8_0_32..Constrant.WX_CODE_8_0_34 -> "com.tencent.mm.ui.y"
             in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_38 -> "com.tencent.mm.ui.z"
-            in Constrant.WX_CODE_8_0_40..Constrant.WX_CODE_8_0_43 -> "com.tencent.mm.ui.b0"
+            in Constrant.WX_CODE_8_0_40..Constrant.WX_CODE_8_0_43 -> "com.tencent.mm.ui.b0" // WX_CODE_PLAY_8_0_42 matches
             in Constrant.WX_CODE_8_0_43..Constrant.WX_CODE_8_0_44 -> "com.tencent.mm.ui.h3"
             in Constrant.WX_CODE_8_0_43..Constrant.WX_CODE_8_0_47 -> "com.tencent.mm.ui.i3"
             else -> null

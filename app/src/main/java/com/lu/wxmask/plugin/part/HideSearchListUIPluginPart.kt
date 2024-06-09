@@ -8,10 +8,7 @@ import com.lu.lposed.api2.XC_MethodHook2
 import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
 import com.lu.lposed.plugin.PluginProviders
-import com.lu.magic.util.AppUtil
 import com.lu.magic.util.GsonUtil
-import com.lu.magic.util.ReflectUtil
-import com.lu.magic.util.TextUtil
 import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.BuildConfig
 import com.lu.wxmask.Constrant
@@ -22,7 +19,6 @@ import com.lu.wxmask.util.dev.DebugUtil
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import java.lang.reflect.Field
-import java.sql.Ref
 
 /**
  * 隐藏搜索列表
@@ -32,7 +28,7 @@ class HideSearchListUIPluginPart : IPlugin {
     private val jsonResultLruCache = LruCache<String, CharSequence>(16)
 
     override fun handleHook(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
-        if (AppVersionUtil.getVersionCode() < Constrant.WX_CODE_8_0_44) {
+        if (AppVersionUtil.getVersionCode() < Constrant.WX_CODE_8_0_44) { // WX_CODE_PLAY_8_0_42 matches
             handleGlobalSearch(context, lpparam)
             handleDetailSearch(context, lpparam)
             return
@@ -118,7 +114,7 @@ class HideSearchListUIPluginPart : IPlugin {
 
     private fun handleDetailSearch(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
         var hookClazzName = when (AppVersionUtil.getVersionCode()) {
-            in Constrant.WX_CODE_8_0_38..Constrant.WX_CODE_8_0_41 -> "com.tencent.mm.plugin.fts.ui.x"
+            in Constrant.WX_CODE_8_0_38..Constrant.WX_CODE_8_0_41 -> "com.tencent.mm.plugin.fts.ui.x" // WX_CODE_PLAY_8_0_42 matches
             else -> "com.tencent.mm.plugin.fts.ui.y"
         }
         //全局搜索详情置空
@@ -150,7 +146,7 @@ class HideSearchListUIPluginPart : IPlugin {
         //        val wxVersionCode = AppVersionUtil.getVersionCode()
         // 理论上 hook com.tencent.mm.plugin.fts.ui.z#getItem 也是一样的，但是被覆盖重命名了
         var hookClazzName = when (AppVersionUtil.getVersionCode()) {
-            in Constrant.WX_CODE_8_0_38..Constrant.WX_CODE_8_0_43 -> "com.tencent.mm.plugin.fts.ui.y"
+            in Constrant.WX_CODE_8_0_38..Constrant.WX_CODE_8_0_43 -> "com.tencent.mm.plugin.fts.ui.y" // WX_CODE_PLAY_8_0_42 matches
             else -> "com.tencent.mm.plugin.fts.ui.z"
         }
         //全局搜索首页
@@ -201,7 +197,7 @@ class HideSearchListUIPluginPart : IPlugin {
 //                else -> null
 //            } ?: return false
 
-            val fieldName = when (AppVersionUtil.getVersionCode()) {
+            val fieldName = when (AppVersionUtil.getVersionCode()) { // WX_CODE_PLAY_8_0_42 not applied here
                 Constrant.WX_CODE_8_0_40 -> "q1"
                 else -> "q"
             }
@@ -213,7 +209,7 @@ class HideSearchListUIPluginPart : IPlugin {
         if (chatUser == null) {
             when (AppVersionUtil.getVersionCode()) {
                 in Constrant.WX_CODE_8_0_33..Constrant.WX_CODE_8_0_41 -> {
-                    val fieldValue: Any = XposedHelpers2.getObjectField<Any?>(itemData, "p") ?: return false
+                    val fieldValue: Any = XposedHelpers2.getObjectField<Any?>(itemData, "p") ?: return false // WX_CODE_PLAY_8_0_42 matches
                     chatUser = XposedHelpers2.getObjectField<String?>(fieldValue, "e")
                 }
 

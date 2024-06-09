@@ -68,7 +68,7 @@ class EnterChattingUIPluginPart() : IPlugin {
                 else "M"
             }
 
-            Constrant.WX_CODE_8_0_35 -> "J"
+            Constrant.WX_CODE_8_0_35, Constrant.WX_CODE_PLAY_8_0_42 -> "J"
             Constrant.WX_CODE_8_0_37, Constrant.WX_CODE_8_0_43 -> "K"
             Constrant.WX_CODE_8_0_38 -> "M"
             in Constrant.WX_CODE_8_0_40..Constrant.WX_CODE_8_0_41 -> "K"
@@ -161,8 +161,11 @@ class EnterChattingHookAction(
         }.getOrNull()
         if (listView == null) {
             listView = runCatching {
+                // Res com.tencent.mm.ui.chatting.view.MMChattingListView under com.tencent.mm.pluginsdk.ui.chat.ChattingUILayout
                 val mmListViewId =
-                    if (AppVersionUtil.getVersionCode() in Constrant.WX_CODE_8_0_42..Constrant.WX_CODE_8_0_47) {
+                    if (AppVersionUtil.getVersionCode() == Constrant.WX_CODE_PLAY_8_0_42) {
+                        ResUtil.getViewId("bnu")
+                    } else if (AppVersionUtil.getVersionCode() in Constrant.WX_CODE_8_0_42..Constrant.WX_CODE_8_0_47) {
                         ResUtil.getViewId("bm6")
                     } else {
                         ResUtil.getViewId("b5n")
@@ -259,7 +262,13 @@ class EnterChattingHookAction(
         //糊界面一脸
         val contentView = ReflectUtil.invokeMethod(fragmentObj, "getView") as? ViewGroup?
         contentView?.let {
-            val pvId = ResUtil.getViewId("b49")
+            // Res com.tencent.mm.pluginsdk.ui.chat.ChattingContent under com.tencent.mm.pluginsdk.ui.chat.ChattingUILayout
+            val pvId =
+                if (AppVersionUtil.getVersionCode() == Constrant.WX_CODE_PLAY_8_0_42) {
+                    ResUtil.getViewId("bm7")
+                } else {
+                    ResUtil.getViewId("b49")
+                }
             val parent = contentView.findViewById<ViewGroup>(pvId)
             var maskView = it.findViewWithTag<View>(tagConst)
             if (maskView == null) {
