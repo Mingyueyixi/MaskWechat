@@ -42,7 +42,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
         var mediaMethodName = when (AppVersionUtil.getVersionCode()) {
             in Constrant.WX_CODE_8_0_32..Constrant.WX_CODE_8_0_35 -> "k"
             in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_43 -> "l" // WX_CODE_PLAY_8_0_42 matches
-            in Constrant.WX_CODE_8_0_43..Constrant.WX_CODE_8_0_44 -> "z"
+            in Constrant.WX_CODE_8_0_43..Constrant.WX_CODE_8_0_44, Constrant.WX_CODE_PLAY_8_0_48 -> "z"
             in Constrant.WX_CODE_8_0_44..Constrant.WX_CODE_8_0_45 -> "A"
             Constrant.WX_CODE_8_0_47 -> "B"
             else -> "l"
@@ -96,7 +96,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
      * 置空图片/视频搜索结果
      */
     private fun setEmptyDetailHistoryUIForGalleryCompat(context: Context, lpparam: XC_LoadPackage.LoadPackageParam?) {
-        if (AppVersionUtil.getVersionCode() > Constrant.WX_CODE_8_0_43) {
+        if (AppVersionUtil.getVersionCode() > Constrant.WX_CODE_8_0_43) { // WX_CODE_PLAY_8_0_48 matches
             setEmptyDetailHistoryUIForGallery8044(context, lpparam)
             return
         } else {
@@ -232,6 +232,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
             in Constrant.WX_CODE_8_0_40..Constrant.WX_CODE_8_0_41, Constrant.WX_CODE_8_0_43 -> "Q"
             in Constrant.WX_CODE_8_0_41..Constrant.WX_CODE_8_0_42 -> "R"
             in Constrant.WX_CODE_8_0_44..Constrant.WX_CODE_8_0_47 -> "D"
+            Constrant.WX_CODE_PLAY_8_0_48 -> "G"
             else -> null
         }
         LogUtil.d("setEmptyActionBarTabPageUI method is :", commonHookMethodName)

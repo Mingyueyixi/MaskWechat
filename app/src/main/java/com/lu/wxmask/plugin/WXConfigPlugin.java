@@ -220,8 +220,8 @@ public class WXConfigPlugin implements IPlugin {
                 //8.0.33: oi3.b
                 //8.0.34: ck3.b
                 //8.0.37: zq3.b
-                // fragmentObj is instance of com.tencent.mm.ui.chatting.BaseChattingFragment
-                Object f = XposedHelpers2.getObjectField(fragmentObj, "f"); // WX_CODE_PLAY_8_0_42 matches
+                // fragmentObj is instance of com.tencent.mm.ui.chatting.BaseChattingUIFragment
+                Object f = XposedHelpers2.getObjectField(fragmentObj, "f"); // WX_CODE_PLAY_8_0_42, WX_CODE_PLAY_8_0_48 matches
                 if (f != null) {
                     //com.tencent.mm.storage.y1
                     if (AppVersionUtil.getVersionCode() <= Constrant.WX_CODE_8_0_32) {
@@ -238,7 +238,9 @@ public class WXConfigPlugin implements IPlugin {
                         //8.0.34开始，数据库基类改变。包：com.tencent.mm.autogen.table 已经不存在，不再校验
                         Object v = XposedHelpers2.getObjectField(f, "h");
                         return v;
-                    } else if (AppVersionUtil.getVersionCode() <= Constrant.WX_CODE_8_0_40 || AppVersionUtil.getVersionCode() == Constrant.WX_CODE_PLAY_8_0_42) {
+                    } else if (AppVersionUtil.getVersionCode() <= Constrant.WX_CODE_8_0_40
+                            || AppVersionUtil.getVersionCode() == Constrant.WX_CODE_PLAY_8_0_42
+                            || AppVersionUtil.getVersionCode() == Constrant.WX_CODE_PLAY_8_0_48) {
                         Object v = XposedHelpers2.getObjectField(f, "i");
                         return v;
                     } else {

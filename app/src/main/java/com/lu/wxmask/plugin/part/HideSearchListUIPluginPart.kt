@@ -17,6 +17,7 @@ import com.lu.wxmask.util.AppVersionUtil
 import com.lu.wxmask.util.ConfigUtil
 import com.lu.wxmask.util.dev.DebugUtil
 import de.robv.android.xposed.XC_MethodHook
+import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import java.lang.reflect.Field
 
@@ -28,7 +29,7 @@ class HideSearchListUIPluginPart : IPlugin {
     private val jsonResultLruCache = LruCache<String, CharSequence>(16)
 
     override fun handleHook(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
-        if (AppVersionUtil.getVersionCode() < Constrant.WX_CODE_8_0_44) { // WX_CODE_PLAY_8_0_42 matches
+        if (AppVersionUtil.getVersionCode() < Constrant.WX_CODE_8_0_44 || AppVersionUtil.getVersionCode() == Constrant.WX_CODE_PLAY_8_0_48) { // WX_CODE_PLAY_8_0_42 matches
             handleGlobalSearch(context, lpparam)
             handleDetailSearch(context, lpparam)
             return
@@ -115,13 +116,17 @@ class HideSearchListUIPluginPart : IPlugin {
     private fun handleDetailSearch(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
         var hookClazzName = when (AppVersionUtil.getVersionCode()) {
             in Constrant.WX_CODE_8_0_38..Constrant.WX_CODE_8_0_41 -> "com.tencent.mm.plugin.fts.ui.x" // WX_CODE_PLAY_8_0_42 matches
+            Constrant.WX_CODE_PLAY_8_0_48 -> "com.tencent.mm.plugin.fts.ui.k1"
             else -> "com.tencent.mm.plugin.fts.ui.y"
         }
         //全局搜索详情置空
         XposedHelpers2.findAndHookMethod(
             hookClazzName,
             context.classLoader,
-            "d",
+            when (AppVersionUtil.getVersionCode()) {
+                Constrant.WX_CODE_PLAY_8_0_48 -> "c"
+                else -> "d"
+            },
             Integer.TYPE,
             object : XC_MethodHook2() {
                 override fun afterHookedMethod(param: MethodHookParam) {
@@ -147,13 +152,17 @@ class HideSearchListUIPluginPart : IPlugin {
         // 理论上 hook com.tencent.mm.plugin.fts.ui.z#getItem 也是一样的，但是被覆盖重命名了
         var hookClazzName = when (AppVersionUtil.getVersionCode()) {
             in Constrant.WX_CODE_8_0_38..Constrant.WX_CODE_8_0_43 -> "com.tencent.mm.plugin.fts.ui.y" // WX_CODE_PLAY_8_0_42 matches
+            Constrant.WX_CODE_PLAY_8_0_48 -> "com.tencent.mm.plugin.fts.ui.o1" // Reverse engineer hint: `if ("SearchContactBar".equals`
             else -> "com.tencent.mm.plugin.fts.ui.z"
         }
         //全局搜索首页
         XposedHelpers2.findAndHookMethod(
             hookClazzName,
             context.classLoader,
-            "d",
+            when (AppVersionUtil.getVersionCode()) {
+                Constrant.WX_CODE_PLAY_8_0_48 -> "c"
+                else -> "d"
+            },
             Integer.TYPE,
             object : XC_MethodHook2() {
                 override fun afterHookedMethod(param: MethodHookParam) {
@@ -197,7 +206,7 @@ class HideSearchListUIPluginPart : IPlugin {
 //                else -> null
 //            } ?: return false
 
-            val fieldName = when (AppVersionUtil.getVersionCode()) { // WX_CODE_PLAY_8_0_42 not applied here
+            val fieldName = when (AppVersionUtil.getVersionCode()) { // WX_CODE_PLAY_8_0_42, WX_CODE_PLAY_8_0_48 not applied here
                 Constrant.WX_CODE_8_0_40 -> "q1"
                 else -> "q"
             }
@@ -208,9 +217,9 @@ class HideSearchListUIPluginPart : IPlugin {
         }
         if (chatUser == null) {
             when (AppVersionUtil.getVersionCode()) {
-                in Constrant.WX_CODE_8_0_33..Constrant.WX_CODE_8_0_41 -> {
-                    val fieldValue: Any = XposedHelpers2.getObjectField<Any?>(itemData, "p") ?: return false // WX_CODE_PLAY_8_0_42 matches
-                    chatUser = XposedHelpers2.getObjectField<String?>(fieldValue, "e")
+                in Constrant.WX_CODE_8_0_33..Constrant.WX_CODE_8_0_41, Constrant.WX_CODE_PLAY_8_0_48 -> {
+                    val fieldValue: Any = XposedHelpers2.getObjectField<Any?>(itemData, "p") ?: return false // WX_CODE_PLAY_8_0_42, WX_CODE_PLAY_8_0_48 (wc2.p0.p) matches
+                    chatUser = XposedHelpers2.getObjectField<String?>(fieldValue, "e") // WX_CODE_PLAY_8_0_42, WX_CODE_PLAY_8_0_48 (lc2.w.e) matches
                 }
 
                 Constrant.WX_CODE_8_0_32 -> {
