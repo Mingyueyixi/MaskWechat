@@ -74,6 +74,7 @@ class EnterChattingUIPluginPart() : IPlugin {
             in Constrant.WX_CODE_8_0_40..Constrant.WX_CODE_8_0_41 -> "K"
             in Constrant.WX_CODE_8_0_41..Constrant.WX_CODE_8_0_42 -> "M"
             in Constrant.WX_CODE_8_0_44 .. Constrant.WX_CODE_8_0_47 -> "z"
+            Constrant.WX_CODE_PLAY_8_0_48 -> "B"
             else -> null
         }
         var dispatchMethod: Method? = null
@@ -165,6 +166,8 @@ class EnterChattingHookAction(
                 val mmListViewId =
                     if (AppVersionUtil.getVersionCode() == Constrant.WX_CODE_PLAY_8_0_42) {
                         ResUtil.getViewId("bnu")
+                    } else if (AppVersionUtil.getVersionCode() == Constrant.WX_CODE_PLAY_8_0_48) {
+                        ResUtil.getViewId("bs6")
                     } else if (AppVersionUtil.getVersionCode() in Constrant.WX_CODE_8_0_42..Constrant.WX_CODE_8_0_47) {
                         ResUtil.getViewId("bm6")
                     } else {
@@ -266,6 +269,8 @@ class EnterChattingHookAction(
             val pvId =
                 if (AppVersionUtil.getVersionCode() == Constrant.WX_CODE_PLAY_8_0_42) {
                     ResUtil.getViewId("bm7")
+                } else if (AppVersionUtil.getVersionCode() == Constrant.WX_CODE_PLAY_8_0_48) {
+                    ResUtil.getViewId("bqg")
                 } else {
                     ResUtil.getViewId("b49")
                 }
