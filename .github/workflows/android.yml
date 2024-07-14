@@ -81,7 +81,7 @@ jobs:
         BOT_TOKEN: ${{ secrets.TG_CI_BOT_TOKEN }}
       run: |
         echo "github_run_url=$GITHUB_RUN_URL"
-        echo "${{ toJson(github) }}"> github_context.txt
+        echo '${{ toJson(github) }}'> github_context.txt
         if [ -f "robot.py" ]; then
           python robot.py -e ci
         fi
