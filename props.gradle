@@ -25,7 +25,7 @@ ext {
 //            'com.github.Mingyueyixi:frame-base-utils'         : 'com.github.Mingyueyixi:frame-base-utils:v1.0.0-alpha.2',
 //            'com.github.Mingyueyixi.frame-base-utils:all'     : 'com.github.Mingyueyixi.frame-base-utils:all:269ae11d06',
 //            'com.github.Mingyueyixi.frame-base-utils:base'    : 'com.github.Mingyueyixi.frame-base-utils:base:269ae11d06',
-            'com.github.Mingyueyixi.frame-base-utils:core'    : 'com.github.Mingyueyixi.frame-baseutils:core:98bd9209eb',
+            'com.github.Mingyueyixi.frame-base-utils:core'    : 'com.github.Mingyueyixi.frame-baseutils:core:3811678a39',
 
 
 //            'com.github.Mingyueyixi:frame-ui'                 : 'com.github.Mingyueyixi:frame-ui:main-SNAPSHOT',

@@ -5,6 +5,7 @@ import com.google.gson.JsonPrimitive;
 import com.lu.lposed.api2.function.Predicate;
 import com.lu.magic.util.GsonUtil;
 import com.lu.magic.util.log.LogUtil;
+import com.lu.wxmask.util.WxSQLiteManager;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
