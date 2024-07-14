@@ -1,10 +1,12 @@
 package com.lu.wxmask.plugin
 
 import android.content.Context
+import android.database.Cursor
 import com.lu.lposed.api2.XC_MethodHook2
 import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
 import com.lu.lposed.plugin.PluginProviders
+import com.lu.magic.util.CursorUtil
 import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.ClazzN
 import de.robv.android.xposed.callbacks.XC_LoadPackage
@@ -95,8 +97,19 @@ class CommonPlugin : IPlugin {
                     var sql = param.args[1].toString()
                     val wxMaskPlugin = PluginProviders.from(WXMaskPlugin::class.java)
                     //sql 中，aux_index 列必须存在，因为接下来需要用来重新构造sql并过滤
-                    val regexResult = Regex("^SELECT (FTS5MetaContact|FTS5MetaTopHits|FTS5MetaKefuContact|FTS5MetaFeature|FTS5MetaWeApp|FTS5MetaFinderFollow|FTS5MetaFavorite)\\.docid, type, subtype, entity_id, aux_index,.*").find(sql)
-                    val needReplace = wxMaskPlugin.maskIdList.isNotEmpty() && (regexResult != null)
+                    val regexResult =
+                        Regex("^SELECT (FTS5MetaContact|FTS5MetaTopHits|FTS5MetaKefuContact|FTS5MetaFeature|FTS5MetaWeApp|FTS5MetaFinderFollow|FTS5MetaFavorite)\\.docid, type, subtype, entity_id, aux_index,.*").find(
+                            sql
+                        )
+                    val needReplace = wxMaskPlugin.maskIdList.isNotEmpty()
+                            && (regexResult != null
+                            // 查消息记录的
+                            //SELECT type, subtype, entity_id, aux_index, MAX(timestamp) as maxTime, count(aux_index) as msgCount, talker FROM FTS5MetaMessage NOT INDEXED JOIN FTS5IndexMessage ON (FTS5MetaMessage.docid = FTS5IndexMessage.rowid) WHERE FTS5IndexMessage MATCH '("我")' AND status >= 0 GROUP BY aux_index ORDER BY timestamp desc LIMIT 4;
+                            || sql.startsWith("SELECT type, subtype, entity_id, aux_index, MAX(timestamp) as maxTime, count(aux_index) as msgCount, talker FROM FTS5MetaMessage ")
+                            //单聊搜索关键词查记录
+                            || sql.startsWith("SELECT FTS5MetaMessage.docid, type, subtype, entity_id, aux_index, timestamp, talker FROM FTS5MetaMessage")
+                            )
+
 //                            sql.startsWith("SELECT FTS5MetaTopHits.docid")
 //                                    || sql.startsWith("SELECT FTS5MetaContact.docid")
 //                                    || sql.startsWith("SELECT FTS5MetaKefuContact.docid")
@@ -132,11 +145,11 @@ class CommonPlugin : IPlugin {
 //                    return result
                 }
 
+                override fun afterHookedMethod(param: MethodHookParam) {
 //                for debug watch sql query result
-//                override fun afterHookedMethod(param: MethodHookParam) {
-//                    LogUtil.d("sql: ", param.args[1])
-//                    LogUtil.d("sql reqult: ", CursorUtil.getAll(param.result as Cursor?, true, true))
-//                }
+                    LogUtil.d("sql: ", param.args[1])
+                    LogUtil.d("sql reqult: ", CursorUtil.getAll(param.result as Cursor?, true, true))
+                }
             })
 
         }
