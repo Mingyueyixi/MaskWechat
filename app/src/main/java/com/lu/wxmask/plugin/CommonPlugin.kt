@@ -1,19 +1,16 @@
 package com.lu.wxmask.plugin
 
 import android.content.Context
-import android.database.Cursor
 import com.lu.lposed.api2.XC_MethodHook2
-import com.lu.lposed.api2.XC_MethodReplacement2
 import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
 import com.lu.lposed.plugin.PluginProviders
-import com.lu.magic.util.CursorUtil
 import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.ClazzN
-import com.lu.wxmask.util.HookPointManager
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 
 class CommonPlugin : IPlugin {
+
     override fun handleHook(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
 //        if (!BuildConfig.DEBUG) {
 //            return
@@ -88,8 +85,8 @@ class CommonPlugin : IPlugin {
             }
             false
         }.onEach {
-            XposedHelpers2.hookMethod(it, object : XC_MethodReplacement2() {
-                override fun replaceHookedMethod(param: MethodHookParam): Any? {
+            XposedHelpers2.hookMethod(it, object : XC_MethodHook2() {
+                override fun beforeHookedMethod(param: MethodHookParam) {
 //                    LogUtil.d("sql rawQueryWithFactory:", param.args[1], param.args[2], param.args[3])
 //                    val sourceData = CursorUtil.getAll(cursor, true, true)
 //                    LogUtil.d("sql rawQueryWithFactory result:", sourceData)
@@ -97,14 +94,16 @@ class CommonPlugin : IPlugin {
 
                     var sql = param.args[1].toString()
                     val wxMaskPlugin = PluginProviders.from(WXMaskPlugin::class.java)
-                    val needReplace = wxMaskPlugin.maskIdList.isNotEmpty() && (
-                            sql.startsWith("SELECT FTS5MetaTopHits.docid")
-                                    || sql.startsWith("SELECT FTS5MetaContact.docid")
-                                    || sql.startsWith("SELECT FTS5MetaKefuContact.docid")
-                                    || sql.startsWith("SELECT FTS5MetaFeature.docid")
-                                    || sql.startsWith("SELECT FTS5MetaWeApp.docid")
-                                    || sql.startsWith("SELECT FTS5MetaFinderFollow.docid")
-                                    || sql.startsWith("SELECT FTS5MetaFavorite.docid"))
+                    //sql 中，aux_index 列必须存在，因为接下来需要用来重新构造sql并过滤
+                    val regexResult = Regex("^SELECT (FTS5MetaContact|FTS5MetaTopHits|FTS5MetaKefuContact|FTS5MetaFeature|FTS5MetaWeApp|FTS5MetaFinderFollow|FTS5MetaFavorite)\\.docid, type, subtype, entity_id, aux_index,.*").find(sql)
+                    val needReplace = wxMaskPlugin.maskIdList.isNotEmpty() && (regexResult != null)
+//                            sql.startsWith("SELECT FTS5MetaTopHits.docid")
+//                                    || sql.startsWith("SELECT FTS5MetaContact.docid")
+//                                    || sql.startsWith("SELECT FTS5MetaKefuContact.docid")
+//                                    || sql.startsWith("SELECT FTS5MetaFeature.docid")
+//                                    || sql.startsWith("SELECT FTS5MetaWeApp.docid")
+//                                    || sql.startsWith("SELECT FTS5MetaFinderFollow.docid")
+//                                    || sql.startsWith("SELECT FTS5MetaFavorite.docid"))
 
                     if (needReplace) {
                         val hideValueText = StringBuilder()
@@ -118,20 +117,26 @@ class CommonPlugin : IPlugin {
                         if (sql.endsWith(";")) {
                             sql = sql.substring(0, sql.length - 1)
                         }
+                        //对原始sql包围一层，过滤掉指定用户
                         val sql2 = "SELECT * FROM ($sql) AS a WHERE aux_index NOT IN ($hideValueText);"
 
                         param.args[1] = sql2
                         LogUtil.d("sql hide hit:", sql2)
                     }
-                    val result = XposedHelpers2.invokeOriginalMethod(param.method, param.thisObject, param.args)
+//                    val result = XposedHelpers2.invokeOriginalMethod(param.method, param.thisObject, param.args)
 
 //                    if (result is Cursor) {
 //                        LogUtil.d("sql:", sql, param.args[2])
 //                        LogUtil.d("sql result:", CursorUtil.getAll(result, true, true))
 //                    }
-                    return result
+//                    return result
                 }
 
+//                for debug watch sql query result
+//                override fun afterHookedMethod(param: MethodHookParam) {
+//                    LogUtil.d("sql: ", param.args[1])
+//                    LogUtil.d("sql reqult: ", CursorUtil.getAll(param.result as Cursor?, true, true))
+//                }
             })
 
         }
