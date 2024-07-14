@@ -8,6 +8,7 @@ import com.lu.lposed.plugin.IPlugin
 import com.lu.lposed.plugin.PluginProviders
 import com.lu.magic.util.CursorUtil
 import com.lu.magic.util.log.LogUtil
+import com.lu.wxmask.BuildConfig
 import com.lu.wxmask.ClazzN
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 
@@ -146,9 +147,12 @@ class CommonPlugin : IPlugin {
                 }
 
                 override fun afterHookedMethod(param: MethodHookParam) {
+//                不打印，开发者自己打开来调试。
 //                for debug watch sql query result
-                    LogUtil.d("sql: ", param.args[1])
-                    LogUtil.d("sql reqult: ", CursorUtil.getAll(param.result as Cursor?, true, true))
+//                    if (BuildConfig.DEBUG) {
+//                        LogUtil.d("sql: ", param.args[1])
+//                        LogUtil.d("sql reqult: ", CursorUtil.getAll(param.result as Cursor?, true, true))
+//                    }
                 }
             })
 
