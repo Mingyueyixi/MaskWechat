@@ -3,9 +3,6 @@ package com.lu.wxmask;
 import android.app.Application;
 import android.app.Instrumentation;
 import android.content.Context;
-import android.content.res.Resources;
-import android.content.res.XModuleResources;
-import android.nfc.Tag;
 
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
@@ -19,7 +16,7 @@ import com.lu.magic.util.log.SimpleLogger;
 import com.lu.wxmask.plugin.CommonPlugin;
 import com.lu.wxmask.plugin.WXConfigPlugin;
 import com.lu.wxmask.plugin.WXMaskPlugin;
-import com.lu.wxmask.util.Rm;
+import com.lu.wxmask.plugin.WXDbPlugin;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -212,6 +209,7 @@ public class MainHook implements IXposedHookLoadPackage, IXposedHookZygoteInit, 
         //目前生成的plugin都是单例的
         PluginRegistry.register(
                 CommonPlugin.class,
+                WXDbPlugin.class,
                 WXConfigPlugin.class,
                 WXMaskPlugin.class
         ).handleHooks(context, lpparam);

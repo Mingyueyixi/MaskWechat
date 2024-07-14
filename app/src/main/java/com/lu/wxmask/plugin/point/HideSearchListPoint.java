@@ -36,59 +36,63 @@ public class HideSearchListPoint implements IPlugin {
         if (mPointBean == null) {
             return;
         }
-        Method method = XposedHelpers2.findMethodExactIfExists(ClazzN.from(mPointBean.getClazz()), mPointBean.getMethod(), Integer.TYPE);
-        if (method == null) {
-            return;
-        }
-        XposedHelpers2.hookMethod(method, new XC_MethodHook2() {
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                if (!ConfigUtil.Companion.getOptionData().getHideMainSearch()) {
-                    LogUtil.i("off hideMainSearch");
-                    return;
-                }
-
-                Object result = param.getResult();
-                if (result == null) {
-                    return;
-                }
-
-                WXMaskPlugin wxMaskPlugin = PluginProviders.from(WXMaskPlugin.class);
-                HideSearchListUIPluginPart pluginPart = wxMaskPlugin.getHideSearchListPluginPart();
-                if (pluginPart.needHideUserName2(param, result)) {
-                    LogUtil.d(">>> need hide", result);
-//                    Object empty = null;
-//                    try {
-//                        empty = result.getClass().newInstance();
-//                        param.setResult(empty);
-//                    } catch (Exception e) {
-//                        param.setResult(null);
+//        Method method = XposedHelpers2.findMethodExactIfExists(ClazzN.from(mPointBean.getClazz()), mPointBean.getMethod(), Integer.TYPE);
+//        if (method == null) {
+//            return;
+//        }
+//        LogUtil.d("strong", method);
+//        XposedHelpers2.hookMethod(method, new XC_MethodHook2() {
+//            @Override
+//            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+//                if (!ConfigUtil.Companion.getOptionData().getHideMainSearch()) {
+//                    LogUtil.i("off hideMainSearch");
+//                    return;
+//                }
+//
+//                Object result = param.getResult();
+//                if (result == null) {
+//                    return;
+//                }
+//
+//                WXMaskPlugin wxMaskPlugin = PluginProviders.from(WXMaskPlugin.class);
+//                HideSearchListUIPluginPart pluginPart = wxMaskPlugin.getHideSearchListPluginPart();
+//                if (pluginPart.needHideUserName2(param, result)) {
+//                    LogUtil.d(">>> need hide", result);
+////                    Object empty = null;
+////                    try {
+////                        empty = result.getClass().newInstance();
+////                        param.setResult(empty);
+////                    } catch (Exception e) {
+////                        param.setResult(null);
+////                    }
+//
+//                    Field[] fields = XposedHelpers2.findFieldsByExactPredicate(param.thisObject.getClass(), new Predicate<Field>() {
+//                        @Override
+//                        public boolean test(Field field) {
+//                            if (SparseArray.class.equals(field.getType()) && "f".equals(field.getName())) {
+//                                return true;
+//                            }
+//                            return false;
+//                        }
+//                    });
+//                    Object newResult = null;
+//                    for (Field field : fields) {
+//                        field.setAccessible(true);
+//                        SparseArray<?> value = (SparseArray<?>) field.get(param.thisObject);
+//                        if (value.size() > 0) {
+//                            Object first = value.get(0);
+//                            if (first != null && first.getClass().isAssignableFrom(result.getClass())) {
+//                                newResult = first;
+//                            }
+//                        }
 //                    }
-
-                    Field[] fields = XposedHelpers2.findFieldsByExactPredicate(param.thisObject.getClass(), new Predicate<Field>() {
-                        @Override
-                        public boolean test(Field field) {
-                            if (SparseArray.class.equals(field.getType())) {
-                                return true;
-                            }
-                            return false;
-                        }
-                    });
-                    Object newResult = null;
-                    for (Field field : fields) {
-                        field.setAccessible(true);
-                        SparseArray<?> value = (SparseArray<?>) field.get(param.thisObject);
-                        if (value.size() > 0) {
-                            Object first = value.get(0);
-                            if (first != null && first.getClass().isAssignableFrom(result.getClass())) {
-                                newResult = first;
-                            }
-                        }
-                    }
-                    param.setResult(newResult);
-                }
-            }
-
-        });
+//
+//                    if (newResult != null) {
+//                        param.setResult(newResult);
+//                    }
+//                }
+//            }
+//
+//        });
     }
 }

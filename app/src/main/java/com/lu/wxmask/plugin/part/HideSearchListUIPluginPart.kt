@@ -4,6 +4,8 @@ import android.content.Context
 import android.text.TextUtils
 import android.util.LruCache
 import android.util.SparseArray
+import android.view.View
+import android.view.ViewGroup
 import com.lu.lposed.api2.XC_MethodHook2
 import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
@@ -11,15 +13,19 @@ import com.lu.lposed.plugin.PluginProviders
 import com.lu.magic.util.GsonUtil
 import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.BuildConfig
+import com.lu.wxmask.ClazzN
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.plugin.WXMaskPlugin
 import com.lu.wxmask.util.AppVersionUtil
 import com.lu.wxmask.util.ConfigUtil
+import com.lu.wxmask.util.FieldClassUtil
+import com.lu.wxmask.util.TextKit
 import com.lu.wxmask.util.dev.DebugUtil
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import java.lang.reflect.Field
+import java.util.logging.Handler
 
 /**
  * 隐藏搜索列表
@@ -29,6 +35,11 @@ class HideSearchListUIPluginPart : IPlugin {
     private val jsonResultLruCache = LruCache<String, CharSequence>(16)
 
     override fun handleHook(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
+        if (AppVersionUtil.getVersionCode() > Constrant.WX_CODE_8_0_47) {
+            //hook数据库
+            LogUtil.d("support by hook dbase api")
+            return
+        }
         if (AppVersionUtil.getVersionCode() < Constrant.WX_CODE_8_0_44 || AppVersionUtil.getVersionCode() == Constrant.WX_CODE_PLAY_8_0_48) { // WX_CODE_PLAY_8_0_42 matches
             handleGlobalSearch(context, lpparam)
             handleDetailSearch(context, lpparam)
@@ -37,10 +48,12 @@ class HideSearchListUIPluginPart : IPlugin {
 
         val getItemMethod = when (AppVersionUtil.getVersionCode()) {
             Constrant.WX_CODE_8_0_44 -> "h"
+            Constrant.WX_CODE_8_0_49 -> "g"
             else -> "i"
         }
 //        LogUtil.d("getItem name:", getItemMethod)
         //hook getItem --> rename to h
+        //hook adapter 's getItem method, this method provider data for every itemView
         XposedHelpers2.findAndHookMethod("com.tencent.mm.plugin.fts.ui.a0",
             context.classLoader,
             getItemMethod,
@@ -116,17 +129,13 @@ class HideSearchListUIPluginPart : IPlugin {
     private fun handleDetailSearch(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
         var hookClazzName = when (AppVersionUtil.getVersionCode()) {
             in Constrant.WX_CODE_8_0_38..Constrant.WX_CODE_8_0_41 -> "com.tencent.mm.plugin.fts.ui.x" // WX_CODE_PLAY_8_0_42 matches
-            Constrant.WX_CODE_PLAY_8_0_48 -> "com.tencent.mm.plugin.fts.ui.k1"
             else -> "com.tencent.mm.plugin.fts.ui.y"
         }
         //全局搜索详情置空
         XposedHelpers2.findAndHookMethod(
             hookClazzName,
             context.classLoader,
-            when (AppVersionUtil.getVersionCode()) {
-                Constrant.WX_CODE_PLAY_8_0_48 -> "c"
-                else -> "d"
-            },
+            "d",
             Integer.TYPE,
             object : XC_MethodHook2() {
                 override fun afterHookedMethod(param: MethodHookParam) {
@@ -152,17 +161,13 @@ class HideSearchListUIPluginPart : IPlugin {
         // 理论上 hook com.tencent.mm.plugin.fts.ui.z#getItem 也是一样的，但是被覆盖重命名了
         var hookClazzName = when (AppVersionUtil.getVersionCode()) {
             in Constrant.WX_CODE_8_0_38..Constrant.WX_CODE_8_0_43 -> "com.tencent.mm.plugin.fts.ui.y" // WX_CODE_PLAY_8_0_42 matches
-            Constrant.WX_CODE_PLAY_8_0_48 -> "com.tencent.mm.plugin.fts.ui.o1" // Reverse engineer hint: `if ("SearchContactBar".equals`
             else -> "com.tencent.mm.plugin.fts.ui.z"
         }
         //全局搜索首页
         XposedHelpers2.findAndHookMethod(
             hookClazzName,
             context.classLoader,
-            when (AppVersionUtil.getVersionCode()) {
-                Constrant.WX_CODE_PLAY_8_0_48 -> "c"
-                else -> "d"
-            },
+            "d",
             Integer.TYPE,
             object : XC_MethodHook2() {
                 override fun afterHookedMethod(param: MethodHookParam) {
@@ -206,7 +211,7 @@ class HideSearchListUIPluginPart : IPlugin {
 //                else -> null
 //            } ?: return false
 
-            val fieldName = when (AppVersionUtil.getVersionCode()) { // WX_CODE_PLAY_8_0_42, WX_CODE_PLAY_8_0_48 not applied here
+            val fieldName = when (AppVersionUtil.getVersionCode()) { // WX_CODE_PLAY_8_0_42 not applied here
                 Constrant.WX_CODE_8_0_40 -> "q1"
                 else -> "q"
             }
@@ -217,9 +222,9 @@ class HideSearchListUIPluginPart : IPlugin {
         }
         if (chatUser == null) {
             when (AppVersionUtil.getVersionCode()) {
-                in Constrant.WX_CODE_8_0_33..Constrant.WX_CODE_8_0_41, Constrant.WX_CODE_PLAY_8_0_48 -> {
-                    val fieldValue: Any = XposedHelpers2.getObjectField<Any?>(itemData, "p") ?: return false // WX_CODE_PLAY_8_0_42, WX_CODE_PLAY_8_0_48 (wc2.p0.p) matches
-                    chatUser = XposedHelpers2.getObjectField<String?>(fieldValue, "e") // WX_CODE_PLAY_8_0_42, WX_CODE_PLAY_8_0_48 (lc2.w.e) matches
+                in Constrant.WX_CODE_8_0_33..Constrant.WX_CODE_8_0_41 -> {
+                    val fieldValue: Any = XposedHelpers2.getObjectField<Any?>(itemData, "p") ?: return false // WX_CODE_PLAY_8_0_42 matches
+                    chatUser = XposedHelpers2.getObjectField<String?>(fieldValue, "e")
                 }
 
                 Constrant.WX_CODE_8_0_32 -> {
@@ -322,20 +327,17 @@ class HideSearchListUIPluginPart : IPlugin {
         if (field.type.isAssignableFrom(Number::class.java)
             || field.type.isAssignableFrom(Byte::class.java)
             || clazzName.startsWith("android")
+            || TextKit.isContain(FieldClassUtil.getAllClassName(fieldValue), "android")
         ) {
             return false
         }
-
         var jsonKey = fieldValue.toString().hashCode().toString()
 
         var compareText = if (fieldValue is CharSequence) {
+//            LogUtil.d("itemData1", fieldValue)
             fieldValue
-        } else {
-            if (jsonResultLruCache[jsonKey] == null) {
-                GsonUtil.toJson(fieldValue)
-            } else {
-                jsonResultLruCache[jsonKey]
-            }
+        } else {//存在复杂对象，gson转化容易堆栈溢出
+            ""
         }
         if (compareText.isBlank()) {
             return false
@@ -348,7 +350,7 @@ class HideSearchListUIPluginPart : IPlugin {
             }
             if (compareText.contains(wxid!!)) {
                 putField2Cache(itemData::class.java.name, field)
-                LogUtil.d("hit wxid compareText: ", compareText)
+                LogUtil.d("hit wxid compareText: ", compareText, field)
                 return true
             }
         }
