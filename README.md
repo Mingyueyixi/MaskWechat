@@ -70,11 +70,12 @@ v1.13版本开始，默认隐藏App在桌面的图标。隐藏以后，打开模
 play store版本：  
 
 8.0.42 2429  
+8.0.48 2589 
 
 感谢 @mislock 大胸弟。
 
 官网版本：  
-8.0.22 (2140) 2022-04-29  0
+8.0.22 (2140) 2022-04-29  
 80.0.32 (2300) 2023-01-06  
 8.0.33 (2320) 2023-02-23  
 8.0.34 (2340) 2023-03-23  
@@ -92,6 +93,7 @@ play store版本：
 8.0.46 (2540) 2024-01-23  
 8.0.47 (2560) 2024-02-01
 8.0.49 (2600) 2024-04-22
+8.0.50 (2701) 2024-07-02
 
 **PS.**
 - 仅支持上述版本，所有其他版本号以及32位版本未经测试，预计百分之九十九不可用
@@ -166,6 +168,9 @@ SHA1: 79F1341563A9CCCAF3090D27A5E9D529008EEC42
 
 8.0.49（2600）: [https://dldir1.qq.com/weixin/android/weixin8049android2600_0x2800313d_arm64.apk](https://dldir1.qq.com/weixin/android/weixin8049android2600_0x2800313d_arm64.apk)    
 SHA1: 6F2B100D9A14833E371651017E154147C21BC6B9
+
+8.0.50（2701）: [https://dldir1.qq.com/weixin/android/weixin8050android2701_0x2800323e_arm64.apk](https://dldir1.qq.com/weixin/android/weixin8050android2701_0x2800323e_arm64.apk)    
+SHA1: EC9A3352879B3B9793A9FA1A9FCCD31D48F88DB0
 
 
 推荐适配的最后两个版本，因为其他版本，作者自己不再使用

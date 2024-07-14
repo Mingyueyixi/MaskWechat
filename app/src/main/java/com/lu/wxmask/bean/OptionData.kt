@@ -27,6 +27,15 @@ class OptionData private constructor(
                 viewWxDbPw = json.optBoolean("viewWxDbPw", false),
             )
         }
+        fun toJson(data: OptionData): String {
+            return JSONObject().apply {
+                put("hideMainSearch", data.hideMainSearch)
+                put("enableMapConversation", data.enableMapConversation)
+                put("hideSingleSearch", data.hideSingleSearch)
+                put("hideMainSearchStrong", data.hideMainSearchStrong)
+                put("viewWxDbPw", data.viewWxDbPw)
+            }.toString()
+        }
 
     }
 }

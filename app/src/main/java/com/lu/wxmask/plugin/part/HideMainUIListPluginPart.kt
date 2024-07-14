@@ -270,7 +270,8 @@ class HideMainUIListPluginPart : IPlugin {
             in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_38 -> "com.tencent.mm.ui.z"
             in Constrant.WX_CODE_8_0_40..Constrant.WX_CODE_8_0_43 -> "com.tencent.mm.ui.b0" // WX_CODE_PLAY_8_0_42 matches
             in Constrant.WX_CODE_8_0_43..Constrant.WX_CODE_8_0_44 -> "com.tencent.mm.ui.h3"
-            in Constrant.WX_CODE_8_0_43..Constrant.WX_CODE_8_0_47, Constrant.WX_CODE_PLAY_8_0_48 , Constrant.WX_CODE_8_0_49 -> "com.tencent.mm.ui.i3"
+            in Constrant.WX_CODE_8_0_43..Constrant.WX_CODE_8_0_47,
+            Constrant.WX_CODE_PLAY_8_0_48 , Constrant.WX_CODE_8_0_49, Constrant.WX_CODE_8_0_50-> "com.tencent.mm.ui.i3"
             else -> null
         }
         var getItemMethod = if (adapterClazzName != null) {

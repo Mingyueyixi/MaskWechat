@@ -46,6 +46,8 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
             in Constrant.WX_CODE_8_0_44..Constrant.WX_CODE_8_0_45 -> "A"
             Constrant.WX_CODE_8_0_47 -> "B"
             Constrant.WX_CODE_8_0_49 -> "y"
+            Constrant.WX_CODE_8_0_49 -> "K"
+
             else -> "l"
         }
         val MediaHistoryListUI = "com.tencent.mm.ui.chatting.gallery.MediaHistoryListUI"
@@ -235,6 +237,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
             in Constrant.WX_CODE_8_0_44..Constrant.WX_CODE_8_0_47 -> "D"
             Constrant.WX_CODE_PLAY_8_0_48 -> "G"
             Constrant.WX_CODE_8_0_49 -> "F"
+            Constrant.WX_CODE_8_0_50 -> "D"
             else -> null
         }
         LogUtil.d("setEmptyActionBarTabPageUI method is :", commonHookMethodName)

@@ -41,6 +41,8 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
     }
 
     private fun loadConfigData() {
+        maskIdList.clear()
+        maskListMap.clear()
         ConfigUtil.getMaskList().forEach {
             maskListMap[it.maskId] = it
             maskIdList.add(it.maskId)

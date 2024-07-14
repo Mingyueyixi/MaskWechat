@@ -51,6 +51,7 @@ class Constrant {
         const val WX_CODE_8_0_46 = 2540
         const val WX_CODE_8_0_47 = 2560
         const val WX_CODE_8_0_49 = 2600
+        const val WX_CODE_8_0_50 = 2701
 
         // Google Play Store
         const val WX_CODE_PLAY_8_0_42 = 2429

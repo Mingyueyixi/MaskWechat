@@ -277,7 +277,6 @@ class MaskManagerCenterUI @JvmOverloads constructor(
                     layoutParams = FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
                         gravity = Gravity.CENTER_VERTICAL or Gravity.RIGHT
                     }
-                    isChecked = mOptionData.hideMainSearchStrong
                     setOnCheckedChangeListener { buttonView, isChecked ->
                         mOptionData.viewWxDbPw = isChecked
                         ConfigUtil.setOptionData(mOptionData)

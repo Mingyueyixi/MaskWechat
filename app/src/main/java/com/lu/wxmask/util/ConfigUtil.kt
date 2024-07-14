@@ -1,5 +1,7 @@
 package com.lu.wxmask.util
 
+import android.content.SharedPreferences
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.text.TextUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -15,10 +17,19 @@ import org.json.JSONObject
 
 class ConfigUtil {
     companion object {
-        val sp by lazy { LocalKVUtil.getTable("mask_wechat_config") }
         val KEY_MASK_LIST = "maskList"
         val KEY_TEMPORARY = "temporary"
         val KEY_OPTIONS = "options"
+
+        val sp by lazy {
+            //偏好文件变更监听
+            LocalKVUtil.getTable("mask_wechat_config").apply {
+                registerOnSharedPreferenceChangeListener { _share, _key ->
+                    LogUtil.d("onSharedPreferenceChanged", _key)
+                    notifyConfigSetObserverChanged()
+                }
+            }
+        }
 
         @JvmStatic
         private val dataSetObserverList = arrayListOf<ConfigSetObserver>()
@@ -58,7 +69,7 @@ class ConfigUtil {
             GsonUtil.toJson(data).let {
                 sp.edit().putString(KEY_MASK_LIST, it).apply()
             }
-            notifyConfigSetObserverChanged()
+//            notifyConfigSetObserverChanged()
         }
 
         fun addMaskList(item: MaskItemBean) {
@@ -72,7 +83,7 @@ class ConfigUtil {
             GsonUtil.toJson(maskList).let {
                 sp.edit().putString(KEY_MASK_LIST, it).apply()
             }
-            notifyConfigSetObserverChanged()
+//            notifyConfigSetObserverChanged()
         }
 
         fun getTemporaryJson(): JsonObject? {
@@ -87,7 +98,7 @@ class ConfigUtil {
         fun <T : BaseTemporary> setTemporary(data: T) {
             try {
                 sp.edit().putString(KEY_TEMPORARY, data.toJson()).apply()
-                notifyConfigSetObserverChanged()
+//                notifyConfigSetObserverChanged()
             } catch (e: Exception) {
                 LogUtil.w("save temporary fail", e)
             }
@@ -99,8 +110,8 @@ class ConfigUtil {
 
         fun setOptionData(data: OptionData) {
             try {
-                sp.edit().putString(KEY_OPTIONS, data.toJson()).apply()
-                notifyConfigSetObserverChanged()
+                sp.edit().putString(KEY_OPTIONS, OptionData.toJson(data)).apply()
+//                notifyConfigSetObserverChanged()
             } catch (e: Exception) {
                 LogUtil.w("setOptionJson fail", e)
             }
@@ -112,7 +123,7 @@ class ConfigUtil {
                 if (!result) {
                     LogUtil.w("clear sp data fail$result")
                 }
-                notifyConfigSetObserverChanged()
+//                notifyConfigSetObserverChanged()
             } catch (e: Exception) {
                 LogUtil.w("clear sp data fail", e)
             }
@@ -135,8 +146,6 @@ class ConfigUtil {
                 it.onConfigChange()
             }
         }
-
-
     }
 
     fun interface ConfigSetObserver {

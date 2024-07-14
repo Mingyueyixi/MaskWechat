@@ -238,14 +238,21 @@ public class WXConfigPlugin implements IPlugin {
                         //8.0.34开始，数据库基类改变。包：com.tencent.mm.autogen.table 已经不存在，不再校验
                         Object v = XposedHelpers2.getObjectField(f, "h");
                         return v;
-                    } else if (AppVersionUtil.getVersionCode() <= Constrant.WX_CODE_8_0_40
-                            || AppVersionUtil.getVersionCode() == Constrant.WX_CODE_PLAY_8_0_42
+                    } else if (AppVersionUtil.getVersionCode() <= Constrant.WX_CODE_8_0_50
+                            || AppVersionUtil.getVersionCode() <= Constrant.WX_CODE_PLAY_8_0_42
                             || AppVersionUtil.getVersionCode() == Constrant.WX_CODE_PLAY_8_0_48) {
                         Object v = XposedHelpers2.getObjectField(f, "i");
                         return v;
                     } else {
                         //8.0.33与8.0.34共同的父类： com.tencent.mm.contact.d
                         Field[] hitFields = XposedHelpers2.findFieldsByExactPredicate(f.getClass(), field -> ClazzN.from("com.tencent.mm.contact.d").isAssignableFrom(field.getType()));
+                        if (hitFields == null || hitFields.length == 0) {
+                            hitFields = XposedHelpers2.findFieldsByExactPredicate(f.getClass(), field -> {
+                                //用户信息对象包名改了
+                                return field.getType().getName().startsWith("com.tencent.mm.storage.");
+                            });
+                        }
+
                         if (hitFields.length > 0) {
                             Field field = hitFields[0];
                             Object result = field.get(f);
