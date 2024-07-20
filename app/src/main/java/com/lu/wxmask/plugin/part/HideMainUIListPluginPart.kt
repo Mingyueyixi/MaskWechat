@@ -35,6 +35,7 @@ class HideMainUIListPluginPart : IPlugin {
         in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_43 -> "k" // WX_CODE_PLAY_8_0_42 matches
         Constrant.WX_CODE_PLAY_8_0_48 -> "l"
         Constrant.WX_CODE_8_0_49 -> "l"
+        Constrant.WX_CODE_8_0_50 -> "n"
         else -> "m"
     }
 
@@ -271,7 +272,7 @@ class HideMainUIListPluginPart : IPlugin {
             in Constrant.WX_CODE_8_0_40..Constrant.WX_CODE_8_0_43 -> "com.tencent.mm.ui.b0" // WX_CODE_PLAY_8_0_42 matches
             in Constrant.WX_CODE_8_0_43..Constrant.WX_CODE_8_0_44 -> "com.tencent.mm.ui.h3"
             in Constrant.WX_CODE_8_0_43..Constrant.WX_CODE_8_0_47,
-            Constrant.WX_CODE_PLAY_8_0_48 , Constrant.WX_CODE_8_0_49, Constrant.WX_CODE_8_0_50-> "com.tencent.mm.ui.i3"
+            Constrant.WX_CODE_PLAY_8_0_48 , Constrant.WX_CODE_8_0_49-> "com.tencent.mm.ui.i3"
             else -> null
         }
         var getItemMethod = if (adapterClazzName != null) {
@@ -307,7 +308,7 @@ class HideMainUIListPluginPart : IPlugin {
                             getItemMethod = XposedHelpers2.findMethodExactIfExists(adapter::class.java.superclass, "getItem", Integer.TYPE)
                         }
                         if (getItemMethod != null) {
-                            hookListViewGetItem(getItemMethod!!)
+                            hookListViewGetItem(getItemMethod)
                             isHookGetItemMethod = true
                         } else {
                             LogUtil.w("guess getItem method is ", getItemMethod)
@@ -327,7 +328,7 @@ class HideMainUIListPluginPart : IPlugin {
             object : XC_MethodHook2() {
                 override fun afterHookedMethod(param: MethodHookParam) {
                     val itemData: Any = param.result ?: return
-                    LogUtil.v("item-data", GsonUtil.toJson(itemData))
+//                    LogUtil.v("item-data", GsonUtil.toJson(itemData))
                     val chatUser: String? = XposedHelpers2.getObjectField(itemData, "field_username")
                     if (chatUser == null) {
                         LogUtil.w("chat user is null")
@@ -347,7 +348,7 @@ class HideMainUIListPluginPart : IPlugin {
                         XposedHelpers2.setObjectField(itemData, "field_unReadMuteCount", 0)
 
                         //文本消息
-//                        XposedHelpers2.setObjectField(itemData, "field_msgType", "1")
+                        XposedHelpers2.setObjectField(itemData, "field_msgType", "1")
                         try {
                             val cTime = XposedHelpers2.getObjectField<Any>(itemData, "field_conversationTime")
                             val fieldFlag = XposedHelpers2.getObjectField<Any>(itemData, "field_flag")
