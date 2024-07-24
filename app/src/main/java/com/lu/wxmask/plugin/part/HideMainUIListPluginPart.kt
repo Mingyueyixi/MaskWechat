@@ -349,15 +349,16 @@ class HideMainUIListPluginPart : IPlugin {
 
                         //文本消息
                         XposedHelpers2.setObjectField(itemData, "field_msgType", "1")
-                        try {
-                            val cTime = XposedHelpers2.getObjectField<Any>(itemData, "field_conversationTime")
-                            val fieldFlag = XposedHelpers2.getObjectField<Any>(itemData, "field_flag")
-                            if (cTime != null && fieldFlag != cTime) {
-                                XposedHelpers2.setObjectField(itemData, "field_flag", cTime)
-                            }
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
+                        // 恢复被置底的好友
+                        // try {
+                        //     val cTime = XposedHelpers2.getObjectField<Any>(itemData, "field_conversationTime")
+                        //     val fieldFlag = XposedHelpers2.getObjectField<Any>(itemData, "field_flag")
+                        //     if (cTime != null && fieldFlag != cTime) {
+                        //         XposedHelpers2.setObjectField(itemData, "field_flag", cTime)
+                        //     }
+                        // } catch (e: Exception) {
+                        //     e.printStackTrace()
+                        // }
 
                     }
 
