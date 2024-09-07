@@ -7,8 +7,8 @@ import android.net.Uri
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModelProvider
 import com.lu.magic.util.AppUtil
+import com.lu.magic.util.ToastUtil
 import com.lu.magic.util.log.LogUtil
-import com.lu.mask.donate.DonatePresenter
 import com.lu.wxmask.App
 import com.lu.wxmask.config.AppConfigUtil
 import com.lu.wxmask.ui.MainActivity
@@ -28,7 +28,6 @@ class MaskAppRouter {
         val vailScheme = "maskwechat"
         val vailHost = "com.lu.wxmask"
         private val appUpdateViewModel = ViewModelProvider(App.instance)[AppUpdateViewModel::class.java]
-        private val donatePresenter by lazy { DonatePresenter.create() }
         fun routeCheckAppUpdateFeat(activity: Activity) {
             route(activity, "maskwechat://com.lu.wxmask/feat/checkAppUpdate")
         }
@@ -124,7 +123,9 @@ class MaskAppRouter {
         private fun routeFeatGroup(context: Context, uri: Uri, name: String) {
             when (name) {
                 "checkAppUpdate" -> appUpdateViewModel.checkOnce(context)
-                "donate" -> donatePresenter.lecturing(context)
+                "donate" -> {
+                    ToastUtil.show("Good good study, day day up.")
+                }
                 else -> LogUtil.w(name, "for mask link featGroup not impl")
             }
 
