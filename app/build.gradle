@@ -61,17 +61,19 @@ this.afterEvaluate {
 
 android {
     namespace 'com.lu.wxmask'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.lu.wxmask"
         minSdk 24
-        targetSdk 34
+        targetSdk 35
         versionCode 1003
         versionName "2.3-niubi"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
+        buildConfigField "int", "VERSION_CODE", "${versionCode}"
+        buildConfigField "String", "VERSION_NAME", "\"${versionName}\""
     }
 //    sourceSets {
 //        main{
@@ -144,7 +146,9 @@ android {
 //            unitTests.returnDefaultValues = true
 //        }
     }
-
+    buildFeatures {
+        buildConfig = true
+    }
 }
 
 configurations.all {
@@ -169,7 +173,6 @@ dependencies {
     implementation(deps['androidx.appcompat:appcompat'])
 //    implementation 'androidx.core:core:1.3.1'
 
-    implementation(project(":lib-donate"))
     compileOnly(deps['de.robv.android.xposed:api'])
     compileOnly('com.tencent.wcdb:wcdb-android:1.1-19')
     // https://mvnrepository.com/artifact/com.tencent.wcdb/wcdb-android
