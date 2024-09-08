@@ -74,6 +74,7 @@ android {
 
         buildConfigField "int", "VERSION_CODE", "${versionCode}"
         buildConfigField "String", "VERSION_NAME", "\"${versionName}\""
+        buildConfigField "String", "buildInfoJson64", "\"${buildInfoJson.bytes.encodeBase64()}\""
     }
 //    sourceSets {
 //        main{
@@ -96,17 +97,13 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.alpha
-
-            buildConfigField "String", "buildInfoJson64", "\"${buildInfoJson.bytes.encodeBase64()}\""
         }
         release {
             debuggable false
             minifyEnabled true
-            shrinkResources true
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.alpha
-
-            buildConfigField "String", "buildInfoJson64", "\"${buildInfoJson.bytes.encodeBase64()}\""
         }
 
     }
@@ -154,7 +151,28 @@ android {
 configurations.all {
     resolutionStrategy {
         force 'androidx.core:core:1.13.1'
-//        force 'androidx.arch.core:core-runtime:2.2.0'
+        force 'androidx.arch.core:core-runtime:2.2.0'
+        force 'androidx.lifecycle:lifecycle-runtime:2.6.2'
+        force 'androidx.lifecycle:lifecycle-livedata-core:2.6.2'
+        force 'androidx.lifecycle:lifecycle-livedata:2.6.2'
+        force 'androidx.lifecycle:lifecycle-process:2.6.2'
+        force 'androidx.activity:activity:1.5.1'
+        force 'androidx.annotation:annotation-experimental:1.4.0'
+        force 'org.jetbrains:annotations:23.0.0'
+        force 'androidx.collection:collection:1.1.0'
+        force 'androidx.concurrent:concurrent-futures:1.1.0'
+        force 'androidx.arch.core:core-common:2.2.0'
+        force 'androidx.test:core:1.5.0'
+        force 'com.google.code.gson:gson:2.10.1'
+        force 'com.google.guava:guava:32.0.1-jre'
+        force 'junit:junit:4.13.2'
+        force 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.20'
+        force 'org.jetbrains.kotlin:kotlin-stdlib-common:2.0.20'
+        force 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0'
+        force 'org.jetbrains.kotlin:kotlin-stdlib:1.9.20'
+        force 'androidx.test:monitor:1.6.0'
+        force 'com.google.protobuf:protobuf-java:3.22.3'
+        force 'androidx.startup:startup-runtime:1.1.1'
     }
 }
 

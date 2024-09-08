@@ -1,5 +1,6 @@
 package com.lu.wxmask.ui.wrapper
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
@@ -23,6 +24,7 @@ import com.lu.wxmask.BuildConfig
 import com.lu.wxmask.route.MaskAppRouter
 import java.net.URL
 
+@Suppress("DEPRECATION")
 class WebViewComponent(context: Context) {
     var forceHtml = false
 
@@ -110,6 +112,7 @@ class WebViewComponent(context: Context) {
                 LogUtil.w(TAG, "onReceivedHttpError", request?.url, errorResponse)
             }
 
+            @SuppressLint("WebViewClientOnReceivedSslError")
             override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: SslError?) {
                 handler?.proceed()
                 LogUtil.w(TAG, "onReceivedSslError", error)

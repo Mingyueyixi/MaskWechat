@@ -68,7 +68,7 @@ public class MainHook implements IXposedHookLoadPackage, IXposedHookZygoteInit, 
                 }
             }
         });
-        LogUtil.i("start main plugin for wechat");
+        LogUtil.i("start main plugin for wechat", lpparam.processName);
         XposedHelpers2.Config
                 .setCallMethodWithProxy(true)
                 .setThrowableCallBack(throwable -> LogUtil.w("MaskPlugin error", throwable))
@@ -208,11 +208,12 @@ public class MainHook implements IXposedHookLoadPackage, IXposedHookZygoteInit, 
     private void initTargetPlugins(Context context, XC_LoadPackage.LoadPackageParam lpparam) {
         //目前生成的plugin都是单例的
         PluginRegistry.register(
-                CommonPlugin.class,
-                WXDbPlugin.class,
-                WXConfigPlugin.class,
-                WXMaskPlugin.class
+                new CommonPlugin(),
+                new WXDbPlugin(),
+                new WXConfigPlugin(),
+                new WXMaskPlugin()
         ).handleHooks(context, lpparam);
+
 
     }
 

@@ -66,7 +66,7 @@ class HideSearchListUIPluginPart : IPlugin {
                         LogUtil.d("search hide", param.result)
 //                        param.result = try {
 //                            //将命中的用户数据抹除掉
-//                            param.result::class.java.newInstance()
+//                            param.result::class.java.getDeclaredConstructor().newInstance()
 //                        } catch (e: Throwable) {
 //                            LogUtil.d("error new Instance, return null")
 //                            null
@@ -143,7 +143,7 @@ class HideSearchListUIPluginPart : IPlugin {
                         LogUtil.d(param.result)
                         param.result = try {
                             //将命中的用户数据抹除掉
-                            param.result::class.java.newInstance()
+                            param.result::class.java.getDeclaredConstructor().newInstance()
                         } catch (e: Throwable) {
                             LogUtil.d("error new Instance, return null")
                             null
@@ -175,7 +175,7 @@ class HideSearchListUIPluginPart : IPlugin {
                         LogUtil.d(param.result)
                         param.result = runCatching {
                             //将命中的用户数据抹除掉
-                            param.result::class.java.newInstance()
+                            param.result::class.java.getDeclaredConstructor().newInstance()
                         }.getOrElse {
                             LogUtil.w("error new Instance, return null")
                             null
