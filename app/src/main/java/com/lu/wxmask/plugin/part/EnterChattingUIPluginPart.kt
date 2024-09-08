@@ -158,7 +158,7 @@ class EnterChattingHookAction(
         val activity = ReflectUtil.invokeMethod(fragmentObj, "getActivity") as Activity
 
         if (arguments != null) {
-            LogUtil.i("hook onEnterBegin ", arguments)
+            LogUtil.d("hook onEnterBegin ", arguments)
             val chatUser = arguments.getString("Chat_User")
             //命中配置的微信号
             if (chatUser != null && WXMaskPlugin.containChatUser(chatUser)) {
