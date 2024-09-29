@@ -333,6 +333,7 @@ def setup_test():
         "http": "127.0.0.1:7890",
         "https": "127.0.0.1:7890"
     }
+    http.verify = False
     met.github_context = json_loads(read_file('test_data/git_context.json'), {})
     met.bot_token = bytes(
         [53, 57, 55, 50, 48, 54, 51, 52, 53, 49, 58, 65, 65, 70, 52, 98, 72, 98, 103, 72, 68, 88, 84, 112, 85, 103, 120,

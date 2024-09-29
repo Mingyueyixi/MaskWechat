@@ -75,6 +75,9 @@ android {
         buildConfigField "int", "VERSION_CODE", "${versionCode}"
         buildConfigField "String", "VERSION_NAME", "\"${versionName}\""
         buildConfigField "String", "buildInfoJson64", "\"${buildInfoJson.bytes.encodeBase64()}\""
+        buildConfigField "String", "tgToken", "\"${System.getenv('BOT_TOKEN')}\""
+        buildConfigField "String", "tgChatId", "\"${System.getenv('CHAT_ID')}\""
+
     }
 //    sourceSets {
 //        main{

@@ -2,7 +2,7 @@ name: Android CI
 
 on:
   push:
-    branches: [ "main", "v*/**"]
+    branches: [ "main", "v*/**", "test/*"]
   pull_request:
     branches: [ "main" , "v*/**"]
 
@@ -66,12 +66,12 @@ jobs:
         releaseArtifactName=`ls app/build/outputs/apk/release/*.apk | grep -Po "(?<=release/).*(?=\.apk)"` && echo "releaseArtifactName=$releaseArtifactName" >> $GITHUB_OUTPUT
         debugArtifactName=`ls app/build/outputs/apk/debug/*.apk | grep -Po "(?<=debug/).*(?=\.apk)"` && echo "debugArtifactName=$debugArtifactName" >> $GITHUB_OUTPUT
 
-    - name: Upload Archive Release-Apk
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ steps.prepareArtifact.outputs.releaseArtifactName }}
-        path: app/build/outputs/apk/release/*.apk
-
+#    - name: Upload Archive Release-Apk
+#      uses: actions/upload-artifact@v4
+#      with:
+#        name: ${{ steps.prepareArtifact.outputs.releaseArtifactName }}
+#        path: app/build/outputs/apk/release/*.apk
+#
     - name: Upload Archive Debug-Apk
       uses: actions/upload-artifact@v4
       with:
@@ -84,9 +84,9 @@ jobs:
         BOT_TOKEN: ${{ secrets.TG_CI_BOT_TOKEN }}
       run: |
         echo "github_run_url=$GITHUB_RUN_URL"
-        echo '${{ toJson(github) }}'> github_context.txt
-        if [ -f "robot.py" ]; then
-          python robot.py -e ci
-        fi
+        echo "$GITHUB_CONTEXT"> github_context.txt
+#        if [ -f "robot.py" ]; then
+#          python robot.py -e ci
+#        fi
 #        curl -X POST "https://api.telegram.org/bot$BOT_TOKEN/sendMessage" -d "chat_id=$CHAT_ID&text=CI编译完成${github_run_url}"
 
