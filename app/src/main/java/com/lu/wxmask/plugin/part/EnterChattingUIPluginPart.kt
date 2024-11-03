@@ -76,6 +76,8 @@ class EnterChattingUIPluginPart() : IPlugin {
             in Constrant.WX_CODE_8_0_44 .. Constrant.WX_CODE_8_0_47 -> "z"
             Constrant.WX_CODE_PLAY_8_0_48,Constrant.WX_CODE_8_0_49 -> "B"
             Constrant.WX_CODE_8_0_50             -> "z"
+            Constrant.WX_CODE_8_0_51 -> "G"
+            Constrant.WX_CODE_8_0_53 -> "F"
             else -> null
         }
         var dispatchMethod: Method? = null
@@ -179,12 +181,12 @@ class EnterChattingHookAction(
             listView = runCatching {
                 // Res com.tencent.mm.ui.chatting.view.MMChattingListView under com.tencent.mm.pluginsdk.ui.chat.ChattingUILayout
                 val mmListViewId =
-                    if (AppVersionUtil.getVersionCode() == Constrant.WX_CODE_PLAY_8_0_42) {
-                        ResUtil.getViewId("bnu")
-                    } else if (AppVersionUtil.getVersionCode() in Constrant.WX_CODE_8_0_42..Constrant.WX_CODE_8_0_50) {
-                        ResUtil.getViewId("bm6")
-                    } else {
+                    if (AppVersionUtil.getVersionCode() < Constrant.WX_CODE_8_0_42) {
                         ResUtil.getViewId("b5n")
+                    } else if (AppVersionUtil.getVersionCode() == Constrant.WX_CODE_PLAY_8_0_42) {
+                        ResUtil.getViewId("bnu")
+                    } else {
+                        ResUtil.getViewId("bm6")
                     }
                 XposedHelpers2.callMethod(fragmentObj, "findViewById", mmListViewId) as View
             }.getOrNull()

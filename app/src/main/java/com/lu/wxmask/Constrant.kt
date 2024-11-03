@@ -52,7 +52,10 @@ class Constrant {
         const val WX_CODE_8_0_47 = 2560
         const val WX_CODE_8_0_49 = 2600
         const val WX_CODE_8_0_50 = 2701
-
+        const val WX_CODE_8_0_51 = 2720
+//        8052版本流产了
+//        const val WX_CODE_8_0_52 = 2901
+        const val WX_CODE_8_0_53 = 2740
         // Google Play Store
         const val WX_CODE_PLAY_8_0_42 = 2429
         const val WX_CODE_PLAY_8_0_48 = 2589
