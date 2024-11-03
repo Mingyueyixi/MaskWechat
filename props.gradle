@@ -33,11 +33,11 @@ ext {
 //            'com.github.Mingyueyixi.frame-ui:ui-all'             : 'com.github.Mingyueyixi.frame-ui:ui-all:8db89324ba',
 //            'com.github.Mingyueyixi.frame-ui:ui-material'        : 'com.github.Mingyueyixi.frame-ui:ui-material:8db89324ba',
 //            'com.github.Mingyueyixi.frame-ui:ui-base'            : 'com.github.Mingyueyixi.frame-ui:ui-base:8db89324ba',
-            'com.github.Mingyueyixi.frame-ui:ui-appcompat'    : 'com.github.Mingyueyixi.frame-ui:ui-appcompat:d912275f35',
+            'com.github.Mingyueyixi.frame-ui:ui-appcompat'    : 'com.github.Mingyueyixi.frame-ui:ui-appcompat:332536884f',
 
             'com.github.Mingyueyixi:frame-multi-preference'   : 'com.github.Mingyueyixi:frame-multi-preference:main-SNAPSHOT',
-            'com.github.Mingyueyixi.lposed:xposed-api2'       : 'com.github.Mingyueyixi.lposed:xposed-api2:f5e46bec5f',
-            'com.github.Mingyueyixi.lposed:plugin'            : 'com.github.Mingyueyixi.lposed:plugin:f5e46bec5f'
+            'com.github.Mingyueyixi.lposed:xposed-api2'       : 'com.github.Mingyueyixi.lposed:xposed-api2:43cc6b0858',
+            'com.github.Mingyueyixi.lposed:plugin'            : 'com.github.Mingyueyixi.lposed:plugin:43cc6b0858'
 
     ]
 }

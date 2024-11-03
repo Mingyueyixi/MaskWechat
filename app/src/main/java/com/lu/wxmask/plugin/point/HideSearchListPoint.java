@@ -60,7 +60,7 @@ public class HideSearchListPoint implements IPlugin {
 //                    LogUtil.d(">>> need hide", result);
 ////                    Object empty = null;
 ////                    try {
-////                        empty = result.getClass().newInstance();
+////                        empty = result.getClass().getDeclaredConstructor().newInstance();
 ////                        param.setResult(empty);
 ////                    } catch (Exception e) {
 ////                        param.setResult(null);

@@ -67,7 +67,7 @@ fun Class<*>?.createEmptyOrNullObject(): Any? {
         return null
     }
     return runCatching {
-        this::class.java.newInstance()
+        this::class.java.getDeclaredConstructor().newInstance()
     }.getOrElse {
         runCatching {
             return GsonUtil.fromJson("{}", this::class.java)

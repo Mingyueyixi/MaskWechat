@@ -109,6 +109,7 @@ class EnterChattingUIPluginPart() : IPlugin {
         if (dispatchMethod == null) {
             return
         }
+        //com.tencent.mm.ui.chatting.ChattingUIProxy.onInit往下调用，直到onEnterBegin调用
         XposedHelpers2.hookMethod(dispatchMethod, object : XC_MethodHook2() {
             val tagConst = "chatting-I"
             val enterAction = EnterChattingHookAction(context, lpparam, tagConst)
@@ -117,11 +118,24 @@ class EnterChattingUIPluginPart() : IPlugin {
             override fun afterHookedMethod(param: MethodHookParam) {
                 // onEnterBegin后，调用的函数的参数常量，啥意思不知道
 //                    LogUtil.d("after I method call, first param：", param.args[0])
+                LogUtil.d("after I method call, param length:", param.args)
                 when (param.args[0]) {
                     //onEnterBegin
-                    128 -> enterAction.handle(param)
+                    128 -> {
+                        try {
+                            enterAction.handle(param)
+                        } catch (e: Exception) {
+                            LogUtil.e("enter chattingUI error", e)
+                        }
+                    }
                     //doResume
-                    8 -> doResumeAction.handle(param)
+                    8 -> {
+                        try {
+                            doResumeAction.handle(param)
+                        } catch (e: Exception) {
+                            LogUtil.e("doResume chattingUI error", e)
+                        }
+                    }
                 }
             }
         })
@@ -144,7 +158,7 @@ class EnterChattingHookAction(
         val activity = ReflectUtil.invokeMethod(fragmentObj, "getActivity") as Activity
 
         if (arguments != null) {
-            LogUtil.i("hook onEnterBegin ", arguments)
+            LogUtil.d("hook onEnterBegin ", arguments)
             val chatUser = arguments.getString("Chat_User")
             //命中配置的微信号
             if (chatUser != null && WXMaskPlugin.containChatUser(chatUser)) {

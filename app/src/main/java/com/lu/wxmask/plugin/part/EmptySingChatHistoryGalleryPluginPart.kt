@@ -46,7 +46,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
             in Constrant.WX_CODE_8_0_44..Constrant.WX_CODE_8_0_45 -> "A"
             Constrant.WX_CODE_8_0_47 -> "B"
             Constrant.WX_CODE_8_0_49 -> "y"
-            Constrant.WX_CODE_8_0_49 -> "K"
+            Constrant.WX_CODE_8_0_50 -> "K"
 
             else -> "l"
         }

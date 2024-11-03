@@ -3,6 +3,7 @@ package com.lu.wxmask;
 import android.app.Application;
 import android.app.Instrumentation;
 import android.content.Context;
+import android.os.Process;
 
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
@@ -37,6 +38,7 @@ public class MainHook implements IXposedHookLoadPackage, IXposedHookZygoteInit, 
     private boolean hasInit = false;
     private List<XC_MethodHook.Unhook> initUnHookList = new ArrayList<>();
     private static String MODULE_PATH = null;
+    private boolean isHookEntryHandle = false;
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
@@ -45,6 +47,10 @@ public class MainHook implements IXposedHookLoadPackage, IXposedHookZygoteInit, 
 //            return;
 //        }
 
+        if (isHookEntryHandle) {
+            return;
+        }
+        isHookEntryHandle = true;
 
         HashSet<String> allowList = new HashSet<>();
         allowList.add(BuildConfig.APPLICATION_ID);
@@ -68,7 +74,7 @@ public class MainHook implements IXposedHookLoadPackage, IXposedHookZygoteInit, 
                 }
             }
         });
-        LogUtil.i("start main plugin for wechat");
+        LogUtil.i("start main plugin for wechat", lpparam.processName, Process.myPid());
         XposedHelpers2.Config
                 .setCallMethodWithProxy(true)
                 .setThrowableCallBack(throwable -> LogUtil.w("MaskPlugin error", throwable))
@@ -208,11 +214,12 @@ public class MainHook implements IXposedHookLoadPackage, IXposedHookZygoteInit, 
     private void initTargetPlugins(Context context, XC_LoadPackage.LoadPackageParam lpparam) {
         //目前生成的plugin都是单例的
         PluginRegistry.register(
-                CommonPlugin.class,
-                WXDbPlugin.class,
-                WXConfigPlugin.class,
-                WXMaskPlugin.class
+                new CommonPlugin(),
+                new WXDbPlugin(),
+                new WXConfigPlugin(),
+                new WXMaskPlugin()
         ).handleHooks(context, lpparam);
+
 
     }
 
