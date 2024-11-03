@@ -19,6 +19,7 @@ import com.lu.wxmask.plugin.WXConfigPlugin;
 import com.lu.wxmask.plugin.WXMaskPlugin;
 import com.lu.wxmask.plugin.WXDbPlugin;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -77,7 +78,12 @@ public class MainHook implements IXposedHookLoadPackage, IXposedHookZygoteInit, 
         LogUtil.i("start main plugin for wechat", lpparam.processName, Process.myPid());
         XposedHelpers2.Config
                 .setCallMethodWithProxy(true)
-                .setThrowableCallBack(throwable -> LogUtil.w("MaskPlugin error", throwable))
+                .setThrowableCallBack(throwable -> {
+                    if (throwable instanceof InvocationTargetException) {
+                        throwable = ((InvocationTargetException) throwable).getTargetException();
+                    }
+                    LogUtil.w("MaskPlugin error", throwable);
+                })
                 .setOnErrorReturnFallback((method, throwable) -> {
                     Class<?> returnType = method.getReturnType();
                     // 函数执行错误时，给定一个默认的返回值值。

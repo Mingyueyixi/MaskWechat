@@ -52,6 +52,7 @@ class Constrant {
         const val WX_CODE_8_0_47 = 2560
         const val WX_CODE_8_0_49 = 2600
         const val WX_CODE_8_0_50 = 2701
+//        2702也有个8.0.51版本，不管了
         const val WX_CODE_8_0_51 = 2720
 //        8052版本流产了
 //        const val WX_CODE_8_0_52 = 2901
