@@ -1,6 +1,7 @@
 package com.lu.wxmask.util.ext
 
 import android.graphics.Color
+import android.text.format.DateFormat
 import android.widget.TextView
 import com.google.gson.JsonObject
 import com.lu.magic.util.AppUtil
@@ -109,4 +110,17 @@ fun TextView?.dayText2Mills(fallback : Long=0): Long {
     } catch (e: Exception) {
     }
     return fallback
+}
+
+fun Long?.format2DateText(pattern:String="yyyy-MM-dd HH:mm:ss"): CharSequence {
+    return try {
+        if (this == null) {
+            ""
+        } else {
+            DateFormat.format(pattern, this)
+//            java.text.SimpleDateFormat(pattern).format(this)
+        }
+    } catch (e: Exception) {
+        ""
+    }
 }

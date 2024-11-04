@@ -2,6 +2,7 @@ package com.lu.wxmask.plugin.part
 
 import android.content.Context
 import android.graphics.Bitmap.Config
+import android.util.TimeUtils
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListAdapter
@@ -22,6 +23,7 @@ import com.lu.wxmask.plugin.WXMaskPlugin
 import com.lu.wxmask.plugin.ui.MaskUtil
 import com.lu.wxmask.util.AppVersionUtil
 import com.lu.wxmask.util.ConfigUtil
+import com.lu.wxmask.util.ext.format2DateText
 import com.lu.wxmask.util.ext.getViewId
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import java.lang.reflect.Method
@@ -40,6 +42,8 @@ class HideMainUIListPluginPart : IPlugin {
         Constrant.WX_CODE_8_0_53 -> "m"
         else -> "m"
     }
+
+    private val mUserTravelTimeTemp: MutableMap<String, Long> = mutableMapOf()
 
     override fun handleHook(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
         runCatching {
@@ -357,7 +361,12 @@ class HideMainUIListPluginPart : IPlugin {
                         if (option.enableTravelTime && option.travelTime != 0L) {
                             val cTime = XposedHelpers2.getObjectField<Any>(itemData, "field_conversationTime")
                             if (cTime is Long) {
-                                XposedHelpers2.setObjectField(itemData, "field_conversationTime", cTime - option.travelTime)
+                                if (mUserTravelTimeTemp[chatUser] != cTime) {//时间有变更，进行处理，没变更不用处理，避免列表多次加载导致时间不停后退
+                                    LogUtil.d("travel time change", chatUser, cTime.format2DateText(),"-->", mUserTravelTimeTemp[chatUser].format2DateText())
+                                    val nexTime = cTime - option.travelTime
+                                    XposedHelpers2.setObjectField(itemData, "field_conversationTime", nexTime)
+                                    mUserTravelTimeTemp[chatUser] = nexTime
+                                }
                             }
                         }
                         // 恢复被置底的好友
