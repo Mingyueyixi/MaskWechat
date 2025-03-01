@@ -7,6 +7,7 @@ import com.lu.lposed.plugin.IPlugin
 import com.lu.lposed.plugin.PluginProviders
 import com.lu.magic.util.log.LogUtil
 import com.lu.wxmask.ClazzN
+import de.robv.android.xposed.XC_MethodHook.MethodHookParam
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 
 class CommonPlugin : IPlugin {
@@ -19,6 +20,7 @@ class CommonPlugin : IPlugin {
         // 单聊搜索关键词记录
         private const val SQL_SELECT_MESSAGES_BY_KEYWORD =
             "SELECT FTS5MetaMessage.docid, type, subtype, entity_id, aux_index, timestamp, talker FROM FTS5MetaMessage"
+
     }
 
     // 缓存正则表达式
@@ -38,31 +40,18 @@ class CommonPlugin : IPlugin {
             XposedHelpers2.hookMethod(method, object : XC_MethodHook2() {
                 override fun beforeHookedMethod(param: MethodHookParam) {
                     //通过拦截sql语句，来隐藏搜索，或者通过cursor代理来隐藏
-
                     val sql = param.args[1].toString()
                     val wxMaskPlugin = PluginProviders.from(WXMaskPlugin::class.java)
-
+//                    LogUtil.d(sql)
                     if (wxMaskPlugin.maskIdList.isNotEmpty()) {
-                        val needReplace =
-                            regex.containsMatchIn(sql) ||
-                                    sql.startsWith(SQL_SELECT_MESSAGE) ||
-                                    sql.startsWith(SQL_SELECT_MESSAGES_BY_KEYWORD)
-
-                        if (needReplace) {
-                            val hideValueText =
-                                wxMaskPlugin.maskIdList.joinToString(",") { "\"$it\"" }
-
-                            val sql2 = if (sql.endsWith(";")) {
-                                sql.dropLast(1)
-                            } else {
-                                sql
-                            }.let { "SELECT * FROM ($it) AS a WHERE aux_index NOT IN ($hideValueText);" }
-
-                            param.args[1] = sql2
-                            LogUtil.d("sql hide hit:", sql2)
+                        if (needReplaceChatSearchHistory(sql)) {
+                            handleHideSearchList(wxMaskPlugin, param, sql)
+                        } else if (needReplacePicAndVideoSearch(sql)) {
+                            handleReplaceChatPicAndVideoSearchHistory(wxMaskPlugin, param, sql)
                         }
                     }
                 }
+
 
                 override fun afterHookedMethod(param: MethodHookParam) {
                     // Ignore
@@ -70,4 +59,52 @@ class CommonPlugin : IPlugin {
             })
         }
     }
+
+    private fun needReplaceChatSearchHistory(sql: String): Boolean {
+        return regex.containsMatchIn(sql) ||
+                sql.startsWith(SQL_SELECT_MESSAGE) ||
+                sql.startsWith(SQL_SELECT_MESSAGES_BY_KEYWORD)
+
+    }
+
+    private fun needReplacePicAndVideoSearch(sql: String): Boolean {
+        return sql.startsWith("select * from ( select * from message where talker= ", ignoreCase = true)
+    }
+
+    /**
+     * 置空单聊页面搜索记录的图片/视频
+     * 代替 @see com.lu.wxmask.plugin.part.EmptySingChatHistoryGalleryPluginPart#setEmptyDetailHistoryUIForGallery8044
+     */
+    private fun handleReplaceChatPicAndVideoSearchHistory(
+        wxMaskPlugin: WXMaskPlugin,
+        param: MethodHookParam,
+        sql: String
+    ) {
+        val hideValueText =
+            wxMaskPlugin.maskIdList.joinToString(",") { "\"$it\"" }
+        val sql2 = if (sql.endsWith(";")) {
+            sql.dropLast(1)
+        } else {
+            sql
+        }.let { "SELECT * FROM ($it) AS a WHERE talker NOT IN ($hideValueText);" }
+        param.args[1] = sql2
+    }
+
+    /**
+     * @see  com.lu.wxmask.plugin.part.HideSearchListUIPluginPart 代替
+     */
+    private fun handleHideSearchList(wxMaskPlugin: WXMaskPlugin, param: MethodHookParam, sql: String) {
+        val hideValueText =
+            wxMaskPlugin.maskIdList.joinToString(",") { "\"$it\"" }
+
+        val sql2 = if (sql.endsWith(";")) {
+            sql.dropLast(1)
+        } else {
+            sql
+        }.let { "SELECT * FROM ($it) AS a WHERE aux_index NOT IN ($hideValueText);" }
+
+        param.args[1] = sql2
+        LogUtil.d("sql hide hit:", sql2)
+    }
+
 }

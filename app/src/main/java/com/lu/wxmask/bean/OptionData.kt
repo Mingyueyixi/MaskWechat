@@ -1,11 +1,8 @@
 package com.lu.wxmask.bean
 
-import androidx.annotation.Keep
 import org.json.JSONObject
 
 
-
-@Keep
 class OptionData
 /**
  * @param hideMainSearch 主页搜索隐藏
