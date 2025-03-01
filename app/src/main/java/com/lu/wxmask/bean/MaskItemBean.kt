@@ -15,7 +15,10 @@ class MaskItemBean(
     var tipMode: Int = Constrant.WX_MASK_TIP_MODE_SILENT,
     var tipData: JsonElement? = JsonObject(),
     //伪装映射id
-    var mapId: String = "officialaccounts"
+    // 订阅号：officialaccounts
+    // 微信支付商家助手：gh_e087bb5b95e6
+    // 微信团队：weixin
+    var mapId: String = "gh_e087bb5b95e6"
 ) {
 
     companion object {
@@ -30,7 +33,7 @@ class MaskItemBean(
                 tagName = json.optString("tagName", ""),
                 tipMode = json.optInt("tipMode", Constrant.WX_MASK_TIP_MODE_SILENT),
                 tipData = GsonUtil.fromJson(json.optString("tipData", "{}"), JsonObject::class.java),
-                mapId = json.optString("mapId", "officialaccounts")
+                mapId = json.optString("mapId", "gh_e087bb5b95e6")
             )
         }
     }

@@ -49,7 +49,7 @@ internal class MaskItemUIController(private val context: Context, private val ma
         }
     }
     var etMapId = EditText(context).apply {
-        hint = "变脸者，默认${MaskItemBean.fromJson("{}").mapId}"
+        hint = "变脸者，微信团队：weixin，订阅号：officialaccounts，微信运动：gh_43f2581f6fd6等}"
         setText(mask.mapId)
     }
 
