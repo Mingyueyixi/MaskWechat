@@ -49,7 +49,8 @@ class EnterChattingUIPluginPart() : IPlugin {
         } else {
             //8.0.22
             LogUtil.d("hook onEnterBegin")
-            XposedHelpers2.hookMethod(onEnterBeginMethod,
+            XposedHelpers2.hookMethod(
+                onEnterBeginMethod,
                 object : XC_MethodHook() {
                     val tagConst = "chatting-onEnterBegin"
                     val enterAction = EnterChattingHookAction(context, lpparam, tagConst)
@@ -73,10 +74,10 @@ class EnterChattingUIPluginPart() : IPlugin {
             Constrant.WX_CODE_8_0_38 -> "M"
             in Constrant.WX_CODE_8_0_40..Constrant.WX_CODE_8_0_41 -> "K"
             in Constrant.WX_CODE_8_0_41..Constrant.WX_CODE_8_0_42 -> "M"
-            in Constrant.WX_CODE_8_0_44 .. Constrant.WX_CODE_8_0_47 -> "z"
-            Constrant.WX_CODE_PLAY_8_0_48,Constrant.WX_CODE_8_0_49 -> "B"
-            Constrant.WX_CODE_8_0_50             -> "z"
-            Constrant.WX_CODE_8_0_51 -> "G"
+            in Constrant.WX_CODE_8_0_44..Constrant.WX_CODE_8_0_47 -> "z"
+            Constrant.WX_CODE_PLAY_8_0_48, Constrant.WX_CODE_8_0_49 -> "B"
+            Constrant.WX_CODE_8_0_50 -> "z"
+            Constrant.WX_CODE_8_0_51, Constrant.WX_CODE_8_0_56 -> "G"
             Constrant.WX_CODE_8_0_53 -> "F"
             else -> null
         }

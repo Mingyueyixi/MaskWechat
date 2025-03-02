@@ -29,7 +29,6 @@ class CommonPlugin : IPlugin {
     }
 
     override fun handleHook(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
-
         XposedHelpers2.findMethodsByExactPredicate(ClazzN.from("com.tencent.wcdb.database.SQLiteDatabase")) { m ->
             if (m.name == "rawQueryWithFactory") {
                 LogUtil.d("rawQueryWithFactory", m.parameterTypes.size)
@@ -47,7 +46,7 @@ class CommonPlugin : IPlugin {
                         if (needReplaceChatSearchHistory(sql)) {
                             handleHideSearchList(wxMaskPlugin, param, sql)
                         } else if (needReplacePicAndVideoSearch(sql)) {
-                            handleReplaceChatPicAndVideoSearchHistory(wxMaskPlugin, param, sql)
+//                            handleReplaceChatPicAndVideoSearchHistory(wxMaskPlugin, param, sql)
                         }
                     }
                 }

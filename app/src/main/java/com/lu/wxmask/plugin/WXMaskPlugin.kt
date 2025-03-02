@@ -9,6 +9,7 @@ import com.lu.wxmask.plugin.part.EmptySingChatHistoryGalleryPluginPart
 import com.lu.wxmask.plugin.part.EnterChattingUIPluginPart
 import com.lu.wxmask.plugin.part.HideMainUIListPluginPart
 import com.lu.wxmask.plugin.part.HideSearchListUIPluginPart
+import com.lu.wxmask.plugin.part.IgnoreVideoCallPluginPart
 import com.lu.wxmask.plugin.part.MaskUIManagerPluginPart
 import com.lu.wxmask.util.ConfigUtil
 import com.lu.wxmask.util.ConfigUtil.ConfigSetObserver
@@ -23,6 +24,7 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
     private val hideMainUIListPluginPart = HideMainUIListPluginPart()
     private val emptySingChatHistoryGalleryPluginPart = EmptySingChatHistoryGalleryPluginPart()
     private val maskUIManagerPluginPart = MaskUIManagerPluginPart()
+//    private val mIgnoreMediaCallPluginPart = IgnoreVideoCallPluginPart()
 
     companion object {
         fun containChatUser(chatUser: String?): Boolean {
@@ -69,6 +71,7 @@ class WXMaskPlugin : IPlugin, ConfigSetObserver {
         }
         emptySingChatHistoryGalleryPluginPart.handleHook(context, lpparam)
         maskUIManagerPluginPart.handleHook(context, lpparam)
+//        mIgnoreMediaCallPluginPart.handleHook(context, lpparam)
     }
 
 

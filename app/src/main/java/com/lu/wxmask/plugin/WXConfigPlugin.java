@@ -238,7 +238,7 @@ public class WXConfigPlugin implements IPlugin {
                         //8.0.34开始，数据库基类改变。包：com.tencent.mm.autogen.table 已经不存在，不再校验
                         Object v = XposedHelpers2.getObjectField(f, "h");
                         return v;
-                    } else if (AppVersionUtil.getVersionCode() <= Constrant.WX_CODE_8_0_50
+                    } else if (AppVersionUtil.getVersionCode() <= Constrant.WX_CODE_8_0_56
                             || AppVersionUtil.getVersionCode() <= Constrant.WX_CODE_PLAY_8_0_42
                             || AppVersionUtil.getVersionCode() == Constrant.WX_CODE_PLAY_8_0_48) {
                         Object v = XposedHelpers2.getObjectField(f, "i");

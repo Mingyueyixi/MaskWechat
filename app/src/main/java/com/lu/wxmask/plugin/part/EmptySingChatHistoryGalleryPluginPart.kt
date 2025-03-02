@@ -4,13 +4,8 @@ import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.core.view.isVisible
-import androidx.core.view.postDelayed
 import com.lu.lposed.api2.XC_MethodHook2
-import com.lu.lposed.api2.XC_MethodReplacement2
 import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
 import com.lu.magic.util.log.LogUtil
@@ -28,9 +23,63 @@ import java.lang.reflect.Method
  */
 class EmptySingChatHistoryGalleryPluginPart : IPlugin {
     val MediaHistoryGalleryUI = "com.tencent.mm.ui.chatting.gallery.MediaHistoryGalleryUI"
+    var mChattingArguments: Bundle? = null
+
     override fun handleHook(context: Context, lpparam: XC_LoadPackage.LoadPackageParam?) {
+        handleImageQueryMainUI(context, lpparam)
         setEmptyDetailHistoryUI(context, lpparam)
         setEmptyActionBarTabPageUI(context, lpparam)
+    }
+
+    /**
+     * 处理8.0.49之后出现的图片搜索页面，发现交谈者是要隐藏的用户，直接结束图片搜索页面。因为该页面是compose写的，没有可以下手的地方
+     */
+    private fun handleImageQueryMainUI(context: Context, lpparam: XC_LoadPackage.LoadPackageParam?) {
+        val ImageQueryMainUI = ClazzN.from("com.tencent.mm.view.activity.ImageQueryMainUI") ?: return
+        XposedHelpers2.findAndHookMethod(
+            ClazzN.from("com.tencent.mm.ui.chatting.BaseChattingUIFragment"),
+            "onCreate",
+            Bundle::class.java,
+            object : XC_MethodHook2() {
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    mChattingArguments = XposedHelpers2.callMethod(param.thisObject, "getArguments")
+                }
+            })
+        XposedHelpers2.findAndHookMethod(
+            ClazzN.from("com.tencent.mm.ui.chatting.BaseChattingUIFragment"),
+            "onDestroy",
+            object : XC_MethodHook2() {
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    mChattingArguments = null
+                }
+            })
+
+        XposedHelpers2.findAndHookMethod(
+            ImageQueryMainUI,
+            "onCreate",
+            Bundle::class.java,
+            object : XC_MethodHook2() {
+                override fun beforeHookedMethod(param: MethodHookParam) {
+                    val act: Activity = param.thisObject as Activity
+                    if (mChattingArguments == null) {
+                        return
+                    }
+                    val bundle: Bundle = mChattingArguments as Bundle
+                    val thizUser = bundle.getString("Chat_User")
+                    if (WXMaskPlugin.containChatUser(thizUser)) {
+                        //隐藏。
+                        act.finish()
+                    }
+                    val kSet = bundle.keySet()
+                    val sb = StringBuilder()
+
+                    for (key in kSet) {
+                        sb.append(key + ": " + bundle.get(key) + ", ")
+                    }
+                    LogUtil.d("ImageQueryMainUI onCreate", sb.toString())
+                }
+            })
+
     }
 
     private fun setEmptyDetailHistoryUI(context: Context, lpparam: XC_LoadPackage.LoadPackageParam?) {
@@ -45,7 +94,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
             in Constrant.WX_CODE_8_0_43..Constrant.WX_CODE_8_0_44, Constrant.WX_CODE_PLAY_8_0_48 -> "z"
             in Constrant.WX_CODE_8_0_44..Constrant.WX_CODE_8_0_45 -> "A"
             Constrant.WX_CODE_8_0_47 -> "B"
-            Constrant.WX_CODE_8_0_49, Constrant.WX_CODE_8_0_51 -> "y"
+            Constrant.WX_CODE_8_0_49, Constrant.WX_CODE_8_0_51, Constrant.WX_CODE_8_0_56 -> "y"
             Constrant.WX_CODE_8_0_50 -> "K"
             Constrant.WX_CODE_8_0_53 -> "z"
             else -> "l"
@@ -159,14 +208,19 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
 
     private fun setEmptyDetailHistoryUIForGallery8044(context: Context, lpparam: XC_LoadPackage.LoadPackageParam?) {
         //k1 run a1 -> a1 run z0 加载图片完成
+        val presenterClazz = when (AppVersionUtil.getVersionCode()) {
+            in Constrant.WX_CODE_8_0_44..Constrant.WX_CODE_8_0_53 -> "com.tencent.mm.ui.chatting.presenter.k1"
+            else -> "com.tencent.mm.ui.chatting.presenter.j1"
+        }
         var methods = XposedHelpers2.findMethodsByExactParameters(
-            ClazzN.from("com.tencent.mm.ui.chatting.presenter.k1"),
+            ClazzN.from(presenterClazz),
             Void.TYPE,
             java.lang.Boolean.TYPE,
             Integer.TYPE,
         )
-        if (methods.isNotEmpty()) {
-            XposedHelpers2.hookMethod(methods[0],
+        if (methods?.isNotEmpty() == true) {
+            XposedHelpers2.hookMethod(
+                methods[0],
                 object : XC_MethodHook2() {
                     override fun beforeHookedMethod(param: MethodHookParam) {
                         super.beforeHookedMethod(param)
@@ -238,7 +292,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
             Constrant.WX_CODE_PLAY_8_0_48 -> "G"
             Constrant.WX_CODE_8_0_49 -> "F"
             Constrant.WX_CODE_8_0_50 -> "D"
-            Constrant.WX_CODE_8_0_51, Constrant.WX_CODE_8_0_53 -> "I"
+            in Constrant.WX_CODE_8_0_51..Constrant.WX_CODE_8_0_56 -> "I"
 
             else -> null
         }
