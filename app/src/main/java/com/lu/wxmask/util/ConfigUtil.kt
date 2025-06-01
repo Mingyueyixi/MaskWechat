@@ -146,6 +146,19 @@ class ConfigUtil {
                 it.onConfigChange()
             }
         }
+
+        fun removeMaskItem(chatUser: String) {
+            val maskList = getMaskList()
+            val it = maskList.iterator()
+            while (it.hasNext()) {
+                val item = it.next()
+                if (chatUser == item.maskId) {
+                    it.remove()
+                }
+            }
+            setMaskList(maskList)
+            notifyConfigSetObserverChanged()
+        }
     }
 
     fun interface ConfigSetObserver {

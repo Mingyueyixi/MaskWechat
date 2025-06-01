@@ -294,6 +294,21 @@ class MaskManagerCenterUI @JvmOverloads constructor(
                 layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, ITEM_HEIGHT).apply {
                     gravity = Gravity.CENTER_VERTICAL
                 }
+                addView(ItemSubTitle("聊天页面输入框口令监听"))
+                addView(Switch(context).apply {
+                    layoutParams = FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+                        gravity = Gravity.CENTER_VERTICAL or Gravity.RIGHT
+                    }
+                    isChecked = mOptionData.hideSingleSearch
+                    setOnCheckedChangeListener { buttonView, isChecked ->
+                        mOptionData.enableChattingKey = isChecked
+                    }
+                })
+            })
+            addView(FrameLayout(context).apply {
+                layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, ITEM_HEIGHT).apply {
+                    gravity = Gravity.CENTER_VERTICAL
+                }
                 addView(ItemSubTitle("查看微信数据库密码").apply {
                     setOnClickListener {
                         handlerWxDbItemClick()

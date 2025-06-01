@@ -2,21 +2,27 @@ package com.lu.wxmask.plugin;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.os.HandlerCompat;
 
 import com.lu.lposed.api2.XC_MethodHook2;
 import com.lu.lposed.api2.XposedHelpers2;
 import com.lu.lposed.plugin.IPlugin;
+import com.lu.magic.util.AppUtil;
 import com.lu.magic.util.GsonUtil;
 import com.lu.magic.util.ToastUtil;
 import com.lu.magic.util.log.LogUtil;
 import com.lu.magic.util.thread.AppExecutor;
+import com.lu.magic.util.thread.WorkerUtil;
 import com.lu.wxmask.ClazzN;
 import com.lu.wxmask.Constrant;
 import com.lu.wxmask.bean.MaskItemBean;
@@ -38,6 +44,8 @@ public class WXConfigPlugin implements IPlugin {
     private boolean isShowingAddConfigTipUI;
 
     private int pluginMode;
+    private Handler  mUiHandler = new Handler( Looper.getMainLooper());
+    private boolean mIsLauncherUiNotResumed;
 
     @Override
     public void handleHook(Context context, XC_LoadPackage.LoadPackageParam lpparam) {
@@ -73,6 +81,37 @@ public class WXConfigPlugin implements IPlugin {
                     }
                 }
         );
+//
+//        XposedHelpers2.findAndHookMethod(
+//                ClazzN.ChattingUI,
+//                context.getClassLoader(),
+//                "onPause",
+//                Bundle.class.getName(),
+//                new XC_MethodHook2() {
+//                     @Override
+//                     protected void afterHookedMethod(MethodHookParam param) {
+//                         mIsLauncherUiNotResumed = true;
+//                         mUiHandler.postDelayed(() -> {
+//                             if (mIsLauncherUiNotResumed) {
+//                                 isOnDoingConfig = false;
+//                             }
+//                         },5000L);
+//                     }
+//                }
+//        );
+//
+//        XposedHelpers2.findAndHookMethod(
+//                ClazzN.ChattingUI,
+//                context.getClassLoader(),
+//                "onResume",
+//                Bundle.class.getName(),
+//                new XC_MethodHook2() {
+//                     @Override
+//                     protected void afterHookedMethod(MethodHookParam param) {
+//                          mIsLauncherUiNotResumed = false;
+//                     }
+//                }
+//        );
     }
 
     //进到微信
@@ -179,38 +218,42 @@ public class WXConfigPlugin implements IPlugin {
                 LogUtil.w("isNot Match Activity", activityClazzName);
                 return;
             }
-            Bundle arguments = XposedHelpers2.callMethod(param.thisObject, "getArguments");
-            String chatUser = arguments.getString("Chat_User");
-            List<MaskItemBean> lst = ConfigUtil.Companion.getMaskList();
-            int idIndex = MaskUtil.findIndex(lst, chatUser);
-
-            Object chatUserInfo = findChatUserObject(param.thisObject);
-            //备注
-            String field_conRemark = "";
-            //chat id == chatUser
-//            String field_username = "";
-            //昵称
-            String field_nickname = "";
-            if (chatUserInfo != null) {
-                field_conRemark = XposedHelpers2.getObjectField(chatUserInfo, "field_conRemark");
-//                field_username = XposedHelpers2.getObjectField(chatUserInfo, "field_username");
-                field_nickname = XposedHelpers2.getObjectField(chatUserInfo, "field_nickname");
-                LogUtil.d("chatUserInfo", GsonUtil.toJson(chatUserInfo));
-            }
-
-            if (idIndex < 0) {
-                new AddMaskItemUI(activity, lst)
-                        .setChatUserId(chatUser)
-                        .setTagName((field_conRemark == null || field_conRemark.isEmpty()) ? field_nickname : field_conRemark)
-                        .setFreeButton("退出配置", (dialog, which) -> isOnDoingConfig = false)
-                        .show();
-            } else {
-                new EditMaskItemUI(activity, lst, idIndex)
-                        .setFreeButton("退出配置", (dialog, which) -> isOnDoingConfig = false)
-                        .show();
-            }
+            showAddMaskDialog(activity, param.thisObject);
         });
 
+    }
+
+    public void showAddMaskDialog(Context context, Object fragmentObj) {
+        Bundle arguments = XposedHelpers2.callMethod(fragmentObj, "getArguments");
+        String chatUser = arguments.getString("Chat_User");
+        List<MaskItemBean> lst = ConfigUtil.Companion.getMaskList();
+        int idIndex = MaskUtil.findIndex(lst, chatUser);
+
+        Object chatUserInfo = findChatUserObject(fragmentObj);
+        //备注
+        String field_conRemark = "";
+        //chat id == chatUser
+//            String field_username = "";
+        //昵称
+        String field_nickname = "";
+        if (chatUserInfo != null) {
+            field_conRemark = XposedHelpers2.getObjectField(chatUserInfo, "field_conRemark");
+//                field_username = XposedHelpers2.getObjectField(chatUserInfo, "field_username");
+            field_nickname = XposedHelpers2.getObjectField(chatUserInfo, "field_nickname");
+            LogUtil.d("chatUserInfo", GsonUtil.toJson(chatUserInfo));
+        }
+
+        if (idIndex < 0) {
+            new AddMaskItemUI(context, lst)
+                    .setChatUserId(chatUser)
+                    .setTagName((field_conRemark == null || field_conRemark.isEmpty()) ? field_nickname : field_conRemark)
+                    .setFreeButton("退出配置", (dialog, which) -> isOnDoingConfig = false)
+                    .show();
+        } else {
+            new EditMaskItemUI(context, lst, idIndex)
+                    .setFreeButton("退出配置", (dialog, which) -> isOnDoingConfig = false)
+                    .show();
+        }
     }
 
     private Object findChatUserObject(Object fragmentObj) {

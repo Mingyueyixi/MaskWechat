@@ -36,8 +36,8 @@ ext {
             'com.github.Mingyueyixi.frame-ui:ui-appcompat'    : 'com.github.Mingyueyixi.frame-ui:ui-appcompat:332536884f',
 
             'com.github.Mingyueyixi:frame-multi-preference'   : 'com.github.Mingyueyixi:frame-multi-preference:main-SNAPSHOT',
-            'com.github.Mingyueyixi.lposed:xposed-api2'       : 'com.github.Mingyueyixi.lposed:xposed-api2:43cc6b0858',
-            'com.github.Mingyueyixi.lposed:plugin'            : 'com.github.Mingyueyixi.lposed:plugin:43cc6b0858'
+            'com.github.Mingyueyixi.lposed:xposed-api2'       : 'com.github.Mingyueyixi.lposed:xposed-api2:a88cf0c651',
+            'com.github.Mingyueyixi.lposed:plugin'            : 'com.github.Mingyueyixi.lposed:plugin:a88cf0c651'
 
     ]
 }

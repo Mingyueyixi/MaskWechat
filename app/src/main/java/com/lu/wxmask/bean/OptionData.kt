@@ -12,6 +12,7 @@ class OptionData
  * @param viewWxDbPw 查看微信数据库密码
  * @param travelTime 时间穿越（单位/毫秒）
  * @param enableTravelTime 是否启用时间穿越
+ * @param enableChattingKey 聊天输入框口令监听
  */
 private constructor(
     var hideMainSearch: Boolean,
@@ -20,8 +21,10 @@ private constructor(
     var hideMainSearchStrong: Boolean,
     var viewWxDbPw: Boolean,
     var travelTime: Long,
-    var enableTravelTime: Boolean
+    var enableTravelTime: Boolean,
+    var enableChattingKey: Boolean
 ) {
+
 
     companion object {
         fun fromJson(jsonText: String): OptionData {
@@ -37,7 +40,8 @@ private constructor(
                 hideMainSearchStrong = json.optBoolean("hideMainSearchStrong", false),
                 viewWxDbPw = json.optBoolean("viewWxDbPw", false),
                 travelTime = json.optLong("travelTime", 0L),
-                enableTravelTime = json.optBoolean("enableTravelTime", false)
+                enableTravelTime = json.optBoolean("enableTravelTime", false),
+                enableChattingKey = json.optBoolean("enableChattingKey", true)
             )
         }
         fun toJson(data: OptionData): String {
@@ -49,6 +53,7 @@ private constructor(
                 put("viewWxDbPw", data.viewWxDbPw)
                 put("travelTime", data.travelTime)
                 put("enableTravelTime", data.enableTravelTime)
+                put("enableChattingKey", data.enableChattingKey)
             }.toString()
         }
 
