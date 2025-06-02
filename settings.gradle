@@ -4,10 +4,10 @@ pluginManagement {
 //            allowInsecureProtocol = true
 //            url "http://127.0.0.1:10072"
 //        }
+        maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/maven-public' }
+        maven { url 'https://repo.huaweicloud.com/repository/maven' }
         maven { url "https://maven.aliyun.com/repository/public" }
         maven { url 'https://jitpack.io/' }
-//        maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/maven-public' }
-//        maven { url 'https://repo.huaweicloud.com/repository/maven' }
         //central有的，public聚合仓不一定有，奇葩
         maven { url 'https://maven.aliyun.com/repository/central' }
         maven { url "https://maven.aliyun.com/repository/public" }
@@ -34,10 +34,10 @@ dependencyResolutionManagement {
 //                password = "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"
 //            }
 //        }
+        maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/maven-public' }
+        maven { url 'https://repo.huaweicloud.com/repository/maven' }
         maven { url "https://maven.aliyun.com/repository/public" }
         maven { url 'https://jitpack.io/' }
-//        maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/maven-public' }
-//        maven { url 'https://repo.huaweicloud.com/repository/maven' }
         //central有的，public聚合仓不一定有，奇葩
         maven { url 'https://maven.aliyun.com/repository/central' }
         maven { url "https://maven.aliyun.com/repository/google" }

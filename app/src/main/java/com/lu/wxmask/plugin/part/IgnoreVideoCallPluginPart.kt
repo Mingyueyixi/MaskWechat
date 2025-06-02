@@ -96,19 +96,16 @@ class IgnoreVideoCallPluginPart : IPlugin {
                     val m = Regex("username=(.*?),").find(rText) ?: return
 //                    val codecClazz = ClazzN.from("com.tencent.pigeon.mm_foundation.FlutterAccountHostCodec")
                     val wxId = m.groups[1]?.value ?: return
-                    if (wxId is String) {
-                        if (WXMaskPlugin.containChatUser(wxId)) {
-                            val act = activityRef.get()
-                            if (act == null) {
-                                LogUtil.d("BasicMessageChannel.onMessage:", "activity is null")
-                            } else {
+                    if (WXMaskPlugin.containChatUser(wxId)) {
+                        val act = activityRef.get()
+                        if (act == null) {
+                            LogUtil.d("BasicMessageChannel.onMessage:", "activity is null")
+                        } else {
 //                                act.findViewById<ViewGroup>(android.R.id.content).removeAllViews()
-                                var logData:Any? = act.intent.getParcelableExtra("page_info")
+                            var logData:Any? = act.intent.getParcelableExtra("page_info")
 
-                                act.finish()
-                            }
+                            act.finish()
                         }
-
                     }
                 }
             }
