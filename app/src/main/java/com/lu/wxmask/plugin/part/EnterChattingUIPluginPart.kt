@@ -203,20 +203,12 @@ class EnterChattingHookAction(
             showChatListUI(fragmentObj)
         }
 
-        XposedHelpers2.callMethod<View?>(fragmentObj, "findViewById", ResUtil.getViewId("gp"))?.let {
-            ChildDeepCheck().each(it) { child ->
-                child.setOnClickListener {
-                    if (PluginProviders.from(WXConfigPlugin::class.java).isOnDoingConfig
-                        || isUserInputCopyId(fragmentObj)
-                    ) {
-                        ClipboardUtil.copy(chatUser)
-                        ToastUtil.show(activity, "已复制wxid:" + chatUser)
-                    }
-                }
-            }
-        }
-
         handleUserInputMagic(activity, fragmentObj, chatUser)
+        handleShowAddMaskDialog(activity,  fragmentObj, chatUser)
+    }
+
+    private fun handleShowAddMaskDialog(activity: Activity, fragmentObj: Any, chatUser: String) {
+        PluginProviders.from(WXConfigPlugin::class.java).checkShowAddMaskConfigDialog(fragmentObj)
     }
 
     private fun handleUserInputMagic(activity: Activity, fragmentObj: Any, chatUser: String) {
@@ -228,14 +220,19 @@ class EnterChattingHookAction(
             // ignore
             return
         }
+
         userInputView.addTextChangedListener {
-            val text = it.toElseEmptyString()
+            val editable = it
+            if (editable == null) {
+                return@addTextChangedListener
+            }
+            val text = editable.toElseEmptyString()
             //LogUtil.d("userInputMagic", "text:", text)
             when (text) {
                 "#add" -> {
                     // 添加
                     PluginProviders.from(WXConfigPlugin::class.java).showAddMaskDialog(userInputView.context, fragmentObj)
-                    return@addTextChangedListener
+                    editable.clear()
                 }
 
                 "#del" -> {
@@ -253,6 +250,7 @@ class EnterChattingHookAction(
 
                         }
                         .show()
+                    editable.clear()
                 }
 
                 "#hide" -> {
@@ -260,10 +258,17 @@ class EnterChattingHookAction(
                     if (chatListView != null) {
                         chatListView.visibility = View.INVISIBLE
                     }
+                    editable.clear()
                 }
 
                 "#show" -> {
                     showChatListUI(fragmentObj)
+                    editable.clear()
+                }
+                "#copyId" -> {
+                    ClipboardUtil.copy(chatUser)
+                    ToastUtil.show(activity, "已复制wxid:" + chatUser)
+                    editable.clear()
                 }
             }
         }
@@ -425,12 +430,3 @@ class EnterChattingHookAction(
 
 
 }
-
-class DoResumeAction(context: Context, lpparam: XC_LoadPackage.LoadPackageParam, tagConst: String) {
-    fun handle(param: XC_MethodHook.MethodHookParam) {
-        PluginProviders.from(WXConfigPlugin::class.java).doResumeHookAction(param)
-    }
-
-}
-
-

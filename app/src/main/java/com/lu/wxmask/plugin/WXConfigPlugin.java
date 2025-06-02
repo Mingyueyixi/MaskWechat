@@ -2,7 +2,6 @@ package com.lu.wxmask.plugin;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,19 +9,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.os.HandlerCompat;
-
 import com.lu.lposed.api2.XC_MethodHook2;
 import com.lu.lposed.api2.XposedHelpers2;
 import com.lu.lposed.plugin.IPlugin;
-import com.lu.magic.util.AppUtil;
 import com.lu.magic.util.GsonUtil;
 import com.lu.magic.util.ToastUtil;
 import com.lu.magic.util.log.LogUtil;
-import com.lu.magic.util.thread.AppExecutor;
-import com.lu.magic.util.thread.WorkerUtil;
 import com.lu.wxmask.ClazzN;
 import com.lu.wxmask.Constrant;
 import com.lu.wxmask.bean.MaskItemBean;
@@ -36,7 +28,6 @@ import com.lu.wxmask.util.ConfigUtil;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class WXConfigPlugin implements IPlugin {
@@ -198,27 +189,27 @@ public class WXConfigPlugin implements IPlugin {
 //
 //    }
 
-    public void doResumeHookAction(XC_MethodHook.MethodHookParam param) {
+    public void checkShowAddMaskConfigDialog(Object fragmentObj) {
         if (!isOnDoingConfig) {
             LogUtil.d("ignore show config ui");
             return;
         }
         LogUtil.i("start config ui");
-        View view = XposedHelpers2.callMethod(param.thisObject, "getView");
+        View view = XposedHelpers2.callMethod(fragmentObj, "getView");
         view.post(() -> {
 
             //确保数据和画面准备好了
-            if (XposedHelpers2.callMethod(param.thisObject, "isHidden")) {
+            if (XposedHelpers2.callMethod(fragmentObj, "isHidden")) {
                 LogUtil.w("isHidden");
                 return;
             }
-            Activity activity = XposedHelpers2.callMethod(param.thisObject, "getActivity");
+            Activity activity = XposedHelpers2.callMethod(fragmentObj, "getActivity");
             String activityClazzName = activity.getClass().getName();
             if (!ClazzN.LauncherUI.equals(activityClazzName) && !ClazzN.ChattingUI.equals(activityClazzName)) {
                 LogUtil.w("isNot Match Activity", activityClazzName);
                 return;
             }
-            showAddMaskDialog(activity, param.thisObject);
+            showAddMaskDialog(activity, fragmentObj);
         });
 
     }

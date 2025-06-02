@@ -346,6 +346,7 @@ class HideMainUIListPluginPart : IPlugin {
                             }
 
                         }
+                        //field_editingMsg 上次输入框输入的内容，没有发送出去
                         XposedHelpers2.setObjectField(itemData, "field_content", "")
                         XposedHelpers2.setObjectField(itemData, "field_digest", "")
                         XposedHelpers2.setObjectField(itemData, "field_unReadCount", 0)
