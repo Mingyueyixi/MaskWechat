@@ -65,6 +65,15 @@ v1.13版本开始，默认隐藏App在桌面的图标。隐藏以后，打开模
 - 微信/QQ不支持通过此类链接跳转
 - 自行配置 html 如：`<a href="maskwechat://com.lu.wxmask">maskwechat://com.lu.wxmask</a>`
 
+### 聊天页面输入框口令（Since v2.5）
+
+支持在聊天页面的输入框根据输入特定文字执行任务：
+#add：加入隐藏列表；  
+#show：临时解除；  
+#hide：临时隐藏，离开聊天页面就无效了；  
+#del：从隐藏列表中移除；  
+#copyId： 复制wxid；  
+
 ## 适配版本
 
 play store版本：  
@@ -94,6 +103,10 @@ play store版本：
 8.0.47 (2560) 2024-02-01
 8.0.49 (2600) 2024-04-22
 8.0.50 (2701) 2024-07-02
+8.0.51 (2720) 2024-09-14
+8.0.55 (2740) 2024-12-16
+8.0.56 (2800) 2025-01-07
+8.0.58 (2841) 2025-04-22
 
 **PS.**
 - 仅支持上述版本，所有其他版本号以及32位版本未经测试，预计百分之九十九不可用
@@ -180,6 +193,12 @@ SHA1: E98D7BA57E14E927D1E37D04E0B099E9B5C4A73F
 
 8.0.53（2740）[https://dldir1.qq.com/weixin/android/weixin8053android2740_0x28003532_arm64.apk](https://dldir1.qq.com/weixin/android/weixin8053android2740_0x28003532_arm64.apk)  
 SHA1: 249366AE1497D1089709D8EC6DEE1401141719B4  
+
+8.0.56（2800）[https://dldir1.qq.com/weixin/android/weixin8056android2800_0x280038f8_arm64.apk](https://dldir1.qq.com/weixin/android/weixin8056android2800_0x280038f8_arm64.apk)  
+SHA1: b4ac5f767499526553b8236203415bcacac5a68b
+
+8.0.58（2841）[https://dldir1v6.qq.com/weixin/android/weixin8058android2841_0x28003a3f_arm64.apk](https://dldir1v6.qq.com/weixin/android/weixin8058android2841_0x28003a3f_arm64.apk)  
+SHA1: 611660980f298079502545512d361db9f0a9216f
 
 推荐适配的最后两个版本，因为其他版本，作者自己不再使用
 

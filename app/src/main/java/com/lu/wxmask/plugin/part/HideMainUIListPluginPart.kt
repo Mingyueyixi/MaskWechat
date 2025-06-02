@@ -26,6 +26,7 @@ import com.lu.wxmask.util.ext.getViewId
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
+import kotlin.coroutines.Continuation
 
 /**
  * 主页UI（即微信底部“微信”Tab选中时所在页面）处理，消息、小红点相关逻辑
@@ -35,7 +36,7 @@ class HideMainUIListPluginPart : IPlugin {
         Constrant.WX_CODE_8_0_22 -> "aCW"
         in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_43 -> "k" // WX_CODE_PLAY_8_0_42 matches
         Constrant.WX_CODE_PLAY_8_0_48 -> "l"
-        Constrant.WX_CODE_8_0_49, Constrant.WX_CODE_8_0_51 -> "l"
+        Constrant.WX_CODE_8_0_49, Constrant.WX_CODE_8_0_51,  Constrant.WX_CODE_8_0_56 -> "l"
         Constrant.WX_CODE_8_0_50 -> "n"
         Constrant.WX_CODE_8_0_53 -> "m"
         else -> "m"
@@ -276,7 +277,7 @@ class HideMainUIListPluginPart : IPlugin {
             in Constrant.WX_CODE_8_0_43..Constrant.WX_CODE_8_0_44 -> "com.tencent.mm.ui.h3"
             in Constrant.WX_CODE_8_0_43..Constrant.WX_CODE_8_0_47,
             Constrant.WX_CODE_PLAY_8_0_48, Constrant.WX_CODE_8_0_50, Constrant.WX_CODE_8_0_51, Constrant.WX_CODE_8_0_53, Constrant.WX_CODE_8_0_56,-> "com.tencent.mm.ui.i3"
-
+            Constrant.WX_CODE_8_0_58 -> "com.tencent.mm.ui.k3"
             else -> null
         }
         var getItemMethod = if (adapterClazzName != null) {

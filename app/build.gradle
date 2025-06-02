@@ -61,12 +61,12 @@ this.afterEvaluate {
 
 android {
     namespace 'com.lu.wxmask'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.lu.wxmask"
         minSdk 24
-        targetSdk 35
+        targetSdk 36
         versionCode 1005
         versionName "2.5-凹凸"
 

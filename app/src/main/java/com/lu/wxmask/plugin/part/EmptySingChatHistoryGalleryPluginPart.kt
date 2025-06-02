@@ -94,7 +94,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
             in Constrant.WX_CODE_8_0_43..Constrant.WX_CODE_8_0_44, Constrant.WX_CODE_PLAY_8_0_48 -> "z"
             in Constrant.WX_CODE_8_0_44..Constrant.WX_CODE_8_0_45 -> "A"
             Constrant.WX_CODE_8_0_47 -> "B"
-            Constrant.WX_CODE_8_0_49, Constrant.WX_CODE_8_0_51, Constrant.WX_CODE_8_0_56 -> "y"
+            Constrant.WX_CODE_8_0_49, Constrant.WX_CODE_8_0_51, Constrant.WX_CODE_8_0_56 , Constrant.WX_CODE_8_0_58 -> "y"
             Constrant.WX_CODE_8_0_50 -> "K"
             Constrant.WX_CODE_8_0_53 -> "z"
             else -> "l"
@@ -293,7 +293,7 @@ class EmptySingChatHistoryGalleryPluginPart : IPlugin {
             Constrant.WX_CODE_8_0_49 -> "F"
             Constrant.WX_CODE_8_0_50 -> "D"
             in Constrant.WX_CODE_8_0_51..Constrant.WX_CODE_8_0_56 -> "I"
-
+            Constrant.WX_CODE_8_0_58 -> "R"
             else -> null
         }
         LogUtil.d("setEmptyActionBarTabPageUI method is :", commonHookMethodName)
