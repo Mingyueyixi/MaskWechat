@@ -107,6 +107,7 @@ play store版本：
 8.0.55 (2740) 2024-12-16
 8.0.56 (2800) 2025-01-07
 8.0.58 (2841) 2025-04-22
+8.0.60 （2860）2025-06-06
 
 **PS.**
 - 仅支持上述版本，所有其他版本号以及32位版本未经测试，预计百分之九十九不可用
@@ -199,6 +200,9 @@ SHA1: b4ac5f767499526553b8236203415bcacac5a68b
 
 8.0.58（2841）[https://dldir1v6.qq.com/weixin/android/weixin8058android2841_0x28003a3f_arm64.apk](https://dldir1v6.qq.com/weixin/android/weixin8058android2841_0x28003a3f_arm64.apk)  
 SHA1: 611660980f298079502545512d361db9f0a9216f
+
+8.0.60（2860）[https://dldir1v6.qq.com/weixin/android/weixin8060android2860_0x28003c39_arm64.apk](https://dldir1v6.qq.com/weixin/android/weixin8060android2860_0x28003c39_arm64.apk)
+SHA1: 6ce8c31fa3757205a052491694868cfce4c5ee72
 
 推荐适配的最后两个版本，因为其他版本，作者自己不再使用
 

@@ -5,6 +5,7 @@ import com.lu.magic.util.AppUtil
 
 interface ClazzN {
     companion object {
+        const val ChattingUIProxy = "com.tencent.mm.ui.chatting.ChattingUIProxy"
         const val BaseChattingUIFragment = "com.tencent.mm.ui.chatting.BaseChattingUIFragment"
         const val LauncherUI = "com.tencent.mm.ui.LauncherUI"
         const val ChattingUI = "com.tencent.mm.ui.chatting.ChattingUI"

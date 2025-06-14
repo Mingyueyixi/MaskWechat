@@ -1,16 +1,13 @@
 package com.lu.wxmask.util.ext
 
-import android.graphics.Color
 import android.widget.TextView
 import com.google.gson.JsonObject
 import com.lu.magic.util.AppUtil
-import com.lu.magic.util.ColorUtil
 import com.lu.magic.util.GsonUtil
 import com.lu.magic.util.ResUtil
 import com.lu.magic.util.SizeUtil
+import com.lu.wxmask.ClazzN
 import com.lu.wxmask.util.ColorUtilX
-import kotlin.math.roundToLong
-import kotlin.time.times
 
 
 val sizeIntCache = HashMap<String, Int>()
@@ -55,6 +52,7 @@ fun CharSequence?.toIntElse(fallback: Int): Int = try {
 } catch (e: Exception) {
     fallback
 }
+
 fun CharSequence?.toLongElse(fallback: Long): Long = try {
     if (this == null) {
         fallback
@@ -103,10 +101,12 @@ fun Long.mills2Day(): Int {
 /**
  * 天数文本转毫秒数
  */
-fun TextView?.dayText2Mills(fallback : Long=0): Long {
+fun TextView?.dayText2Mills(fallback: Long = 0): Long {
     try {
         return this?.text?.toString()?.toLongOrNull()?.day2Mills() ?: fallback
     } catch (e: Exception) {
     }
     return fallback
 }
+
+val String.OfClass: Class<*>? get() = ClazzN.from(this)
