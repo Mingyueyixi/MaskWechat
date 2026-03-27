@@ -70,6 +70,7 @@ class AppVersionUtil {
                 Constrant.WX_CODE_8_0_53,
                 Constrant.WX_CODE_8_0_56,
                 Constrant.WX_CODE_8_0_58
+                const val WX_CODE_8_0_69
                 -> true
 
                 else -> false
