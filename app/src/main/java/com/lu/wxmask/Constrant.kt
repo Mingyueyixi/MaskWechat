@@ -29,6 +29,7 @@ class Constrant {
 
         /** 静默模式，点击符合条件的用户，进行静默处理，即无反应，不能发起聊天 */
         const val WX_MASK_TIP_MODE_SILENT = 10086
+
         const val WX_MASK_TIP_ALERT_MESS_DEFAULT = "该用户已对您私密（拉黑），请联系对方解除~"
 
         //微信版本号
@@ -61,11 +62,11 @@ class Constrant {
         const val WX_CODE_8_0_53 = 2740
         const val WX_CODE_8_0_56 = 2800
         const val WX_CODE_8_0_58 = 2841
+        const val WX_CODE_8_0_60 = 2860
+        const val WX_CODE_8_0_76 = 3140  // 微信 8.0.76 版本码
 
         // Google Play Store
         const val WX_CODE_PLAY_8_0_42 = 2429
         const val WX_CODE_PLAY_8_0_48 = 2589
-
     }
-
 }

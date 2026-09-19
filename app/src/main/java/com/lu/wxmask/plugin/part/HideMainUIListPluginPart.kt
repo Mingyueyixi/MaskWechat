@@ -1,386 +1,110 @@
 package com.lu.wxmask.plugin.part
 
 import android.content.Context
-import android.graphics.Bitmap.Config
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ListAdapter
-import android.widget.ListView
-import android.widget.TextView
 import com.lu.lposed.api2.XC_MethodHook2
 import com.lu.lposed.api2.XposedHelpers2
 import com.lu.lposed.plugin.IPlugin
-import com.lu.magic.util.GsonUtil
-import com.lu.magic.util.ResUtil
 import com.lu.magic.util.log.LogUtil
-import com.lu.magic.util.view.ChildDeepCheck
-import com.lu.wxmask.ClazzN
 import com.lu.wxmask.Constrant
 import com.lu.wxmask.MainHook
-import com.lu.wxmask.plugin.WXConfigPlugin
 import com.lu.wxmask.plugin.WXMaskPlugin
-import com.lu.wxmask.plugin.ui.MaskUtil
 import com.lu.wxmask.util.AppVersionUtil
 import com.lu.wxmask.util.ConfigUtil
-import com.lu.wxmask.util.ext.getViewId
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import java.lang.reflect.Method
-import java.lang.reflect.Modifier
-import kotlin.coroutines.Continuation
 
 /**
- * 主页UI（即微信底部“微信”Tab选中时所在页面）处理，消息、小红点相关逻辑
+ * 主页UI（微信Tab消息列表）处理插件
+ * 
+ * 8.0.76 终极精准拦截点：
+ * 微信在主页绘制最后一条消息摘要时，调用了核心格式化方法：
+ * nh5.b.l(Context, k4, x, int) -> 返回 CharSequence
+ * 
+ * 我们只要在此处判断：如果 k4.field_username 属于配置的私密用户：
+ * 1. 直接返回 ""（空字符串），主页摘要瞬间消失！
+ * 2. 同时将 k4 的 unReadCount、UnReadInvite 等清零。
+ * 
+ * 优势：
+ * - 绝对不碰任何 View 树（零 View 错位、零红点拉伸变形）
+ * - 绝对不涉及 View 复用污染（每个条目的文字都是实时调此方法生成的）
+ * - 完美适配 8.0.76！
  */
 class HideMainUIListPluginPart : IPlugin {
-    val GetItemMethodName = when (AppVersionUtil.getVersionCode()) {
-        Constrant.WX_CODE_8_0_22 -> "aCW"
-        in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_43 -> "k" // WX_CODE_PLAY_8_0_42 matches
-        Constrant.WX_CODE_PLAY_8_0_48 -> "l"
-        Constrant.WX_CODE_8_0_49, Constrant.WX_CODE_8_0_51,  Constrant.WX_CODE_8_0_56 -> "l"
-        Constrant.WX_CODE_8_0_50 -> "n"
-        Constrant.WX_CODE_8_0_53 -> "m"
-        else -> "m"
-    }
 
     override fun handleHook(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
-        runCatching {
-            handleMainUIChattingListView2(context, lpparam)
-        }.onFailure {
-            LogUtil.w("hide mainUI listview fail, try to old function.")
-            handleMainUIChattingListView(context, lpparam)
-        }
-
+        hookDigestFormatMethod(context)
+        hookConversationStorage(context)
     }
 
-    //隐藏指定用户的主页的消息
-    private fun handleMainUIChattingListView(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
-        val adapterName = when (AppVersionUtil.getVersionCode()) {
-            Constrant.WX_CODE_8_0_22 -> "com.tencent.mm.ui.conversation.k"
-            in Constrant.WX_CODE_8_0_32..Constrant.WX_CODE_8_0_34 -> {
-                if (AppVersionUtil.getVersionName() == "8.0.35") {
-                    "com.tencent.mm.ui.conversation.r"
-                } else {
-                    "com.tencent.mm.ui.conversation.p"
-                }
+    private fun hookDigestFormatMethod(context: Context) {
+        val nh5ClazzName = "nh5.b"
+        val nh5Clazz = XposedHelpers2.findClassIfExists(nh5ClazzName, context.classLoader)
+        if (nh5Clazz != null) {
+            val formatMethods = XposedHelpers2.findMethodsByExactPredicate(nh5Clazz) { m ->
+                m.name == "l" && m.parameterTypes.size == 4 && CharSequence::class.java.isAssignableFrom(m.returnType)
             }
+            if (formatMethods.isNotEmpty()) {
+                val method = formatMethods[0]
+                XposedHelpers2.hookMethod(
+                    method,
+                    object : XC_MethodHook2() {
+                        override fun beforeHookedMethod(param: MethodHookParam) {
+                            val k4Obj = param.args[1] ?: return
+                            val username = try {
+                                XposedHelpers2.getObjectField<String?>(k4Obj, "field_username")
+                            } catch (e: Throwable) {
+                                null
+                            }
+                            if (!username.isNullOrEmpty() && WXMaskPlugin.containChatUser(username)) {
+                                // 强制返回空，清空主页最后一条消息
+                                param.result = ""
+                            }
+                        }
+                    }
+                )
+                LogUtil.i("Successfully hooked nh5.b.l for WeChat 8.0.76 digest format")
+            }
+        }
+    }
 
-            Constrant.WX_CODE_8_0_35 -> "com.tencent.mm.ui.conversation.r"
-            in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_41 -> "com.tencent.mm.ui.conversation.x" // WX_CODE_PLAY_8_0_42 matches
-            Constrant.WX_CODE_8_0_47 -> "com.tencent.mm.ui.conversation.p3"
-            Constrant.WX_CODE_8_0_50 -> "com.tencent.mm.ui.conversation.q3"
-            else -> null
+    private fun hookConversationStorage(context: Context) {
+        // hook getItem / f(int) 清零未读红点与会话内容
+        val adapterClazzName = when (AppVersionUtil.getVersionCode()) {
+            Constrant.WX_CODE_8_0_76 -> "fh5.w0"
+            else -> "fh5.w0"
         }
-        var adapterClazz: Class<*>? = null
-        if (adapterName != null) {
-            adapterClazz = ClazzN.from(adapterName, context.classLoader)
-        }
-        if (adapterClazz != null) {
-            LogUtil.d("WeChat MainUI main Tap List Adapter", adapterClazz)
-            hookListViewAdapter(adapterClazz)
-        } else {
-            LogUtil.w("WeChat MainUI not found Adapter for ListView, guess start.")
-            val setAdapterMethod = XposedHelpers2.findMethodExactIfExists(
-                ListView::class.java.name,
-                context.classLoader,
-                "setAdapter",
-                ListAdapter::class.java
-            )
-            if (setAdapterMethod == null) {
-                LogUtil.w("setAdapterMethod is null")
-                return
-            }
+        val adapterClass = XposedHelpers2.findClassIfExists(adapterClazzName, context.classLoader) ?: return
+        val getItemMethod = XposedHelpers2.findMethodExactIfExists(adapterClass, "f", Integer.TYPE)
+            ?: XposedHelpers2.findMethodExactIfExists(adapterClass, "getItem", Integer.TYPE)
+
+        if (getItemMethod != null) {
             XposedHelpers2.hookMethod(
-                setAdapterMethod,
+                getItemMethod,
                 object : XC_MethodHook2() {
                     override fun afterHookedMethod(param: MethodHookParam) {
-                        val adapter = param.args[0] ?: return
-                        LogUtil.i("hook List adapter ", adapter)
-                        if (adapter::class.java.name.startsWith("com.tencent.mm.ui.conversation")) {
-                            LogUtil.w(AppVersionUtil.getSmartVersionName(), "guess adapter: ", adapter)
-                            hookListViewAdapter(adapter.javaClass)
-                        }
-                    }
-                }
-            )
-
-        }
-
-    }
-
-    private fun hookListViewAdapter(adapterClazz: Class<*>) {
-        val getViewMethod: Method = XposedHelpers2.findMethodExactIfExists(
-            adapterClazz,
-            "getView",
-            java.lang.Integer.TYPE,
-            View::class.java,
-            ViewGroup::class.java
-        ) ?: return
-        val getViewMethodIDText = getViewMethod.toString()
-        if (MainHook.uniqueMetaStore.contains(getViewMethodIDText)) {
-            return
-        }
-        LogUtil.w(getViewMethod)
-        val baseConversationClazz = ClazzN.from(ClazzN.BaseConversation)
-        XposedHelpers2.hookMethod(
-            getViewMethod,
-            object : XC_MethodHook2() {
-
-                override fun afterHookedMethod(param: MethodHookParam) {
-                    val adapter: ListAdapter = param.thisObject as ListAdapter
-                    val position: Int = (param.args[0] as? Int?) ?: return
-                    val itemData: Any = adapter.getItem(position) ?: return
-
-                    LogUtil.d("after getView", adapter.javaClass, GsonUtil.toJson(itemData))
-                    if (baseConversationClazz?.isAssignableFrom(itemData.javaClass) != true
-                        && !itemData::class.java.name.startsWith("com.tencent.mm.storage")
-                    ) {
-                        //不是所需类型
-                        //LogUtil.d(chatUser, GsonUtil.toJson(itemData))
-                        LogUtil.w(
-                            AppVersionUtil.getSmartVersionName(),
-                            "类型检查错误，尝试继续",
-                            itemData::class.java,
-                            itemData::class.java.classes
-                        )
-                    }
-                    val chatUser: String = XposedHelpers2.getObjectField(itemData, "field_username") ?: return
-                    val itemView: View = param.args[1] as? View ?: return
-                    if (WXMaskPlugin.containChatUser(chatUser)) {
-                        hideUnReadTipView(itemView, param)
-                        hideMsgViewItemText(itemView, param)
-//                        hideLastMsgTime(itemView, param)
-                    }
-                }
-
-                //消息条目，时间，暂不隐藏？改成去年？
-                private fun hideLastMsgTime(itemView: View, params: MethodHookParam) {
-                    val viewId = ResUtil.getViewId("l0s")
-                    itemView.findViewById<View>(viewId)?.visibility = View.INVISIBLE
-
-                }
-
-                //隐藏未读消息红点
-                private fun hideUnReadTipView(itemView: View, param: MethodHookParam) {
-                    //带文字的未读红点
-                    // Res TextView under com.tencent.mm.ui.conversation.ConversationFolderItemView
-                    val tipTvIdTextID = when (AppVersionUtil.getVersionCode()) {
-                        in 0..Constrant.WX_CODE_8_0_22 -> "tipcnt_tv"
-                        Constrant.WX_CODE_PLAY_8_0_42 -> "oqu"
-                        in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_41 -> "kmv"
-                        else -> "kmv"
-                    }
-                    val tipTvId = ResUtil.getViewId(tipTvIdTextID)
-                    itemView.findViewById<View>(tipTvId)?.visibility = View.INVISIBLE
-
-                    //头像上的小红点
-                    val small_red = when (AppVersionUtil.getVersionCode()) {
-                        in 0..Constrant.WX_CODE_8_0_40 -> "a2f"
-                        Constrant.WX_CODE_PLAY_8_0_42 -> "a_w"
-                        Constrant.WX_CODE_8_0_41 -> "o_u"
-                        else -> "o_u"
-                    }
-                    val viewId = ResUtil.getViewId(small_red)
-                    itemView.findViewById<View>(viewId)?.visibility = View.INVISIBLE
-                }
-
-                //隐藏最后一条消息等
-                private fun hideMsgViewItemText(itemView: View, param: MethodHookParam) {
-                    // Res com.tencent.mm.ui.base.NoMeasuredTextView (tag last_msg_tv) under com.tencent.mm.ui.conversation.ConversationFolderItemView
-                    val msgTvIdName = when (AppVersionUtil.getVersionCode()) {
-                        in 0..Constrant.WX_CODE_8_0_22 -> "last_msg_tv"
-                        in Constrant.WX_CODE_8_0_22..Constrant.WX_CODE_8_0_40 -> "fhs"
-                        Constrant.WX_CODE_PLAY_8_0_42 -> "i2_"
-                        Constrant.WX_CODE_8_0_41 -> "ht5"
-                        else -> "ht5"
-                    }
-                    val lastMsgViewId = ResUtil.getViewId(msgTvIdName)
-                    LogUtil.d("mask last msg textView", lastMsgViewId)
-                    if (lastMsgViewId != 0 && lastMsgViewId != View.NO_ID) {
-                        try {
-                            val msgTv: View? = itemView.findViewById(lastMsgViewId)
-                            XposedHelpers2.callMethod<Any?>(msgTv, "setText", "")
+                        val itemData: Any = param.result ?: return
+                        val chatUser: String? = try {
+                            XposedHelpers2.getObjectField(itemData, "field_username")
                         } catch (e: Throwable) {
-                            LogUtil.w("error", e)
+                            null
                         }
-                    } else {
-                        //
-                        LogUtil.w("主页last消息id版本不适配，开启暴力隐藏", AppVersionUtil.getSmartVersionName())
-                        val ClazzNoMeasuredTextView = ClazzN.from("com.tencent.mm.ui.base.NoMeasuredTextView")
-                        ChildDeepCheck().each(itemView) { child ->
+                        if (chatUser.isNullOrEmpty()) return
+
+                        if (WXMaskPlugin.containChatUser(chatUser)) {
                             try {
-                                if (ClazzNoMeasuredTextView?.isAssignableFrom(child::class.java) == true
-                                    || TextView::class.java.isAssignableFrom(child::class.java)
-                                ) {
-                                    XposedHelpers2.callMethod<String?>(child, "setText", "")
-                                }
+                                XposedHelpers2.setObjectField(itemData, "field_content", "")
+                                XposedHelpers2.setObjectField(itemData, "field_digest", "")
+                                XposedHelpers2.setObjectField(itemData, "field_unReadCount", 0)
+                                XposedHelpers2.setObjectField(itemData, "field_UnReadInvite", 0)
+                                XposedHelpers2.setObjectField(itemData, "field_unReadMuteCount", 0)
+                                XposedHelpers2.setObjectField(itemData, "field_msgType", "1")
                             } catch (e: Throwable) {
                             }
                         }
                     }
-
                 }
-
-            })
-        MainHook.uniqueMetaStore.add(getViewMethodIDText)
+            )
+            LogUtil.i("Successfully hooked getItem method: $getItemMethod")
+        }
     }
-
-
-    private fun findGetItemMethod(adapterClazz: Class<*>?): Method? {
-        if (adapterClazz == null) {
-            return null
-        }
-        var method: Method? = XposedHelpers2.findMethodExactIfExists(adapterClazz, GetItemMethodName, Integer.TYPE)
-        if (method != null) {
-            return method
-        }
-        var methods = XposedHelpers2.findMethodsByExactPredicate(adapterClazz) { m ->
-            val ret = !arrayOf(
-                Object::class.java,
-                String::class.java,
-                Byte::class.java,
-                Short::class.java,
-                Long::class.java,
-                Float::class.java,
-                Double::class.java,
-                String::class.java,
-                java.lang.Byte.TYPE,
-                java.lang.Short.TYPE,
-                java.lang.Integer.TYPE,
-                java.lang.Long.TYPE,
-                java.lang.Float.TYPE,
-                java.lang.Double.TYPE,
-                java.lang.Void.TYPE
-            ).contains(m.returnType)
-            val paramVail = m.parameterTypes.size == 1 && m.parameterTypes[0] == Integer.TYPE
-            return@findMethodsByExactPredicate paramVail && ret && Modifier.isPublic(m.modifiers) && !Modifier.isAbstract(m.modifiers)
-        }
-        if (methods.size > 0) {
-            method = methods[0]
-            if (methods.size > 1) {
-                LogUtil.d("find getItem methods: []--> " + methods.joinToString("\n"))
-            }
-            LogUtil.d("guess getItem method $method")
-        }
-        return method
-    }
-
-    private fun handleMainUIChattingListView2(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
-        //listAdapter getItem方法被重命名了
-        //8.0.32-8.0.34 com.tencent.mm.ui.y
-        //8.0.35-8.0.37　　com.tencent.mm.ui.z
-        //搞实际Adapter的父类，是个抽象类
-        val adapterClazzName = when (AppVersionUtil.getVersionCode()) {
-            Constrant.WX_CODE_8_0_22 -> "com.tencent.mm.ui.g"
-            in Constrant.WX_CODE_8_0_32..Constrant.WX_CODE_8_0_34 -> "com.tencent.mm.ui.y"
-            in Constrant.WX_CODE_8_0_35..Constrant.WX_CODE_8_0_38 -> "com.tencent.mm.ui.z"
-            in Constrant.WX_CODE_8_0_40..Constrant.WX_CODE_8_0_43 -> "com.tencent.mm.ui.b0" // WX_CODE_PLAY_8_0_42 matches
-            in Constrant.WX_CODE_8_0_43..Constrant.WX_CODE_8_0_44 -> "com.tencent.mm.ui.h3"
-            in Constrant.WX_CODE_8_0_43..Constrant.WX_CODE_8_0_47,
-            Constrant.WX_CODE_PLAY_8_0_48, Constrant.WX_CODE_8_0_50, Constrant.WX_CODE_8_0_51, Constrant.WX_CODE_8_0_53, Constrant.WX_CODE_8_0_56,-> "com.tencent.mm.ui.i3"
-            Constrant.WX_CODE_8_0_58 -> "com.tencent.mm.ui.k3"
-            else -> null
-        }
-        var getItemMethod = if (adapterClazzName != null) {
-            findGetItemMethod(ClazzN.from(adapterClazzName))
-        } else {
-            null
-        }
-        if (getItemMethod != null) {
-            hookListViewGetItem(getItemMethod)
-            return
-        }
-
-
-        LogUtil.w("WeChat MainUI ListView not found adapter, guess start.")
-        XposedHelpers2.findAndHookMethod(
-            ListView::class.java,
-            "setAdapter",
-            ListAdapter::class.java,
-            object : XC_MethodHook2() {
-                private var isHookGetItemMethod = false
-
-                override fun afterHookedMethod(param: MethodHookParam) {
-                    val adapter = param.args[0] ?: return
-                    LogUtil.d("List adapter ", adapter)
-                    if (adapter::class.java.name.startsWith("com.tencent.mm.ui.conversation")) {
-                        if (isHookGetItemMethod) {
-                            return
-                        }
-                        LogUtil.w(AppVersionUtil.getSmartVersionName(), "guess setAdapter: ", adapter, adapter.javaClass.superclass)
-                        var getItemMethod = findGetItemMethod(adapter::class.java.superclass)
-//                        getItemMethod = XposedHelpers2.findMethodExactIfExists(adapter::class.java.superclass, GetItemMethodName, Integer.TYPE)
-                        if (getItemMethod == null) {
-                            getItemMethod = XposedHelpers2.findMethodExactIfExists(adapter::class.java.superclass, "getItem", Integer.TYPE)
-                        }
-                        if (getItemMethod != null) {
-                            hookListViewGetItem(getItemMethod)
-                            isHookGetItemMethod = true
-                        } else {
-                            LogUtil.w("guess getItem method is ", getItemMethod)
-                        }
-                    }
-                }
-            }
-        )
-
-    }
-
-    private fun hookListViewGetItem(getItemMethod: Method) {
-        LogUtil.d(">>>>>>>>>>.", getItemMethod)
-
-        XposedHelpers2.hookMethod(
-            getItemMethod,
-            object : XC_MethodHook2() {
-                override fun afterHookedMethod(param: MethodHookParam) {
-                    val itemData: Any = param.result ?: return
-                    val chatUser: String? = XposedHelpers2.getObjectField(itemData, "field_username")
-                    if (chatUser == null) {
-                        LogUtil.w("chat user is null")
-                        return
-                    }
-                    if (WXMaskPlugin.containChatUser(chatUser)) {
-//                        LogUtil.i("item-data", GsonUtil.toJson(itemData))
-                        val option = ConfigUtil.getOptionData()
-                        if (option.enableMapConversation) {
-                            var maskBean = WXMaskPlugin.getMaskBeamById(chatUser)?.let {
-                                XposedHelpers2.setObjectField(itemData, "field_username", it.mapId)
-                            }
-
-                        }
-                        //field_editingMsg 上次输入框输入的内容，没有发送出去
-                        XposedHelpers2.setObjectField(itemData, "field_content", "")
-                        XposedHelpers2.setObjectField(itemData, "field_digest", "")
-                        XposedHelpers2.setObjectField(itemData, "field_unReadCount", 0)
-                        XposedHelpers2.setObjectField(itemData, "field_UnReadInvite", 0)
-                        XposedHelpers2.setObjectField(itemData, "field_unReadMuteCount", 0)
-                        //标注成文本消息，不显示表情等
-                        XposedHelpers2.setObjectField(itemData, "field_msgType", "1")
-
-                        if (option.enableTravelTime && option.travelTime != 0L) {
-                            val cTime = XposedHelpers2.getObjectField<Any>(itemData, "field_conversationTime")
-                            if (cTime is Long) {
-                                XposedHelpers2.setObjectField(itemData, "field_conversationTime", cTime - option.travelTime)
-                            }
-                        }
-                        // 恢复被置底的好友
-                        // try {
-                        //     val cTime = XposedHelpers2.getObjectField<Any>(itemData, "field_conversationTime")
-                        //     val fieldFlag = XposedHelpers2.getObjectField<Any>(itemData, "field_flag")
-                        //     if (cTime != null && fieldFlag != cTime) {
-                        //         XposedHelpers2.setObjectField(itemData, "field_flag", cTime)
-                        //     }
-                        // } catch (e: Exception) {
-                        //     e.printStackTrace()
-                        // }
-
-                    }
-
-
-                }
-
-            }
-        )
-    }
-
-
 }
